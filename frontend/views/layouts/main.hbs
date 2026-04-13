@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} | Tunisie Authentique</title>
+  <title>{{#if title}}{{title}} | Tunisie Authentique{{else}}Tunisie Authentique{{/if}}</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Découvrez la Tunisie, ses régions, guides et trésors cachés. Expériences authentiques et voyages inoubliables.">
+  <meta name="keywords" content="Tunisie, tourisme, voyage, guides, gouvernorats, authentique">
+  <meta name="author" content="Tunisie Authentique">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -164,6 +169,30 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen text-gray-900 overflow-x-hidden">
 
+  <!-- Loader -->
+  <div id="loader" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-ocean-blue"></div>
+  </div>
+
+  <!-- Flash Messages -->
+  {{#if success}}
+    <div class="fixed top-20 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-up">
+      <div class="flex items-center">
+        <i class="fas fa-check-circle mr-2"></i>
+        {{success}}
+      </div>
+    </div>
+  {{/if}}
+
+  {{#if error}}
+    <div class="fixed top-20 right-5 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-up">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        {{error}}
+      </div>
+    </div>
+  {{/if}}
+
   <!-- Navigation -->
   {{#unless hideNavbar}}
     {{> navbar}}
@@ -178,5 +207,50 @@
   {{#unless hideFooter}}
     {{> footer}}
   {{/unless}}
+  {{> footer}}
+
+  <!-- Scroll to Top Button -->
+  <button onclick="window.scrollTo({top:0, behavior:'smooth'})" 
+    class="fixed bottom-6 right-6 bg-ocean-blue text-white p-3 rounded-full shadow-lg hover:scale-110 transition-all duration-300 z-40 hover:bg-ocean-dark">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Global Scripts -->
+  <script>
+    // Loader
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loader');
+      if (loader) {
+        loader.style.display = 'none';
+      }
+    });
+
+    // Smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+
+    // Auto-hide flash messages after 5 seconds
+    setTimeout(() => {
+      const flashMessages = document.querySelectorAll('[class*="fixed top-20 right-5"]');
+      flashMessages.forEach(msg => {
+        msg.style.opacity = '0';
+        msg.style.transform = 'translateX(100%)';
+        setTimeout(() => msg.remove(), 300);
+      });
+    }, 5000);
+
+    // Scroll to top button visibility
+    window.addEventListener('scroll', () => {
+      const scrollButton = document.querySelector('button[onclick*="scrollTo"]');
+      if (scrollButton) {
+        if (window.pageYOffset > 300) {
+          scrollButton.style.opacity = '1';
+          scrollButton.style.pointerEvents = 'auto';
+        } else {
+          scrollButton.style.opacity = '0';
+          scrollButton.style.pointerEvents = 'none';
+        }
+      }
+    });
+  </script>
 </body>
 </html>

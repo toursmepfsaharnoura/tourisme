@@ -110,7 +110,7 @@ exports.getGuideAvis = async (req, res) => {
     res.render('guide/avis', {
       user: req.session.user,
       avis: enrichedAvis,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Error getting guide avis:', err);

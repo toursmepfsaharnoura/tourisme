@@ -49,7 +49,7 @@ exports.getGuides = async (req, res) => {
     res.render('guides', { 
       guides: featuredGuides,
       user: req.session.user || null,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error(err);

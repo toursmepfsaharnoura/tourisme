@@ -2,6 +2,34 @@ const Delegation = require('../models/Delegation');
 const Gouvernorat = require('../models/Gouvernorat');
 
 /**
+ * Get all delegations (public view)
+ */
+exports.getAllDelegations = async (req, res) => {
+  try {
+    const delegations = await Delegation.findAll();
+    
+    // Get governorat information for each delegation
+    const delegationsWithGouvernorat = await Promise.all(
+      delegations.map(async (delegation) => {
+        const gouvernorat = await Gouvernorat.findById(delegation.id_gouvernorat);
+        return {
+          ...delegation,
+          gouvernorat_nom: gouvernorat ? gouvernorat.nom : 'Inconnu'
+        };
+      })
+    );
+    
+    res.render('delegations', {
+      delegations: delegationsWithGouvernorat,
+      user: req.session.user
+    });
+  } catch (error) {
+    console.error('Error getting all delegations:', error);
+    res.status(500).render('404', { url: req.originalUrl });
+  }
+};
+
+/**
  * Get delegation detail page (public view)
  */
 exports.getDelegationDetail = async (req, res) => {

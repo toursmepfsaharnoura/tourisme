@@ -22,7 +22,7 @@
             <i class="fas fa-home text-sm"></i>
             <span>Accueil</span>
           </a>
-          <a href="/touriste/gouvernorat/1" class="text-gray-900 hover:text-ocean-blue transition-colors duration-300 font-medium flex items-center space-x-2">
+          <a href="/gouvernorats/1/delegations" class="text-gray-900 hover:text-ocean-blue transition-colors duration-300 font-medium flex items-center space-x-2">
             <i class="fas fa-map-marked-alt text-sm"></i>
             <span>Destinations</span>
           </a>
@@ -34,6 +34,10 @@
             <i class="fas fa-user-tie text-sm"></i>
             <span>Guides</span>
           </a>
+          <a href="/delegations" class="text-gray-900 hover:text-ocean-blue transition-colors duration-300 font-medium flex items-center space-x-2">
+            <i class="fas fa-map-marked-alt text-sm"></i>
+            <span>Délégations</span>
+          </a>
         </div>
         
         <!-- User Actions -->
@@ -41,10 +45,22 @@
           {{#if user}}
             <!-- Notifications -->
             <div class="relative">
-              <button class="text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50">
-                <i class="fas fa-bell text-lg"></i>
-                <span class="absolute -top-1 -right-1 w-5 h-5 desert-orange rounded-full text-xs font-bold flex items-center justify-center text-white">3</span>
-              </button>
+              {{#if (eq user.role 'GUIDE')}}
+                <a href="/notifications/guide" class="text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50 relative">
+                  <i class="fas fa-bell text-lg"></i>
+                  <span id="notifCount" class="absolute -top-1 -right-1 w-5 h-5 desert-orange rounded-full text-xs font-bold flex items-center justify-center text-white">0</span>
+                </a>
+              {{else if (eq user.role 'ADMIN')}}
+                <a href="/admin/dashboard" class="text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50 relative">
+                  <i class="fas fa-bell text-lg"></i>
+                  <span class="absolute -top-1 -right-1 w-5 h-5 desert-orange rounded-full text-xs font-bold flex items-center justify-center text-white">3</span>
+                </a>
+              {{else}}
+                <button class="text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50">
+                  <i class="fas fa-bell text-lg"></i>
+                  <span class="absolute -top-1 -right-1 w-5 h-5 desert-orange rounded-full text-xs font-bold flex items-center justify-center text-white">3</span>
+                </button>
+              {{/if}}
             </div>
             
             <!-- Messages -->

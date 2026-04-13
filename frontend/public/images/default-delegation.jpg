@@ -1,0 +1,14 @@
+<!-- Placeholder image for delegations without images -->
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#F0FDF4"/>
+  <path d="M200 150 L180 120 L220 120 L200 150 Z" fill="#3B82F6" opacity="0.8"/>
+  <circle cx="200" cy="80" r="30" fill="#10B981" opacity="0.6"/>
+  <path d="M170 180 Q200 160 230 180" stroke="#059669" stroke-width="3" fill="none"/>
+  <path d="M230 180 Q200 160 170 180" stroke="#059669" stroke-width="3" fill="none"/>
+  <text x="200" y="250" text-anchor="middle" fill="#374151" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+    Délégation
+  </text>
+  <text x="200" y="270" text-anchor="middle" fill="#6B7280" font-family="Arial, sans-serif" font-size="12">
+    Image non disponible
+  </text>
+</svg>

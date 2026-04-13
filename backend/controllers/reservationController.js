@@ -81,7 +81,7 @@ exports.getGuideReservations = async (req, res) => {
     res.render('guide/reservations', {
       user: req.session.user,
       reservations: enrichedReservations,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Error getting guide reservations:', err);

@@ -1,18 +1,30 @@
 const Plan = require('../models/Plan');
 const Guide = require('../models/Guide');
 const PlanLieu = require('../models/PlanLieu');
-const Delegation = require('../models/Delegation');
-const Gouvernorat = require('../models/Gouvernorat');
-const User = require('../models/User');
 const db = require('../config/db');
+
+// Helper function to format dates
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return date.toLocaleDateString('fr-FR', options);
+};
+
+// Helper function to truncate text
+const truncateText = (text, maxLength = 150) => {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+};
 
 /**
  * Get form to create a new plan
  */
 exports.getNewPlan = async (req, res) => {
   try {
-    // Get delegations with governorat names for the form
-    const delegations = await db.query(`
+    const [gouvernorats] = await db.query('SELECT * FROM gouvernorats ORDER BY nom');
+    const [delegations] = await db.query(`
       SELECT d.*, g.nom as gouvernorat_nom 
       FROM delegations d 
       LEFT JOIN gouvernorats g ON d.id_gouvernorat = g.id 
@@ -21,7 +33,9 @@ exports.getNewPlan = async (req, res) => {
 
     res.render('guide/create-plan', {
       user: req.session.user,
-      delegations: delegations[0]
+      governorates: gouvernorats,
+      delegations: delegations,
+      error: req.query.error || null
     });
   } catch (err) {
     console.error('Error getting new plan form:', err);
@@ -109,8 +123,12 @@ exports.createPlan = async (req, res) => {
       description,
       date_debut,
       date_fin,
-      prix
-    });
+      prix: parseFloat(prix),
+      max_participants: parseInt(max_participants),
+      id_gouvernorat: parseInt(id_gouvernorat),
+      id_delegation: parseInt(id_delegation),
+      image: imagePath
+    };
 
     // 3. Ajouter les lieux (si existent)
     const delegationIds = Array.isArray(lieux)
@@ -194,6 +212,28 @@ exports.getPlanDetails = async (req, res) => {
   } catch (err) {
     console.error('Error getting plan details:', err);
     res.status(500).send('Server error');
+  }
+};
+
+/**
+ * Get plan for view (HTML page)
+ */
+exports.getPlanForView = async (req, res) => {
+  const planId = req.params.id;
+
+  try {
+    const plan = await Plan.getFullDetails(planId);
+    if (!plan) {
+      return res.redirect('/plans?error=Plan non trouvé');
+    }
+
+    res.render('plans/show', {
+      user: req.session.user,
+      plan
+    });
+  } catch (err) {
+    console.error('Error getting plan view:', err);
+    res.redirect('/plans?error=Erreur serveur');
   }
 };
 
@@ -392,14 +432,23 @@ exports.duplicatePlan = async (req, res) => {
  */
 exports.getAllPlans = async (req, res) => {
   try {
-    const plans = await Plan.findAllWithDetails();
+    const filters = {
+      search: req.query.search,
+      min_price: req.query.min_price,
+      max_price: req.query.max_price,
+      gouvernorat_id: req.query.gouvernorat_id
+    };
+
+    const plans = await Plan.findAllWithFilters(filters);
+    const [gouvernorats] = await db.query('SELECT * FROM gouvernorats ORDER BY nom');
     
-    // Use public view for non-authenticated users, tourist view for logged-in users
     const template = req.session.user ? 'touriste/plans' : 'plans';
     
     res.render(template, {
       user: req.session.user,
-      plans
+      plans,
+      governorates: gouvernorats,
+      currentFilters: filters
     });
   } catch (err) {
     console.error('Error getting all plans:', err);

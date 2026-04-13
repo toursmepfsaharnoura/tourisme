@@ -1,6 +1,5 @@
 const Guide = require('../models/Guide');
 const User = require('../models/User');
-const Plan = require('../models/Plan');
 const Notification = require('../models/Notification');
 const Message = require('../models/Message');
 const path = require('path');
@@ -194,9 +193,86 @@ exports.uploadPhoto = async (req, res) => {
   }
 };
 
+const Plan = require('../models/Plan'); // تأكد من وجوده
+
 /**
- * Affiche la conversation entre le guide et l'administrateur.
+ * Afficher la page de création de plan
  */
+exports.getCreatePlan = async (req, res) => {
+  try {
+    res.render('guide/create-plan', {
+      user: req.session.user
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+};
+
+/**
+ * Créer un nouveau plan touristique
+ */
+exports.createPlan = async (req, res) => {
+  const userId = req.session.user.id;
+
+  const {
+    titre,
+    description,
+    prix,
+    date_debut,
+    date_fin,
+    max_participants,
+    id_gouvernorat,
+    id_delegation,
+    lieux
+  } = req.body;
+
+  try {
+    // Validation بسيطة
+    if (!titre || !description || !prix) {
+      return res.redirect('/guide/plans/new?error=Champs obligatoires manquants');
+    }
+
+    // إنشاء plan
+    await Plan.create({
+      id_guide: userId,
+      titre,
+      description,
+      prix,
+      date_debut,
+      date_fin,
+      max_participants,
+      id_gouvernorat,
+      id_delegation,
+      lieux
+    });
+
+    return res.redirect('/guide/plans?success=Plan créé avec succès');
+  } catch (err) {
+    console.error('❌ Erreur createPlan:', err);
+    return res.redirect('/guide/plans?error=Erreur lors de la création');
+  }
+};
+
+/**
+ * Liste des plans du guide
+ */
+exports.getPlans = async (req, res) => {
+  const userId = req.session.user.id;
+
+  try {
+    const plans = await Plan.findByGuide(userId);
+
+    res.render('guide/plans', {
+      user: req.session.user,
+      plans
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+};
+ 
 exports.getMessages = async (req, res) => {
   const guideId = req.session.user.id;
   try {
@@ -224,24 +300,58 @@ exports.getMessages = async (req, res) => {
 };
 
 /**
- * Envoie un message du guide à l'administrateur.
+ * Affiche la conversation entre le guide et l'admin
  */
-exports.sendMessage = async (req, res) => {
+exports.getConversation = async (req, res) => {
   const guideId = req.session.user.id;
-  const { contenu, type_message = 'TEXT' } = req.body;
-
-  if (!contenu || contenu.trim() === '') {
-    return res.redirect('/guide/messages');
-  }
-
+  
   try {
+    // Trouver l'administrateur
     const admin = await User.findAdmin();
     if (!admin) {
       return res.status(500).send('Aucun administrateur trouvé.');
     }
     const adminId = admin.id;
 
+    // Récupérer la conversation
+    const messages = await Message.findConversation(guideId, adminId);
+    
+    // Marquer les messages de l'admin comme lus
+    await Message.markConversationAsRead(adminId, guideId);
+
+    res.render('guide/conversation', {
+      user: req.session.user,
+      admin: admin,
+      messages: messages,
+      hideNavbar: true
+    });
+  } catch (err) {
+    console.error('❌ Erreur dans getConversation:', err);
+    res.status(500).send('Erreur serveur : ' + err.message);
+  }
+};
+
+/**
+ * Envoie un message du guide à l'administrateur.
+ */
+exports.sendMessage = async (req, res) => {
+  const guideId = req.session.user.id;
+  const { contenu, isResponse = false, type_message = 'TEXT' } = req.body;
+
+  if (!contenu || contenu.trim() === '') {
+    return res.status(400).json({ success: false, message: 'Le message ne peut pas être vide.' });
+  }
+
+  try {
+    const admin = await User.findAdmin();
+    if (!admin) {
+      return res.status(500).json({ success: false, message: 'Aucun administrateur trouvé.' });
+    }
+    const adminId = admin.id;
+
     await Message.create({
+    // Créer le message
+    const newMessageId = await Message.create({
       id_expediteur: guideId,
       id_destinataire: adminId,
       contenu: contenu.trim(),
@@ -251,13 +361,63 @@ exports.sendMessage = async (req, res) => {
     await Notification.create({
       id_utilisateur: adminId,
       type: 'MESSAGE',
-      contenu: `Nouveau message de ${req.session.user.nom_complet}`
+      contenu: `${isResponse ? 'Réponse de' : 'Nouveau message de'} ${req.session.user.nom_complet}: ${contenu.trim()}`
     });
 
-    res.redirect('/guide/messages');
+    // Envoyer la notification en temps réel à l'admin
+    const io = req.app.get('io');
+    if (io) {
+      io.to('adminRoom').emit('admin_notification', {
+        id: Date.now(),
+        message: `${isResponse ? 'Réponse de' : 'Nouveau message de'} ${req.session.user.nom_complet}`,
+        type: 'message',
+        from: req.session.user.nom_complet,
+        content: contenu.trim(),
+        date: new Date()
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Message envoyé avec succès!',
+      messageId: newMessageId
+    });
   } catch (err) {
     console.error('Erreur envoi message:', err);
     res.status(500).send('Erreur serveur : ' + err.message);
+    console.error('❌ Erreur envoi message:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erreur serveur : ' + err.message 
+    });
+  }
+};
+exports.markMessagesAsRead = async (req, res) => {
+  const guideId = req.session.user.id;
+  const { messageId } = req.body;
+
+  try {
+    if (messageId) {
+      // Marquer un message spécifique comme lu
+      await Message.markAsRead(messageId);
+    } else {
+      // Marquer tous les messages de l'admin comme lus
+      const admin = await User.findAdmin();
+      if (admin) {
+        await Message.markConversationAsRead(admin.id, guideId);
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Messages marqués comme lus' 
+    });
+  } catch (err) {
+    console.error('Erreur markMessagesAsRead:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erreur serveur : ' + err.message 
+    });
   }
 };
 

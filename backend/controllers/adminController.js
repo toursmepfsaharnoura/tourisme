@@ -5,6 +5,28 @@ const Notification = require('../models/Notification');
 const Message = require('../models/Message');
 const Plan = require('../models/Plan');
 
+// Helper function to format notifications
+const formatNotifications = (notifications) => {
+  return notifications.map(n => {
+    let contenu = n.contenu;
+
+    // Try to parse JSON content
+    try {
+      if (typeof contenu === 'string') {
+        contenu = JSON.parse(contenu);
+      }
+    } catch (e) {
+      // Keep as string if parsing fails
+    }
+
+    return {
+      ...n,
+      contenu,
+      isObject: typeof contenu === 'object'
+    };
+  });
+};
+
 /**
  * Affiche le tableau de bord administrateur avec statistiques et listes.
  */
@@ -19,6 +41,33 @@ exports.getDashboard = async (req, res) => {
       Plan.findAll().then(plans => plans.length)    // nombre total de plans
     ]);
 
+    // Get notifications by type for tabs
+    const [messageNotifications, reservationNotifications, cvNotifications] = await Promise.all([
+      Notification.findByType(adminId, 'MESSAGE'),
+      Notification.findByType(adminId, 'RESERVATION'),
+      Notification.findByType(adminId, 'CV')
+    ]);
+
+    // Get user information for messages and format them
+    const db = require('../config/db');
+    const messageNotificationsWithUsers = await Promise.all(
+      messageNotifications.map(async (notification) => {
+        const [userRows] = await db.query(
+          'SELECT nom_complet, email FROM utilisateurs WHERE id = ?',
+          [notification.id_utilisateur]
+        );
+        return {
+          ...notification,
+          sender: userRows[0] || { nom_complet: 'Utilisateur inconnu', email: '' }
+        };
+      })
+    );
+
+    // Format all notifications with proper JSON parsing
+    const formattedMessages = formatNotifications(messageNotificationsWithUsers);
+    const formattedPlans = formatNotifications(reservationNotifications);
+    const formattedDocuments = formatNotifications(cvNotifications);
+
     // 10 derniers guides actifs (avec leurs plans)
     const actifsAvecPlans = await Promise.all(
       guidesActifs.slice(0, 10).map(async (guide) => {
@@ -30,9 +79,22 @@ exports.getDashboard = async (req, res) => {
     // Notifications récentes
     const notifications = await Notification.findByUser(adminId, 10);
     const fixedGuidesAttente = guidesEnAttente.map(g => ({
-  ...g,
-  id: g.id_utilisateur
-}));
+      ...g,
+      id: g.id_utilisateur
+    }));
+
+    // Prepare notification data for tabs
+    const notificationTabs = {
+      messages: formattedMessages,
+      plans: formattedPlans,
+      documents: formattedDocuments,
+      unreadCounts: {
+        messages: formattedMessages.filter(n => !n.est_vu).length,
+        plans: formattedPlans.filter(n => !n.est_vu).length,
+        documents: formattedDocuments.filter(n => !n.est_vu).length
+      }
+    };
+
     res.render('admin/dashboard', {
       user: req.session.user,
       stats: {
@@ -44,7 +106,8 @@ exports.getDashboard = async (req, res) => {
       guides_actifs: actifsAvecPlans,
       guides_attente: fixedGuidesAttente,
       notifications,
-      layout: 'minimal'
+      notificationTabs,
+      layout: 'main'
     });
   } catch (err) {
     console.error('Erreur dashboard admin:', err);
@@ -61,7 +124,7 @@ exports.getCvAttente = async (req, res) => {
     res.render('admin/cv-attente', {
       user: req.session.user,
       cvs,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Erreur cv-attente:', err);
@@ -97,7 +160,7 @@ exports.getGuidesDocs = async (req, res) => {
     const list = await Guide.findPending(); // déjà fait
     res.render('admin/guides_docs', { 
       list,
-      layout: 'minimal' 
+      layout: 'main' 
     });
   } catch (err) {
     console.error('Erreur guides-docs:', err);
@@ -181,7 +244,7 @@ exports.getMessagesList = async (req, res) => {
     res.render('admin/messages', {
       messages: enriched,
       user: req.session.user,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Erreur liste messages:', err);
@@ -210,7 +273,7 @@ exports.getConversation = async (req, res) => {
       user: req.session.user,
       guide,
       messages,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Erreur conversation:', err);
@@ -285,7 +348,7 @@ exports.getReplyForm = async (req, res) => {
       guide,
       guideId: guide.id, // Ajouter explicitement l'ID du guide
       messages: messages.slice(-5), // 5 derniers messages
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Erreur formulaire réponse:', err);
@@ -320,9 +383,169 @@ exports.replyToGuide = async (req, res) => {
       contenu: `Nouvelle réponse de l'administrateur`
     });
 
+    // Envoyer la notification en temps réel au guide
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`guide_${guideId}`).emit('guide_message', {
+        id: Date.now(),
+        content: contenu.trim(),
+        from: 'admin',
+        date: new Date()
+      });
+    }
+
     res.redirect(`/admin/reply-message?guideId=${guideId}&success=Message envoyé avec succès`);
   } catch (err) {
     console.error('Erreur réponse au guide:', err);
     res.status(500).send('Erreur serveur');
+  }
+};
+
+/**
+ * Affiche la page de chat avec un guide spécifique
+ */
+exports.getChatWithGuide = async (req, res) => {
+  const adminId = req.session.user.id;
+  const guideId = req.params.guideId;
+
+  try {
+    // Récupérer les informations du guide
+    const guide = await User.findById(guideId);
+    if (!guide) {
+      return res.status(404).send('Guide non trouvé');
+    }
+
+    // Récupérer la conversation
+    const messages = await Message.findConversation(adminId, guideId);
+    
+    // Marquer les messages du guide comme lus
+    await Message.markConversationAsRead(guideId, adminId);
+
+    // Récupérer tous les guides pour la sidebar
+    const guides = await Guide.findAll();
+    const guidesWithUnread = await Message.getConversationsWithUnreadCounts(adminId);
+
+    res.render('admin/chat', {
+      user: req.session.user,
+      selectedGuide: guide,
+      guides: guidesWithUnread,
+      messages: messages,
+      hideNavbar: true
+    });
+  } catch (err) {
+    console.error('Erreur getChatWithGuide:', err);
+    res.status(500).send('Erreur serveur : ' + err.message);
+  }
+};
+
+/**
+ * Affiche la liste des guides pour le chat
+ */
+exports.getChatList = async (req, res) => {
+  const adminId = req.session.user.id;
+
+  try {
+    // Récupérer tous les guides avec leurs informations complètes
+    const allGuides = await Guide.findAll();
+    
+    // Récupérer les conversations avec les compteurs de messages non lus
+    const conversations = await Message.getConversationsWithUnreadCounts(adminId);
+    
+    // Fusionner les informations des guides avec les conversations
+    const guidesWithConversations = allGuides.map(guide => {
+      const conversation = conversations.find(conv => conv.id === guide.id_utilisateur);
+      
+      return {
+        id: guide.id_utilisateur,
+        nom_complet: guide.nom_complet || `${guide.prenom} ${guide.nom}`,
+        email: guide.email,
+        photo_profil: guide.photo_profil,
+        statut: guide.statut,
+        unread_count: conversation ? conversation.unread_count : 0,
+        last_message: conversation ? conversation.last_message : null,
+        last_message_date: conversation ? conversation.last_message_time : null
+      };
+    });
+
+    // Trier par date de dernier message (les plus récents en premier)
+    guidesWithConversations.sort((a, b) => {
+      if (!a.last_message_date) return 1;
+      if (!b.last_message_date) return -1;
+      return new Date(b.last_message_date) - new Date(a.last_message_date);
+    });
+
+    res.render('admin/chat-list', {
+      user: req.session.user,
+      guides: guidesWithConversations,
+      hideNavbar: true
+    });
+  } catch (err) {
+    console.error('Erreur getChatList:', err);
+    res.status(500).send('Erreur serveur : ' + err.message);
+  }
+};
+
+/**
+ * Envoie un message à un guide
+ */
+exports.sendMessageToGuide = async (req, res) => {
+  const adminId = req.session.user.id;
+  const guideId = req.params.guideId;
+  const { message } = req.body;
+
+  if (!message || message.trim() === '') {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Le message ne peut pas être vide.' 
+    });
+  }
+
+  try {
+    // Créer le message
+    await Message.create({
+      id_expediteur: adminId,
+      id_destinataire: guideId,
+      contenu: message.trim(),
+      type_message: 'TEXT'
+    });
+
+    // Notification au guide
+    await Notification.create({
+      id_utilisateur: guideId,
+      type: 'MESSAGE',
+      contenu: `Nouveau message de l'administrateur: ${message.trim()}`
+    });
+
+    // Envoyer la notification en temps réel au guide
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`guide_${guideId}`).emit('guide_message', {
+        id: Date.now(),
+        content: message.trim(),
+        from: 'admin',
+        date: new Date()
+      });
+
+      // Notifier l'admin lui-même
+      io.to('adminRoom').emit('admin_notification', {
+        id: Date.now(),
+        message: `Message envoyé à ${guide.nom_complet}`,
+        type: 'message',
+        from: req.session.user.nom_complet,
+        content: message.trim(),
+        date: new Date()
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Message envoyé avec succès!' 
+    });
+  } catch (err) {
+    console.error('Erreur envoi message:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erreur serveur : ' + err.message 
+    });
   }
 };

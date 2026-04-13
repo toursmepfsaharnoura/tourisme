@@ -3,7 +3,7 @@ const router = express.Router();
 const guideController = require('../controllers/guideController');
 const planController = require('../controllers/planController');
 const abonnementController = require('../controllers/abonnementController');
-const { verifGuide, checkGuideValidated } = require('../middlewares/auth'); // ou middlewares selon le nom
+const { verifGuide, checkGuideValidated } = require('../middlewares/auth');
 const upload = require('../middlewares/upload');
 router.use(verifGuide);
 
@@ -25,18 +25,25 @@ router.post('/create-plan', planController.createPlan);
 router.put('/plans/:id', planController.updatePlan);
 router.delete('/plans/:id', planController.deletePlan);
 
+// Plan Routes
+router.get('/create-plan', checkGuideValidated, planController.getNewPlan);
+router.post('/create-plan', checkGuideValidated, planController.createPlan);
+router.get('/plans/:id/details', checkGuideValidated, planController.getPlanDetails);
+
 // Routes de messagerie spécifiques aux guides
 router.get('/messages', guideController.getMessages);                 // Messages avec l'admin (URL principale)
 router.get('/admin-messages', guideController.getMessages);           // Messages avec l'admin (URL alternative)
+router.get('/conversation', guideController.getConversation);        // Page de conversation dédiée
 router.post('/send-message', guideController.sendMessage);            // Envoyer message à l'admin (URL principale)
 router.post('/admin-messages/send', guideController.sendMessage);      // Envoyer à l'admin (URL alternative)
+router.post('/mark-read', guideController.markMessagesAsRead);      // Marquer messages comme lus
 router.post('/notifications/read', guideController.markNotificationsRead);
 router.get('/notifications/refresh', guideController.refreshNotifications);
 
 router.get('/upload-docs', guideController.getUploadDocs);
 router.post('/upload-docs', upload.docs.fields([{ name: 'cv', maxCount: 1 }, { name: 'diplome', maxCount: 1 }]), guideController.uploadDocs);
 
-// Supporter l'ancienne URL pour compatibilité
+// Supporter l'ancienne URL pour compatibilite
 router.get('/documents/upload', guideController.getUploadDocs);
 router.post('/documents/upload', upload.docs.fields([{ name: 'cv', maxCount: 1 }, { name: 'diplome', maxCount: 1 }]), guideController.uploadDocs);
 

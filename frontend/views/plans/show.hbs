@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{plan.titre}} - Inside Tunisia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .desert-gradient { background: linear-gradient(135deg, #f59e0b, #dc2626); }
+    .ocean-gradient { background: linear-gradient(135deg, #0891b2, #0e7490); }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  {{> navbar}}
+  
+  <!-- Hero Section -->
+  <section class="relative h-64 flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');">
+    <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 font-playfair">{{plan.titre}}</h1>
+      <p class="text-lg text-gray-200 max-w-2xl mx-auto">
+        {{plan.description}}
+      </p>
+    </div>
+  </section>
+
+  <!-- Plan Details Section -->
+  <section class="py-16 px-4 max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+          <!-- Description -->
+          <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 font-playfair">Description détaillée</h2>
+            <p class="text-gray-700 leading-relaxed">{{plan.description}}</p>
+          </div>
+
+          <!-- Lieux visités -->
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 font-playfair">Lieux visités</h2>
+            {{#if plan.lieux.length}}
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{#each plan.lieux}}
+                  <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-start">
+                      <i class="fas fa-map-marker-alt text-blue-500 mt-1 mr-3"></i>
+                      <div>
+                        <h3 class="font-semibold text-gray-900">{{this.delegation_nom}}</h3>
+                        <p class="text-sm text-gray-600">{{this.gouvernorat_nom}}</p>
+                        {{#if this.type}}
+                          <span class="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                            {{this.type}}
+                          </span>
+                        {{/if}}
+                      </div>
+                    </div>
+                  </div>
+                {{/each}}
+              </div>
+            {{else}}
+              <div class="text-center py-8 bg-gray-50 rounded-lg">
+                <i class="fas fa-map-marked-alt text-gray-400 text-3xl mb-3"></i>
+                <p class="text-gray-600">Aucun lieu spécifié pour ce plan</p>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <!-- Price & Dates -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 font-playfair">Informations pratiques</h3>
+          
+          <div class="space-y-4">
+            <div class="flex justify-between items-center pb-4 border-b">
+              <span class="text-gray-600">Prix</span>
+              <span class="text-2xl font-bold text-blue-600">{{plan.prix}} TND</span>
+            </div>
+            
+            <div class="pb-4 border-b">
+              <p class="text-gray-600 mb-2">Dates du voyage</p>
+              <div class="space-y-1">
+                <p class="text-sm"><strong>Début:</strong> {{plan.date_debut}}</p>
+                <p class="text-sm"><strong>Fin:</strong> {{plan.date_fin}}</p>
+              </div>
+            </div>
+            
+            <div>
+              <p class="text-gray-600 mb-2">Guide</p>
+              <div class="flex items-center">
+                {{#if plan.guide_photo}}
+                  <img src="{{plan.guide_photo}}" alt="{{plan.guide_nom}}" class="w-10 h-10 rounded-full mr-3">
+                {{else}}
+                  <div class="w-10 h-10 bg-gray-300 rounded-full mr-3 flex items-center justify-center">
+                    <i class="fas fa-user text-gray-600"></i>
+                  </div>
+                {{/if}}
+                <div>
+                  <p class="font-semibold">{{plan.guide_nom}}</p>
+                  <p class="text-sm text-gray-600">{{plan.guide_email}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 font-playfair">Actions</h3>
+          
+          <div class="space-y-3">
+            {{#if user}}
+              <button class="w-full ocean-gradient text-white py-3 px-6 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                <i class="fas fa-calendar-check mr-2"></i>
+                Réserver ce plan
+              </button>
+              
+              <button class="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
+                <i class="fas fa-heart mr-2"></i>
+                Ajouter aux favoris
+              </button>
+            {{else}}
+              <a href="/login" class="block w-full ocean-gradient text-white py-3 px-6 rounded-xl font-semibold hover:opacity-90 transition-opacity text-center">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Connectez-vous pour réserver
+              </a>
+            {{/if}}
+            
+            <button class="w-full border border-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+              <i class="fas fa-share-alt mr-2"></i>
+              Partager ce plan
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  {{> footer}}
+</body>
+</html>

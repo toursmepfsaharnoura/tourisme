@@ -4,6 +4,7 @@ const homeController = require('../controllers/homeController');
 const homePageController = require('../controllers/homePageController');
 const delegationController = require('../controllers/delegationController');
 const authController = require('../controllers/authController');
+const planController = require('../controllers/planController');
 
 // Modern homepage routes
 router.get('/', homePageController.getHomePage);
@@ -22,5 +23,9 @@ router.post('/login', authController.postLogin);
 router.get('/verification', authController.getVerification);
 router.post('/verification', authController.postVerification);
 router.get('/logout', authController.logout);
+
+// Plans Public Routes
+router.get('/plans', planController.getAllPlans);
+router.get('/plans/:id', planController.getPlanForView);
 
 module.exports = router;

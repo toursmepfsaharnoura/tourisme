@@ -18,6 +18,11 @@ router.get('/messages/:guideId', adminController.getConversation);
 router.post('/messages/:guideId', adminController.sendMessage);
 router.get('/messages/:guideId/refresh', adminController.refreshConversation);
 
+// Chat routes
+router.get('/chat', adminController.getChatList);
+router.get('/chat/:guideId', adminController.getChatWithGuide);
+router.post('/chat/:guideId/send', adminController.sendMessageToGuide);
+
 // Routes pour répondre aux messages des guides
 router.get('/reply-message', adminController.getReplyForm);
 router.post('/reply-message', adminController.replyToGuide);

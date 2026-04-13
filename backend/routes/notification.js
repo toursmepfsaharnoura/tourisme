@@ -1,16 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const notificationController = require('../controllers/notificationController');
-const { verifUser } = require('../middlewares/auth');
+const controller = require('../controllers/notificationController');
 
-router.use(verifUser);
+// API ONLY
+router.get('/', controller.getAdminNotifications);
 
-router.get('/notifications', notificationController.getNotifications);
-router.get('/notifications/unread-count', notificationController.getUnreadCount);
-router.get('/notifications/recent', notificationController.getRecentNotifications);
-router.post('/notifications/read', notificationController.markAsRead);
-router.delete('/notifications/:id', notificationController.deleteNotification);
-router.delete('/notifications', notificationController.clearAll);
-router.post('/notifications', notificationController.createNotification);
+// Routes pour les notifications guides
+router.post('/sendToGuide', controller.sendToGuide);
+router.post('/sendToAllGuides', controller.sendToAllGuides);
+
+// Page des notifications pour les guides
+router.get('/guide', controller.getGuideNotifications);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const router = express.Router();
 const planController = require('../controllers/planController');
 const upload = require('../middlewares/upload');
 const { verifGuide, verifTouriste, checkGuideValidated } = require('../middlewares/auth');
+const { planImage, planImageOptional } = require('../middlewares/upload');
 
 
 // =========================

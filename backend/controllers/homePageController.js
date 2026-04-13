@@ -8,7 +8,7 @@ exports.getHomePage = async (req, res) => {
     // Fetch all governorats from database
     const gouvernorats = await Gouvernorat.findAll();
     
-    res.render('home', {
+    res.render('accueil', {
       gouvernorats,
       title: 'Explorez la Tunisie - Découvrez les merveilles de la Tunisie',
       user: req.session.user || null

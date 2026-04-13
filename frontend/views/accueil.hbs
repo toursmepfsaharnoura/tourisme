@@ -1,34 +1,45 @@
 <!-- Hero Section -->
-<section class="relative h-screen flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');">
-  <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/30"></div>
-  <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+<section class="relative min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');">
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black/70"></div>
+  
+  <!-- Animated Background Elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-float"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-float" style="animation-delay: 4s;"></div>
+  </div>
+  
+  <div class="relative z-10 text-center text-white px-4 max-w-5xl mx-auto">
     <div class="animate-slide-up">
       <h1 class="text-5xl md:text-7xl font-bold mb-6 text-shadow-glow font-playfair">
-        Explore Tunisia<br>
-        <span class="text-ocean-light">like never before</span>
+        Explorez la Tunisie
       </h1>
-      <p class="text-xl md:text-2xl mb-12 text-gray-200 max-w-2xl mx-auto">
-        Discover authentic experiences, certified guides, and unforgettable journeys across the beautiful landscapes of Tunisia
+      <p class="text-xl md:text-2xl mb-12 text-gray-200 max-w-3xl mx-auto leading-relaxed">
+        Découvrez les trésors cachés, les paysages magnifiques et l'hospitalité chaleureuse des 24 gouvernorats de Tunisie
       </p>
       
       <!-- Search Bar -->
-      <div class="max-w-2xl mx-auto mb-8">
-        <div class="glass-morphism rounded-2xl p-2 flex flex-col md:flex-row gap-2">
-          <div class="flex-1 flex items-center px-4">
-            <i class="fas fa-search text-gray-400 mr-3"></i>
-            <input 
-              type="text" 
-              placeholder="Search destinations, activities, or guides..." 
-              class="w-full bg-transparent text-white placeholder-gray-400 outline-none py-3"
-              id="heroSearch"
-            >
+      <div class="max-w-2xl mx-auto mb-12">
+        <form action="/search" method="GET" class="glass-morphism rounded-2xl p-2 backdrop-blur-xl border border-white/20 shadow-2xl">
+          <div class="flex flex-col md:flex-row gap-2">
+            <div class="flex-1 flex items-center px-6">
+              <i class="fas fa-search text-gray-300 mr-4 text-lg"></i>
+              <input 
+                type="text" 
+                name="q"
+                placeholder="Rechercher un gouvernorat..." 
+                class="w-full bg-transparent text-white placeholder-gray-400 outline-none py-4 text-lg"
+              >
+            </div>
+            <button type="submit" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <i class="fas fa-search mr-2"></i>
+              Rechercher
+            </button>
           </div>
-          <button class="desert-gradient px-8 py-3 rounded-xl font-semibold text-white button-glow hover:scale-105 transition-transform">
-            Search
-          </button>
-        </div>
+        </form>
       </div>
-    </div>
+      
+          </div>
   </div>
   
   <!-- Scroll Indicator -->
@@ -37,37 +48,47 @@
   </div>
 </section>
 
-<!-- Popular Destinations -->
+<!-- Governorats Grid Section -->
 <section class="py-20 bg-gradient-to-b from-gray-50 to-white">
   <div class="max-w-7xl mx-auto px-4">
     <div class="text-center mb-16">
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font-playfair">
-        Popular Destinations
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-playfair">
+        Tous les Gouvernorats
       </h2>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-        Explore Tunisia's most breathtaking locations and hidden gems
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Explorez chaque région de la Tunisie et découvrez ses attractions uniques, son histoire et sa culture
       </p>
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+    <!-- Responsive Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {{#each gouvernorats}}
-      <div class="group cursor-pointer" onclick="window.location.href='/gouvernorats/{{id}}/delegations'">
-        <div class="relative overflow-hidden rounded-2xl card-hover">
-          <!-- Destination Image -->
-          <div class="h-64 bg-gradient-to-br from-ocean-blue to-desert-orange relative">
-            <div class="absolute inset-0 flex items-center justify-center">
-              <i class="fas fa-map-marker-alt text-6xl text-white/30"></i>
-            </div>
-            <!-- Overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div class="group relative">
+        <!-- Card -->
+        <div class="relative overflow-hidden rounded-2xl shadow-lg card-hover bg-white">
+          <!-- Image Container -->
+          <div class="relative h-48 overflow-hidden">
+            {{#if image}}
+              <img src="{{image}}" alt="{{nom}}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerpolicy="no-referrer">
+              <!-- Gradient Overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            {{else}}
+              <!-- Gradient Placeholder -->
+              <div class="w-full h-full bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 relative">
+                <div class="absolute inset-0 bg-black/20"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <i class="fas fa-map-marked-alt text-white text-4xl opacity-50"></i>
+                </div>
+              </div>
+            {{/if}}
             
-            <!-- Favorite Button -->
-            <button class="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
-              <i class="far fa-heart"></i>
+            <!-- Heart Button -->
+            <button class="absolute top-3 right-3 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 border border-white/30">
+              <i class="far fa-heart text-lg"></i>
             </button>
             
             <!-- Rating Badge -->
-            <div class="absolute bottom-4 left-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+            <div class="absolute bottom-3 left-3 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/30">
               <div class="flex items-center text-white text-sm">
                 <i class="fas fa-star text-yellow-400 mr-1"></i>
                 <span>4.8</span>
@@ -76,18 +97,21 @@
           </div>
           
           <!-- Content -->
-          <div class="p-6 bg-white rounded-b-2xl shadow-lg">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">{{nom}}</h3>
-            <p class="text-gray-600 text-sm mb-4">Discover the wonders of {{nom}}</p>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center text-gray-500 text-sm">
-                <i class="fas fa-map-pin mr-2"></i>
-                <span>Tunisia</span>
-              </div>
-              <div class="text-ocean-blue font-semibold">
-                Explore →
-              </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">{{nom}}</h3>
+            <p class="text-gray-600 text-sm mb-3">Découvrez les merveilles de {{nom}}</p>
+            
+            <!-- Location Info -->
+            <div class="flex items-center text-gray-500 text-sm mb-4">
+              <i class="fas fa-map-pin mr-2"></i>
+              <span>Tunisie</span>
             </div>
+            
+            <!-- Discover Button -->
+            <button onclick="window.location.href='/gouvernorats/{{id}}/delegations'" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg">
+              <i class="fas fa-compass mr-2"></i>
+              Découvrir
+            </button>
           </div>
         </div>
       </div>
@@ -96,49 +120,49 @@
   </div>
 </section>
 
-<!-- Why Choose Us -->
+<!-- Features Section -->
 <section class="py-20 bg-gradient-to-b from-white to-gray-50">
   <div class="max-w-7xl mx-auto px-4">
     <div class="text-center mb-16">
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font-playfair">
-        Why Choose Us
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-playfair">
+        Pourquoi Choisir la Tunisie
       </h2>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-        We make your Tunisian adventure unforgettable with professional service and authentic experiences
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Une destination unique qui combine histoire, culture, paysages et hospitalité
       </p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <!-- Feature 1 -->
       <div class="text-center group">
-        <div class="w-20 h-20 ocean-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-          <i class="fas fa-certificate text-white text-3xl"></i>
+        <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+          <i class="fas fa-landmark text-white text-3xl"></i>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">Certified Guides</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Histoire Riche</h3>
         <p class="text-gray-600 leading-relaxed">
-          Professional, knowledgeable, and passionate local guides who bring Tunisia's rich history and culture to life
+          Des milliers d'années d'histoire à travers des sites archéologiques uniques au monde
         </p>
       </div>
       
       <!-- Feature 2 -->
       <div class="text-center group">
-        <div class="w-20 h-20 desert-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-          <i class="fas fa-calendar-check text-white text-3xl"></i>
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+          <i class="fas fa-umbrella-beach text-white text-3xl"></i>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">Easy Booking</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Paysages Magnifiques</h3>
         <p class="text-gray-600 leading-relaxed">
-          Simple, secure, and instant booking system with flexible cancellation policies and 24/7 support
+          Plages méditerranéennes, déserts sahariens et montagnes verdoyantes
         </p>
       </div>
       
       <!-- Feature 3 -->
       <div class="text-center group">
-        <div class="w-20 h-20 sage-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-          <i class="fas fa-star text-white text-3xl"></i>
+        <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+          <i class="fas fa-heart text-white text-3xl"></i>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">Unique Experiences</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Hospitalité</h3>
         <p class="text-gray-600 leading-relaxed">
-          Exclusive tours and activities that showcase the authentic beauty and hidden treasures of Tunisia
+          Accueillez par le sourire et découvrez la chaleur de la culture tunisienne
         </p>
       </div>
     </div>
@@ -146,7 +170,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-20 bg-gradient-to-r from-ocean-blue to-desert-orange relative overflow-hidden">
+<section class="py-20 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 relative overflow-hidden">
   <div class="absolute inset-0">
     <div class="absolute top-0 left-0 w-full h-full bg-black/20"></div>
     <div class="wave-animation absolute inset-0"></div>
@@ -154,71 +178,26 @@
   
   <div class="relative z-10 max-w-4xl mx-auto px-4 text-center">
     <h2 class="text-4xl md:text-5xl font-bold text-white mb-6 font-playfair">
-      Ready for Your Tunisian Adventure?
+      Devenez Guide Local
     </h2>
     <p class="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
-      Join thousands of travelers who have discovered the magic of Tunisia with our expert guides and curated experiences
+      Partagez votre passion pour la Tunisie et aidez les visiteurs à découvrir les trésors de votre région
     </p>
     
     <div class="flex flex-col sm:flex-row gap-6 justify-center">
-      <a href="/gouvernorats/1/delegations" class="bg-white text-ocean-blue px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:scale-105 transition-transform duration-300">
-        <i class="fas fa-search mr-2"></i>
-        Book Your Trip
-      </a>
-      <a href="/inscription?role=GUIDE" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white hover:text-ocean-blue transition-all duration-300">
+      <a href="/inscription?role=GUIDE" class="bg-white text-purple-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:scale-105 transition-transform duration-300">
         <i class="fas fa-user-tie mr-2"></i>
-        Become a Guide
+        S'inscrire comme Guide
       </a>
-    </div>
-    
-    <!-- Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20">
-      <div class="text-center">
-        <div class="text-4xl font-bold text-white mb-2">50K+</div>
-        <div class="text-white/80">Happy Travelers</div>
-      </div>
-      <div class="text-center">
-        <div class="text-4xl font-bold text-white mb-2">200+</div>
-        <div class="text-white/80">Expert Guides</div>
-      </div>
-      <div class="text-center">
-        <div class="text-4xl font-bold text-white mb-2">4.9</div>
-        <div class="text-white/80">Average Rating</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Newsletter Section -->
-<section class="py-16 bg-white">
-  <div class="max-w-4xl mx-auto px-4 text-center">
-    <h3 class="text-3xl font-bold text-gray-900 mb-4">Stay Updated</h3>
-    <p class="text-gray-600 mb-8">Get the latest travel tips and exclusive offers delivered to your inbox</p>
-    
-    <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-      <input 
-        type="email" 
-        placeholder="Enter your email" 
-        class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:border-ocean-blue focus:outline-none"
-      >
-      <button class="ocean-gradient px-6 py-3 rounded-xl text-white font-semibold hover:scale-105 transition-transform">
-        Subscribe
-      </button>
+      <a href="/guides" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white hover:text-purple-600 transition-all duration-300">
+        <i class="fas fa-users mr-2"></i>
+        Voir les Guides
+      </a>
     </div>
   </div>
 </section>
 
 <script>
-// Search functionality
-document.getElementById('heroSearch')?.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    const query = this.value.trim();
-    if (query) {
-      window.location.href = `/search?q=${encodeURIComponent(query)}`;
-    }
-  }
-});
-
 // Add entrance animations on scroll
 const observerOptions = {
   threshold: 0.1,
@@ -241,12 +220,13 @@ document.querySelectorAll('section').forEach(section => {
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';
 
-// Mobile menu toggle (if needed)
-const mobileMenuButton = document.querySelector('button[class*="lg:hidden"]');
-if (mobileMenuButton) {
-  mobileMenuButton.addEventListener('click', function() {
-    // Toggle mobile menu logic here
-    console.log('Mobile menu clicked');
+// Add heart button functionality
+document.querySelectorAll('.fa-heart').forEach(heart => {
+  heart.parentElement.addEventListener('click', function(e) {
+    e.stopPropagation();
+    heart.classList.toggle('far');
+    heart.classList.toggle('fas');
+    heart.classList.toggle('text-red-500');
   });
-}
+});
 </script>

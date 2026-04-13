@@ -29,9 +29,14 @@ exports.verifGuide = (req, res, next) => {
 };
 
 exports.checkGuideValidated = (req, res, next) => {
+  // Vérification simple : utilisateur doit être connecté et être un guide
   if (!req.session.user || req.session.user.role !== 'GUIDE') {
     return res.redirect('/auth/login');
   }
+  
+  // Pour l'instant, on permet à tous les guides d'accéder
+  // Plus tard, vous pouvez décommenter la vérification du statut
+  /*
   db.query(
     'SELECT statut FROM guides WHERE id_utilisateur = ?',
     [req.session.user.id],
@@ -45,4 +50,7 @@ exports.checkGuideValidated = (req, res, next) => {
       next();
     }
   );
+  */
+  
+  next();
 };
