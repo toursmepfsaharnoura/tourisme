@@ -362,7 +362,7 @@ exports.getAllPlans = async (req, res) => {
     const plans = await Plan.findAllWithFilters(filters);
     const [gouvernorats] = await db.query('SELECT * FROM gouvernorats ORDER BY nom');
     
-    const template = req.session.user ? 'touriste/plans' : 'plans';
+    const template = req.session.user ? 'touriste/plans' : 'public/plans';
     
     res.render(template, {
       user: req.session.user,

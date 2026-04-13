@@ -1,21 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const homeController = require('../controllers/homeController');
-const homePageController = require('../controllers/homePageController');
+const accueilController = require('../controllers/accueilController');
 const delegationController = require('../controllers/delegationController');
 const authController = require('../controllers/authController');
 const planController = require('../controllers/planController');
 
 // Modern homepage routes
-router.get('/', homePageController.getHomePage);
-router.get('/search', homePageController.searchGovernorats);
+router.get('/', accueilController.getAccueil);
+router.get('/search', accueilController.getSearch);
 
 // Public delegation detail page
 router.get('/delegation/:id', delegationController.getDelegationDetail);
 
 // Legacy routes
-router.get('/accueil', homeController.getAccueil);
-router.get('/guides', homeController.getGuides);
+router.get('/accueil', accueilController.getAccueil);
+router.get('/guides', accueilController.getGuides);
 router.get('/inscription', authController.getRegister);
 router.post('/inscription', authController.postInscription);
 router.get('/login', authController.getLogin);

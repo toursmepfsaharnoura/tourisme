@@ -14,14 +14,7 @@ exports.getDashboard = async (req, res) => {
       guide = await Guide.findByUserId(userId);
     }
     const user = await User.findById(userId);
-    
-    // 🔥 AJOUTE CES LOGS
-    console.log('=== DASHBOARD GUIDE ===');
-    console.log('userId:', userId);
-    console.log('guide trouvé :', guide);
-    console.log('abonnement_fin (brut) :', guide.abonnement_fin);
-    console.log('abonnement_actif :', guide.abonnement_actif);
-    
+
     res.render('guide/dashboard', {
       user,
       guide,
@@ -79,10 +72,7 @@ exports.getProfile = async (req, res) => {
     const user = await User.findById(userId);
     // Récupérer les infos spécifiques au guide (contient bio)
     const guide = await Guide.findByUserId(userId);
-    
-    console.log(' Profile data - User:', user);
-    console.log(' Profile data - Guide:', guide);
-    
+
     // Fusionner les données pour l'affichage
     const profileData = {
       id: user?.id,
@@ -97,8 +87,7 @@ exports.getProfile = async (req, res) => {
       abonnement_actif: guide?.abonnement_actif || 0,
       abonnement_fin: guide?.abonnement_fin || null
     };
-    
-    console.log(' Final profile data:', profileData);
+
     res.render('guide/profile', profileData);
   } catch (err) {
     console.error(' Error getting profile:', err);
@@ -112,56 +101,38 @@ exports.updateProfile = async (req, res) => {
   const userId = req.session.user.id;
   const { nom_complet, telephone, bio } = req.body;
 
-  console.log('');
-  console.log('userId:', userId);
-  console.log('req.body:', req.body);
-  console.log('nom_complet:', nom_complet);
-  console.log('telephone:', telephone);
-  console.log('bio:', bio);
-  console.log('typeof nom_complet:', typeof nom_complet);
-  console.log('nom_complet length:', nom_complet ? nom_complet.length : 'undefined');
-
   try {
     // Validation des champs requis
     const errors = [];
-    
-    // Debug: Check if nom_complet is actually being received
+
     if (nom_complet === undefined || nom_complet === null) {
-      console.log('');
       errors.push('Le nom complet est requis (non reçu)');
     } else if (typeof nom_complet !== 'string') {
-      console.log('');
       errors.push('Le nom complet doit être une chaîne de caractères');
     } else if (nom_complet.trim() === '') {
-      console.log('');
       errors.push('Le nom complet est requis (vide)');
-    } else {
-      console.log('');
     }
-    
+
     if (!telephone || telephone.trim() === '') {
       errors.push('Le numéro de téléphone est requis');
     } else if (!/^\d{8}$/.test(telephone.trim())) {
       errors.push('Le numéro de téléphone doit contenir exactement 8 chiffres');
     }
-    
+
     // La bio est optionnelle - si vide, on met une valeur par défaut
     const bioValue = (bio && bio.trim() !== '') ? bio.trim() : 'Guide touristique professionnel';
 
     if (errors.length > 0) {
-      console.log('');
       return res.redirect(`/guide/profile?error=${encodeURIComponent(errors.join(', '))}`);
     }
 
     // 1. Mettre à jour nom_complet et telephone dans utilisateurs
-    console.log('');
     await User.update(userId, { 
       nom_complet: nom_complet.trim(),
       telephone: telephone.trim()
     });
 
     // 2. Mettre à jour bio dans guides
-    console.log('');
     const guide = await Guide.findByUserId(userId);
     if (guide) {
       await Guide.updateProfile(userId, { bio: bioValue });
@@ -172,20 +143,14 @@ exports.updateProfile = async (req, res) => {
     }
 
     // 3. Mettre à jour la session IMMÉDIATEMENT
-    console.log('');
     req.session.user.nom_complet = nom_complet.trim();
     req.session.user.telephone = telephone.trim();
     req.session.user.bio = bioValue;
-
-    console.log('');
-    console.log('');
 
     // 4. Rediriger vers la page de profil avec message de succès
     return res.redirect('/guide/profile?success=Profil mis à jour avec succès');
 
   } catch (err) {
-    console.error('');
-    
     // Rediriger avec message d'erreur
     return res.redirect('/guide/profile?error=Erreur lors de la mise à jour du profil');
   }
@@ -195,7 +160,7 @@ exports.updateProfile = async (req, res) => {
  */
 exports.uploadPhoto = async (req, res) => {
   const userId = req.session.user.id;
-  
+
   try {
     // Vérifier qu'un fichier a bien été envoyé
     if (!req.file) {
@@ -207,7 +172,6 @@ exports.uploadPhoto = async (req, res) => {
 
     // Construire le chemin public de la photo
     const photoPath = `/uploads/photos-profil/${req.file.filename}`;
-    console.log(' Photo upload:', photoPath);
 
     // Mettre à jour l'utilisateur en base de données
     await User.update(userId, { photo_profil: photoPath });
@@ -215,7 +179,6 @@ exports.uploadPhoto = async (req, res) => {
     // Mettre à jour la session pour que la nouvelle photo s'affiche immédiatement
     req.session.user.photo_profil = photoPath;
 
-    console.log(' Photo uploaded successfully!');
 
     // Répondre avec un JSON de succès (attendu par le frontend)
     return res.json({

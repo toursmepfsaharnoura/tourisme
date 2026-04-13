@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
-class Home {
-  static async getHomeStats() {
+class Accueil {
+  static async getAccueilStats() {
     const [stats] = await db.query(`
       SELECT 
         (SELECT COUNT(*) FROM utilisateurs WHERE role = 'GUIDE' AND est_actif = 1) as active_guides,
@@ -99,9 +99,9 @@ class Home {
     return suggestions;
   }
 
-  static async getHomePageData() {
+  static async getAccueilData() {
     const [stats, featuredPlans, featuredGuides, recentReviews, popularDestinations] = await Promise.all([
-      this.getHomeStats(),
+      this.getAccueilStats(),
       this.getFeaturedPlans(6),
       this.getFeaturedGuides(4),
       this.getRecentReviews(5),
@@ -118,4 +118,4 @@ class Home {
   }
 }
 
-module.exports = Home;
+module.exports = Accueil;

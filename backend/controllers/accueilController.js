@@ -1,15 +1,15 @@
-const Home = require('../models/Home');
+const Accueil = require('../models/Accueil');
 const Gouvernorat = require('../models/Gouvernorat');
 
 exports.getAccueil = async (req, res) => {
   try {
-    const [homeData, gouvernorats] = await Promise.all([
-      Home.getHomePageData(),
+    const [accueilData, gouvernorats] = await Promise.all([
+      Accueil.getAccueilData(),
       Gouvernorat.findAll()
     ]);
     
-    res.render('accueil', {
-      ...homeData,
+    res.render('public/accueil', {
+      ...accueilData,
       gouvernorats,
       isHome: true,
       user: req.session.user || null
@@ -31,7 +31,7 @@ exports.getSearch = async (req, res) => {
       gouv.nom.toLowerCase().includes(q.toLowerCase())
     );
     
-    res.render('search', {
+    res.render('public/rechercher', {
       query: q,
       gouvernorats: filteredGouvernorats,
       resultsCount: filteredGouvernorats.length,
@@ -45,8 +45,8 @@ exports.getSearch = async (req, res) => {
 
 exports.getGuides = async (req, res) => {
   try {
-    const featuredGuides = await Home.getFeaturedGuides();
-    res.render('guides', { 
+    const featuredGuides = await Accueil.getFeaturedGuides();
+    res.render('public/guides', { 
       guides: featuredGuides,
       user: req.session.user || null,
       layout: 'main'
@@ -61,7 +61,7 @@ exports.getSearchSuggestions = async (req, res) => {
   const { q } = req.query;
   
   try {
-    const suggestions = await Home.getSearchSuggestions(q);
+    const suggestions = await Accueil.getSearchSuggestions(q);
     res.json(suggestions);
   } catch (err) {
     console.error('Error getting search suggestions:', err);

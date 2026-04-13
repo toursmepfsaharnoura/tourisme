@@ -65,3 +65,23 @@ exports.postChat = async (req, res) => {
     res.status(500).send('Erreur serveur');
   }
 };
+
+/**
+ * Affiche la liste des conversations du touriste.
+ */
+exports.getMessages = async (req, res) => {
+  const touristeId = req.session.user.id;
+
+  try {
+    // Récupérer toutes les conversations du touriste
+    const guides = await User.findGuidesWithConversations(touristeId);
+    
+    res.render('touriste/messages', {
+      user: req.session.user,
+      guides
+    });
+  } catch (err) {
+    console.error('Erreur chargement messages touriste:', err);
+    res.status(500).send('Erreur serveur');
+  }
+};
