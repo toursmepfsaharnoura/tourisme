@@ -165,7 +165,9 @@
 <body class="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen text-gray-900 overflow-x-hidden">
 
   <!-- Navigation -->
-  {{> navbar}}
+  {{#unless hideNavbar}}
+    {{> navbar}}
+  {{/unless}}
 
   <!-- MAIN CONTENT -->
   <main class="min-h-screen animate-fade-in">
@@ -173,6 +175,8 @@
   </main>
 
   <!-- Footer -->
-  {{> footer}}
+  {{#unless hideFooter}}
+    {{> footer}}
+  {{/unless}}
 </body>
 </html>

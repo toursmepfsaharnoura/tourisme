@@ -2,18 +2,21 @@ const db = require('../config/db');
 
 class Guide {
   static async findByUserId(userId) {
-    const [rows] = await db.query('SELECT * FROM guides WHERE id_utilisateur = ?', [userId]);
+    const [rows] = await db.query(
+      'SELECT id_utilisateur AS id, guides.* FROM guides WHERE id_utilisateur = ?',
+      [userId]
+    );
     return rows[0];
   }
 
   static async create(userId) {
     const [result] = await db.query(
-      'INSERT INTO guides (id_utilisateur, statut) VALUES (?, "ATTENTE")',
+      `INSERT INTO guides (id_utilisateur, statut, cv_approved, diplome_approved, abonnement_actif)
+       VALUES (?, 'ATTENTE', 0, 0, 0)`,
       [userId]
     );
-    return result.affectedRows > 0;
+    return result.insertId;
   }
-
   static async update(userId, updates) {
     const allowedFields = ['cv', 'diplome', 'statut', 'validation_cv', 'cv_approved', 'diplome_approved', 'date_soumission', 'abonnement_actif', 'abonnement_fin'];
     const entries = Object.entries(updates).filter(([key]) => allowedFields.includes(key));

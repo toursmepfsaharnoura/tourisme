@@ -25,6 +25,7 @@ const gouvernoratRoutes = require('./routes/gouvernorat');
 const planLieuRoutes = require('./routes/planLieu');
 const paiementRoutes = require('./routes/paiement');
 const homeRoutes = require('./routes/home');
+const methodOverride = require('method-override');
 
 const app = express();
 
@@ -41,14 +42,13 @@ app.engine('hbs', engine({
 }));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, '../frontend/views'));
-
+app.use(methodOverride('_method'));
 // Middlewares standards
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use('/uploads', express.static(path.join(__dirname, '../frontend/public/uploads')));
 app.use(cors());
-
 // Session
 app.use(session({
   secret: process.env.SESSION_SECRET || 'ton_secret_super_secret',
@@ -86,7 +86,10 @@ app.use('/paiements', paiementRoutes);
 app.use((req, res) => {
   res.status(404).render('404', { url: req.originalUrl });
 });
-
+app.use((err, req, res, next) => {
+  console.error('🔥 ERREUR COMPLETE:', err.stack); // hethi taffich kol chy
+  res.status(500).send('Erreur: ' + err.message); // tbadl render b send bech tchouf l'erreur brute
+});
 // Gestion des erreurs 500
 app.use((err, req, res, next) => {
   console.error('ERREUR:', err);

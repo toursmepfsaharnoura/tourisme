@@ -1,0 +1,62 @@
+<h2>Modifier le plan</h2>
+
+{{#if success}}
+  <div class="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-green-800">
+    {{success}}
+  </div>
+{{/if}}
+{{#if error}}
+  <div class="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-red-800">
+    {{error}}
+  </div>
+{{/if}}
+
+<form method="POST" action="/guide/plans/{{plan.id}}?_method=PUT">
+
+  <label>Titre</label>
+  <input type="text" name="titre" value="{{plan.titre}}" required>
+
+  <br><br>
+
+  <label>Description</label>
+  <textarea name="description" required>{{plan.description}}</textarea>
+
+  <br><br>
+
+  <label>Prix</label>
+  <input type="number" name="prix" value="{{plan.prix}}" required>
+
+  <br><br>
+
+  <label>Date début</label>
+  <input id="date_debut" type="date" name="date_debut" value="{{formatDateForInput plan.date_debut}}" required>
+
+  <br><br>
+
+  <label>Date fin</label>
+  <input id="date_fin" type="date" name="date_fin" value="{{formatDateForInput plan.date_fin}}" required>
+
+  <br><br>
+
+  <button type="submit">Modifier</button>
+
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dateDebut = document.getElementById('date_debut');
+    const dateFin = document.getElementById('date_fin');
+    const today = new Date().toISOString().split('T')[0];
+    dateDebut.min = today;
+    dateFin.min = today;
+
+    dateDebut.addEventListener('change', function() {
+      if (this.value) {
+        dateFin.min = this.value;
+        if (dateFin.value && dateFin.value < this.value) {
+          dateFin.value = this.value;
+        }
+      }
+    });
+  });
+</script>

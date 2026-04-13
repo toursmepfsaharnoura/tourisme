@@ -255,14 +255,14 @@
               <td>{{this.date_creation}}</td>
               <td>
                 {{#if this.cv}}
-                  <button onclick="viewCV('/{{this.cv}}')" class="cv-link">📄 Voir CV</button>
+                  <button onclick="viewCV('{{uploadPath this.cv}}')" class="cv-link">📄 Voir CV</button>
                 {{else}}
                   Pas de CV
                 {{/if}}
               </td>
               <td>
                 {{#if this.diplome}}
-                  <button onclick="viewCV('/{{this.diplome}}')" class="cv-link">🎓 Voir Diplôme</button>
+                  <button onclick="viewCV('{{uploadPath this.diplome}}')" class="cv-link">🎓 Voir Diplôme</button>
                 {{else}}
                   Pas de diplôme
                 {{/if}}

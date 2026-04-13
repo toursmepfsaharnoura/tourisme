@@ -1,24 +1,62 @@
-<h2>Mes plans touristiques</h2>
-
-<div class="plans-list">
-  {{#each plans}}
-    <div class="plan-card">
-      <h3>{{this.titre}}</h3>
-      <p>{{this.description}}</p>
-      <div class="plan-details">
-        <span><strong>Dates:</strong> {{this.date_debut}} - {{this.date_fin}}</span>
-        <span><strong>Prix:</strong> {{this.prix}} TND</span>
-      </div>
-      <div class="plan-actions">
-        <a href="/guide/plans/{{this.id}}/edit" class="btn btn-small">Modifier</a>
-        <a href="/guide/plans/{{this.id}}/lieux" class="btn btn-small">Ajouter des lieux</a>
-        <a href="/guide/plans/{{this.id}}" class="btn btn-small">Voir détails</a>
-      </div>
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Mes plans touristiques</h1>
+      <p class="mt-2 text-sm text-slate-600">Visualisez et gérez vos circuits créés pour les voyageurs.</p>
     </div>
-  {{/each}}
-  
-  {{#unless plans}}
-    <p>Vous n'avez pas encore créé de plans touristiques.</p>
-    <a href="/guide/plans/new" class="btn">Créer votre premier plan</a>
-  {{/unless}}
+    <a href="/guide/plans/new" class="inline-flex items-center gap-2 rounded-full bg-ocean-blue px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-ocean-blue/20 hover:bg-ocean-dark transition">
+      <i class="fas fa-plus"></i>
+      Nouveau plan
+    </a>
+  </div>
+
+  {{#if success}}
+    <div class="mb-6 rounded-3xl border border-green-200 bg-green-50 px-6 py-4 text-sm text-green-900 shadow-sm">
+      <strong>Succès :</strong> {{success}}
+    </div>
+  {{/if}}
+
+  {{#if error}}
+    <div class="mb-6 rounded-3xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-900 shadow-sm">
+      <strong>Erreur :</strong> {{error}}
+    </div>
+  {{/if}}
+
+  {{#if plans.length}}
+    <div class="grid gap-6 lg:grid-cols-2">
+      {{#each plans}}
+        <article class="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-slate-900">{{this.titre}}</h2>
+              <p class="mt-3 text-sm leading-6 text-slate-600 line-clamp-3">{{this.description}}</p>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-sand-dune px-4 py-2 text-sm font-semibold text-slate-900">{{this.prix}} TND</span>
+          </div>
+
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-3xl bg-slate-50 p-4 text-sm text-slate-700">
+              <div class="font-semibold text-slate-900">Dates</div>
+              <div class="mt-2 text-base text-slate-700">{{formatDate this.date_debut}} — {{formatDate this.date_fin}}</div>
+            </div>
+            <div class="rounded-3xl bg-slate-50 p-4 text-sm text-slate-700">
+              <div class="font-semibold text-slate-900">Créé le</div>
+              <div class="mt-2 text-base text-slate-700">{{formatDate this.created_at}}</div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="/guide/plans/{{this.id}}/edit" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Modifier</a>
+            <a href="/guide/plans/{{this.id}}/lieux" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Ajouter des lieux</a>
+            <a href="/guide/plans/{{this.id}}" class="inline-flex items-center gap-2 rounded-full bg-ocean-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-ocean-dark">Voir détails</a>
+          </div>
+        </article>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+      <p class="text-lg font-medium text-slate-900">Vous n'avez pas encore créé de plans touristiques.</p>
+      <a href="/guide/plans/new" class="mt-6 inline-flex items-center gap-2 rounded-full bg-ocean-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-ocean-dark">Créer votre premier plan</a>
+    </div>
+  {{/if}}
 </div>

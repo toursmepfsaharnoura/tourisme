@@ -7,8 +7,8 @@ const docsStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let subfolder = '';
     if (file.fieldname === 'cv') subfolder = 'cv';
-    else if (file.fieldname === 'diplome') subfolder = 'diplome';
-    const dir = path.join(__dirname, '../frontend/public/uploads', subfolder);
+    else if (file.fieldname === 'diplome') subfolder = 'diplomes';
+    const dir = path.join(__dirname, '../../frontend/public/uploads', subfolder);
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -31,7 +31,7 @@ exports.docs = multer({
 // Stockage pour les photos de profil
 const photoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../frontend/public/uploads/photos-profil');
+    const dir = path.join(__dirname, '../../frontend/public/uploads/photos-profil');
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -44,6 +44,30 @@ const photoStorage = multer.diskStorage({
 
 exports.photo = multer({
   storage: photoStorage,
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Le fichier doit être une image'), false);
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+const lieuStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '../../frontend/public/uploads/lieu');
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = file.originalname.split('.').pop();
+    const uniqueName = `lieu-${Date.now()}.${ext}`;
+    cb(null, uniqueName);
+  }
+});
+
+exports.lieu = multer({
+  storage: lieuStorage,
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('Le fichier doit être une image'), false);

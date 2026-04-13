@@ -14,7 +14,7 @@ class Plan {
              GROUP_CONCAT(DISTINCT d.nom ORDER BY d.nom SEPARATOR ', ') as delegations,
              GROUP_CONCAT(DISTINCT gvr.nom ORDER BY gvr.nom SEPARATOR ', ') as gouvernorats
       FROM plans_touristiques p
-      LEFT JOIN guides g ON p.id_guide = g.id
+      LEFT JOIN guides g ON p.id_guide = g.id_utilisateur
       LEFT JOIN utilisateurs u ON g.id_utilisateur = u.id
       LEFT JOIN plan_lieux pl ON p.id = pl.id_plan
       LEFT JOIN delegations d ON pl.id_delegation = d.id
@@ -60,6 +60,7 @@ class Plan {
   }
 
   static async delete(id) {
+    await db.query('DELETE FROM plan_lieux WHERE id_plan = ?', [id]);
     const [result] = await db.query('DELETE FROM plans_touristiques WHERE id = ?', [id]);
     return result.affectedRows > 0;
   }
@@ -72,7 +73,7 @@ class Plan {
       `SELECT u.*, g.statut, g.abonnement_actif
        FROM utilisateurs u
        JOIN guides g ON u.id = g.id_utilisateur
-       WHERE u.id = ?`,
+       WHERE g.id_utilisateur = ?`,
       [plan[0].id_guide]
     );
 
@@ -85,10 +86,14 @@ class Plan {
       [planId]
     );
 
+    const delegations = lieux.filter(lieu => !lieu.type && !lieu.image);
+    const actualLieux = lieux.filter(lieu => lieu.type || lieu.image);
+
     return {
       ...plan[0],
       guide: guide[0] || null,
-      lieux
+      delegations,
+      lieux: actualLieux
     };
   }
 }
