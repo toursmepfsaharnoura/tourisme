@@ -7,7 +7,7 @@
       <div class="cv-info">
         <p><strong>ID Guide:</strong> {{this.id_utilisateur}}</p>
         {{#if this.cv}}
-          <p><strong>CV:</strong> <button onclick="viewCV('/{{this.cv}}')" class="btn btn-small">Voir le CV</button></p>
+          <p><strong>CV:</strong> <button onclick="viewCV('{{uploadPath this.cv}}')" class="btn btn-small">Voir le CV</button></p>
         {{else}}
           <p><strong>CV:</strong> <span class="no-cv">Non uploadé</span></p>
         {{/if}}

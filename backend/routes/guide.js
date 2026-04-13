@@ -19,9 +19,11 @@ router.post('/paiement', abonnementController.processPayment);
 router.post('/abonnement/cancel', abonnementController.cancelSubscription);
 router.get('/abonnement/history', abonnementController.getSubscriptionHistory);
 
-router.get('/plans', checkGuideValidated, planController.getGuidePlans);
-router.put('/plans/:id', checkGuideValidated, planController.updatePlan);
-router.delete('/plans/:id', checkGuideValidated, planController.deletePlan);
+router.get('/plans', planController.getGuidePlans);
+router.get('/create-plan', planController.getNewPlan);
+router.post('/create-plan', planController.createPlan);
+router.put('/plans/:id', planController.updatePlan);
+router.delete('/plans/:id', planController.deletePlan);
 
 // Plan Routes
 router.get('/create-plan', checkGuideValidated, planController.getNewPlan);

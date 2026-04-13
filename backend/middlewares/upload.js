@@ -7,8 +7,8 @@ const docsStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let subfolder = '';
     if (file.fieldname === 'cv') subfolder = 'cv';
-    else if (file.fieldname === 'diplome') subfolder = 'diplome';
-    const dir = path.join(__dirname, '../frontend/public/uploads', subfolder);
+    else if (file.fieldname === 'diplome') subfolder = 'diplomes';
+    const dir = path.join(__dirname, '../../frontend/public/uploads', subfolder);
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -31,7 +31,7 @@ exports.docs = multer({
 // Stockage pour les photos de profil
 const photoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../frontend/public/uploads/photos-profil');
+    const dir = path.join(__dirname, '../../frontend/public/uploads/photos-profil');
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -53,6 +53,9 @@ exports.photo = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
+const lieuStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '../../frontend/public/uploads/lieu');
 // Stockage pour les images des plans touristiques
 const planImageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -62,11 +65,15 @@ const planImageStorage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const ext = file.originalname.split('.').pop();
+    const uniqueName = `lieu-${Date.now()}.${ext}`;
     const uniqueName = `plan-${Date.now()}.${ext}`;
     cb(null, uniqueName);
   }
 });
 
+exports.lieu = multer({
+  storage: lieuStorage,
+  fileFilter: (req, file, cb) => {
 exports.planImage = multer({
   storage: planImageStorage,
   fileFilter: (req, file, cb) => {

@@ -81,7 +81,13 @@ exports.getDelegationDetail = async (req, res) => {
  */
 exports.getAllDelegations = async (req, res) => {
   try {
-    const delegations = await Delegation.findAll();
+    const db = require('../config/db');
+    const [delegations] = await db.query(`
+      SELECT d.*, g.nom as gouvernorat_nom
+      FROM delegations d
+      LEFT JOIN gouvernorats g ON d.id_gouvernorat = g.id
+      ORDER BY d.nom
+    `);
     res.json(delegations);
   } catch (err) {
     console.error('Error getting delegations:', err);

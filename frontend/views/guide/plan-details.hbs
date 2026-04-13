@@ -1,0 +1,283 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+      <a href="/guide/plans" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition">
+        <i class="fas fa-arrow-left"></i>
+        Retour aux plans
+      </a>
+    </div>
+    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900">{{plan.titre}}</h1>
+        <p class="mt-2 text-lg text-slate-600">{{plan.description}}</p>
+        {{#if plan.delegations.length}}
+          <div class="mt-4 flex flex-wrap gap-2">
+            {{#each plan.delegations}}
+              <span class="rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700">
+                {{this.delegation_nom}}
+              </span>
+            {{/each}}
+          </div>
+        {{/if}}
+      </div>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <span class="inline-flex items-center gap-2 rounded-full bg-sand-dune px-4 py-2 text-sm font-semibold text-slate-900">
+          <i class="fas fa-coins"></i>
+          {{plan.prix}} TND
+        </span>
+        <span class="inline-flex items-center gap-2 rounded-full bg-ocean-blue px-4 py-2 text-sm font-semibold text-white">
+          <i class="fas fa-calendar"></i>
+          {{formatDate plan.date_debut}} — {{formatDate plan.date_fin}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  {{#if success}}
+    <div class="mb-6 rounded-3xl border border-green-200 bg-green-50 px-6 py-4 text-sm text-green-900 shadow-sm">
+      <strong>Succès :</strong> {{success}}
+    </div>
+  {{/if}}
+
+  {{#if error}}
+    <div class="mb-6 rounded-3xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-900 shadow-sm">
+      <strong>Erreur :</strong> {{error}}
+    </div>
+  {{/if}}
+
+  <div class="grid gap-8 lg:grid-cols-3">
+    <!-- Liste des lieux -->
+    <div class="lg:col-span-2">
+      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-semibold text-slate-900">Lieux du circuit</h2>
+          {{#if plan.delegations.length}}
+            <button onclick="openAddLieuModal()" class="inline-flex items-center gap-2 rounded-full bg-ocean-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-ocean-dark">
+              <i class="fas fa-plus"></i>
+              Ajouter un lieu
+            </button>
+          {{else}}
+            <span class="rounded-full bg-yellow-50 px-4 py-2 text-sm font-semibold text-yellow-800 border border-yellow-200">
+              Aucune délégation définie pour ce plan. Créez un plan en sélectionnant au moins une délégation.
+            </span>
+          {{/if}}
+        </div>
+
+        {{#if plan.lieux.length}}
+          <div class="space-y-4">
+            {{#each plan.lieux}}
+              <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:bg-slate-100 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-1 items-center gap-4">
+                  <div class="h-20 w-20 overflow-hidden rounded-3xl bg-slate-200">
+                    {{#if this.image}}
+                      <img src="{{this.image}}" alt="{{this.delegation_nom}}" class="h-full w-full object-cover" />
+                    {{else}}
+                      <div class="flex h-full w-full items-center justify-center text-slate-400">
+                        <i class="fas fa-image text-2xl"></i>
+                      </div>
+                    {{/if}}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="font-semibold text-slate-900">{{this.delegation_nom}}</h3>
+                      <span class="rounded-full bg-slate-200 px-3 py-1 text-xs uppercase tracking-wide text-slate-600">{{this.type}}</span>
+                    </div>
+                    <p class="text-sm text-slate-600">{{this.gouvernorat_nom}}</p>
+                  </div>
+                </div>
+                <button onclick="removeLieu({{this.id}})" class="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm font-semibold text-red-700 transition hover:bg-red-100">
+                  <i class="fas fa-trash"></i>
+                  Supprimer
+                </button>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+            <div class="mx-auto h-12 w-12 text-slate-400">
+              <i class="fas fa-map-marked-alt text-3xl"></i>
+            </div>
+            <h3 class="mt-4 text-sm font-semibold text-slate-900">Aucun lieu ajouté</h3>
+            <p class="mt-2 text-sm text-slate-600">Commencez par ajouter des lieux à votre circuit touristique.</p>
+            <button onclick="openAddLieuModal()" class="mt-4 inline-flex items-center gap-2 rounded-full bg-ocean-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-ocean-dark">
+              <i class="fas fa-plus"></i>
+              Ajouter le premier lieu
+            </button>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+
+    <!-- Informations complémentaires -->
+    <div class="space-y-6">
+      <!-- Statistiques -->
+      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Statistiques</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-sm text-slate-600">Nombre de lieux</span>
+            <span class="text-sm font-semibold text-slate-900">{{plan.lieux.length}}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-slate-600">Prix par personne</span>
+            <span class="text-sm font-semibold text-slate-900">{{plan.prix}} TND</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-slate-600">Durée</span>
+            <span class="text-sm font-semibold text-slate-900">
+              {{#calculateDays plan.date_debut plan.date_fin}}{{/calculateDays}} jours
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Actions</h3>
+        <div class="space-y-3">
+          <a href="/guide/plans/{{plan.id}}/edit" class="flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
+            <i class="fas fa-edit"></i>
+            Modifier le plan
+          </a>
+          
+          <button onclick="deletePlan({{plan.id}})" class="flex w-full items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-100">
+            <i class="fas fa-trash"></i>
+            Supprimer le plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour ajouter un lieu -->
+<div id="addLieuModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+  <div class="mx-4 w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-slate-900">Ajouter un lieu</h3>
+      <button onclick="closeAddLieuModal()" class="text-slate-400 hover:text-slate-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form id="addLieuForm" onsubmit="addLieu(event)">
+      <div class="mb-4">
+        <div class="mb-4">
+          <label for="typeSelect" class="block text-sm font-medium text-slate-700 mb-2">
+            Type de lieu
+          </label>
+          <select id="typeSelect" name="type" required
+                  class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-ocean-blue focus:outline-none focus:ring-1 focus:ring-ocean-blue">
+            <option value="">Choisir un type...</option>
+            <option value="hotel">Hôtel</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="lieu">Lieu touristique</option>
+          </select>
+        </div>
+
+      <div class="mb-4">
+        <label for="imageInput" class="block text-sm font-medium text-slate-700 mb-2">
+          Image du lieu (optionnelle)
+        </label>
+        <input id="imageInput" name="image" type="file" accept="image/*"
+               class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-ocean-blue focus:outline-none focus:ring-1 focus:ring-ocean-blue" />
+      </div>
+
+      <div class="flex gap-3">
+        <button type="button" onclick="closeAddLieuModal()"
+                class="flex-1 rounded-xl border border-slate-300 bg-white py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+          Annuler
+        </button>
+        <button type="submit"
+                class="flex-1 rounded-xl bg-ocean-blue py-2 text-sm font-semibold text-white transition hover:bg-ocean-dark">
+          Ajouter
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Ouvrir le modal d'ajout de lieu
+function openAddLieuModal() {
+  document.getElementById('addLieuModal').classList.remove('hidden');
+  document.getElementById('addLieuModal').classList.add('flex');
+}
+
+// Fermer le modal d'ajout de lieu
+function closeAddLieuModal() {
+  document.getElementById('addLieuModal').classList.add('hidden');
+  document.getElementById('addLieuModal').classList.remove('flex');
+}
+
+// Ajouter un lieu
+async function addLieu(event) {
+  event.preventDefault();
+
+  const formData = new FormData(event.target);
+
+  try {
+    const response = await fetch(`/guide/plans/{{plan.id}}/lieux`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
+      closeAddLieuModal();
+      location.reload();
+    } else {
+      const errorData = await response.json();
+      alert(errorData.error || 'Erreur lors de l\'ajout du lieu');
+    }
+  } catch (error) {
+    console.error('Erreur:', error);
+    alert('Erreur lors de l\'ajout du lieu');
+  }
+}
+
+// Supprimer un lieu
+async function removeLieu(planLieuId) {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer ce lieu du plan ?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/guide/plans/{{plan.id}}/lieux/${planLieuId}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      location.reload();
+    } else {
+      alert('Erreur lors de la suppression du lieu');
+    }
+  } catch (error) {
+    console.error('Erreur:', error);
+    alert('Erreur lors de la suppression du lieu');
+  }
+}
+
+// Supprimer le plan
+async function deletePlan(planId) {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer ce plan ? Cette action est irréversible.')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/guide/plans/${planId}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      window.location.href = '/guide/plans?success=Plan supprimé avec succès';
+    } else {
+      alert('Erreur lors de la suppression du plan');
+    }
+  } catch (error) {
+    console.error('Erreur:', error);
+    alert('Erreur lors de la suppression du plan');
+  }
+}
+
+
+</script>

@@ -203,6 +203,7 @@ class Plan {
   }
 
   static async delete(id) {
+    await db.query('DELETE FROM plan_lieux WHERE id_plan = ?', [id]);
     const [result] = await db.query('DELETE FROM plans_touristiques WHERE id = ?', [id]);
     return result.affectedRows > 0;
   }
@@ -220,18 +221,31 @@ class Plan {
     
     if (!plan[0]) return null;
 
-    // Get lieux for this plan
-    const [lieux] = await db.query(`
-      SELECT pl.*, d.nom as delegation_nom, gov.nom as gouvernorat_nom
-      FROM plan_lieux pl
-      LEFT JOIN delegations d ON pl.id_delegation = d.id
-      LEFT JOIN gouvernorats gov ON d.id_gouvernorat = gov.id
-      WHERE pl.id_plan = ?
-    `, [planId]);
+    const [guide] = await db.query(
+      `SELECT u.*, g.statut, g.abonnement_actif
+       FROM utilisateurs u
+       JOIN guides g ON u.id = g.id_utilisateur
+       WHERE g.id_utilisateur = ?`,
+      [plan[0].id_guide]
+    );
+
+    const [lieux] = await db.query(
+      `SELECT pl.*, d.nom as delegation_nom, g.nom as gouvernorat_nom
+       FROM plan_lieux pl
+       JOIN delegations d ON pl.id_delegation = d.id
+       JOIN gouvernorats g ON d.id_gouvernorat = g.id
+       WHERE pl.id_plan = ?`,
+      [planId]
+    );
+
+    const delegations = lieux.filter(lieu => !lieu.type && !lieu.image);
+    const actualLieux = lieux.filter(lieu => lieu.type || lieu.image);
 
     return {
       ...plan[0],
-      lieux: lieux || []
+      guide: guide[0] || null,
+      delegations,
+      lieux: actualLieux
     };
   }
 }

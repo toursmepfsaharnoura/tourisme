@@ -1,171 +1,62 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mes plans touristiques - Inside Tunisia</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
-    .font-playfair { font-family: 'Playfair Display', serif; }
-    .desert-gradient { background: linear-gradient(135deg, #f59e0b, #dc2626); }
-    .ocean-gradient { background: linear-gradient(135deg, #0891b2, #0e7490); }
-    .card-hover { transition: all 0.3s ease; }
-    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  </style>
-</head>
-<body class="bg-gray-50">
-  <!-- Navigation -->
-  {{> navbar}}
-  
-  <!-- Hero Section -->
-  <section class="relative h-48 flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');">
-    <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 font-playfair">Mes plans touristiques</h1>
-      <p class="text-lg text-gray-200 max-w-2xl mx-auto">
-        Gérez vos offres de voyages et partagez les merveilles de la Tunisie
-      </p>
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Mes plans touristiques</h1>
+      <p class="mt-2 text-sm text-slate-600">Visualisez et gérez vos circuits créés pour les voyageurs.</p>
     </div>
-  </section>
+    <a href="/guide/plans/new" class="inline-flex items-center gap-2 rounded-full bg-ocean-blue px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-ocean-blue/20 hover:bg-ocean-dark transition">
+      <i class="fas fa-plus"></i>
+      Nouveau plan
+    </a>
+  </div>
 
-  <!-- Main Content -->
-  <section class="py-12 px-4 max-w-7xl mx-auto">
-    <!-- Success/Error Messages -->
-    {{#if success}}
-      <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center">
-        <i class="fas fa-check-circle mr-3"></i>
-        <span>{{success}}</span>
-      </div>
-    {{/if}}
-
-    {{#if error}}
-      <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center">
-        <i class="fas fa-exclamation-circle mr-3"></i>
-        <span>{{error}}</span>
-      </div>
-    {{/if}}
-
-    <!-- Header with Create Button -->
-    <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-      <div class="mb-4 md:mb-0">
-        <h2 class="text-2xl font-bold text-gray-900 font-playfair">Vos créations</h2>
-        <p class="text-gray-600 mt-1">{{plans.length}} plan(s) touristique(s) créé(s)</p>
-      </div>
-      <a href="/guide/create-plan" class="desert-gradient text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity inline-flex items-center">
-        <i class="fas fa-plus mr-2"></i>
-        Créer un nouveau plan
-      </a>
+  {{#if success}}
+    <div class="mb-6 rounded-3xl border border-green-200 bg-green-50 px-6 py-4 text-sm text-green-900 shadow-sm">
+      <strong>Succès :</strong> {{success}}
     </div>
+  {{/if}}
 
-    <!-- Plans Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {{#if error}}
+    <div class="mb-6 rounded-3xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-900 shadow-sm">
+      <strong>Erreur :</strong> {{error}}
+    </div>
+  {{/if}}
+
+  {{#if plans.length}}
+    <div class="grid gap-6 lg:grid-cols-2">
       {{#each plans}}
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
-          <!-- Card Header with Image -->
-          <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 relative">
-            <div class="absolute inset-0 flex items-center justify-center">
-              <i class="fas fa-map-marked-alt text-white text-4xl opacity-50"></i>
+        <article class="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-slate-900">{{this.titre}}</h2>
+              <p class="mt-3 text-sm leading-6 text-slate-600 line-clamp-3">{{this.description}}</p>
             </div>
-            <div class="absolute top-4 right-4">
-              <span class="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
-                {{this.prix}} TND
-              </span>
+            <span class="inline-flex items-center rounded-full bg-sand-dune px-4 py-2 text-sm font-semibold text-slate-900">{{this.prix}} TND</span>
+          </div>
+
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-3xl bg-slate-50 p-4 text-sm text-slate-700">
+              <div class="font-semibold text-slate-900">Dates</div>
+              <div class="mt-2 text-base text-slate-700">{{formatDate this.date_debut}} — {{formatDate this.date_fin}}</div>
+            </div>
+            <div class="rounded-3xl bg-slate-50 p-4 text-sm text-slate-700">
+              <div class="font-semibold text-slate-900">Créé le</div>
+              <div class="mt-2 text-base text-slate-700">{{formatDate this.created_at}}</div>
             </div>
           </div>
 
-          <!-- Card Content -->
-          <div class="p-6">
-            <!-- Title -->
-            <h3 class="text-xl font-bold text-gray-900 mb-3 font-playfair line-clamp-2">
-              {{this.titre}}
-            </h3>
-
-            <!-- Description -->
-            <p class="text-gray-600 mb-4 line-clamp-3">
-              {{this.description_courte}}
-            </p>
-
-            <!-- Date Range -->
-            <div class="flex items-center text-sm text-gray-500 mb-4">
-              <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
-              <span>{{this.periode}}</span>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-wrap gap-2">
-              <button onclick="viewPlanDetails({{this.id}})" class="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-lg font-medium hover:bg-blue-100 transition-colors text-sm">
-                <i class="fas fa-eye mr-1"></i>
-                Voir détails
-              </button>
-              <button onclick="editPlan({{this.id}})" class="flex-1 bg-gray-50 text-gray-600 px-3 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm">
-                <i class="fas fa-edit mr-1"></i>
-                Modifier
-              </button>
-              <button onclick="deletePlan({{this.id}})" class="bg-red-50 text-red-600 px-3 py-2 rounded-lg font-medium hover:bg-red-100 transition-colors text-sm">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="/guide/plans/{{this.id}}/edit" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Modifier</a>
+            <a href="/guide/plans/{{this.id}}/lieux" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Ajouter des lieux</a>
+            <a href="/guide/plans/{{this.id}}" class="inline-flex items-center gap-2 rounded-full bg-ocean-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-ocean-dark">Voir détails</a>
           </div>
-        </div>
+        </article>
       {{/each}}
     </div>
-
-    <!-- Empty State -->
-    {{#unless plans}}
-      <div class="text-center py-16">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
-          <i class="fas fa-suitcase-rolling text-gray-400 text-3xl"></i>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-4 font-playfair">Aucun plan créé</h3>
-        <p class="text-gray-600 mb-8 max-w-md mx-auto">
-          Vous n'avez pas encore créé de plans touristiques. Commencez dès maintenant à partager les beautés de la Tunisie avec les visiteurs.
-        </p>
-        <a href="/guide/create-plan" class="desert-gradient text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity inline-flex items-center">
-          <i class="fas fa-plus mr-2"></i>
-          Créer votre premier plan
-        </a>
-      </div>
-    {{/unless}}
-  </section>
-
-  <!-- Footer -->
-  {{> footer}}
-
-  <script>
-    function viewPlanDetails(planId) {
-      window.location.href = `/plans/${planId}`;
-    }
-
-    function editPlan(planId) {
-      window.location.href = `/guide/plans/${planId}/edit`;
-    }
-
-    function deletePlan(planId) {
-      if (confirm('Êtes-vous sûr de vouloir supprimer ce plan ? Cette action est irréversible.')) {
-        fetch(`/guide/plans/${planId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            window.location.reload();
-          } else {
-            alert('Erreur lors de la suppression du plan');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Erreur lors de la suppression du plan');
-        });
-      }
-    }
-  </script>
-</body>
-</html>
+  {{else}}
+    <div class="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+      <p class="text-lg font-medium text-slate-900">Vous n'avez pas encore créé de plans touristiques.</p>
+      <a href="/guide/plans/new" class="mt-6 inline-flex items-center gap-2 rounded-full bg-ocean-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-ocean-dark">Créer votre premier plan</a>
+    </div>
+  {{/if}}
+</div>

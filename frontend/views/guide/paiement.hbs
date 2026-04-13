@@ -80,6 +80,11 @@
             width: 3rem;
             height: 3rem;
         }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -130,31 +135,126 @@
     </div>
 
     <script>
-        // Formatage du numéro de carte
-        document.getElementById('cardNumber').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
-            let formatted = '';
-            for (let i = 0; i < value.length; i++) {
-                if (i % 4 === 0 && i > 0) formatted += ' ';
-                formatted += value[i];
-            }
-            e.target.value = formatted;
-        });
+const form = document.getElementById('payment-form');
 
-        // Formatage de la date d'expiration
-        document.getElementById('expiry').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\//g, '').replace(/[^0-9]/g, '');
-            if (value.length >= 2) {
-                value = value.slice(0,2) + '/' + value.slice(2,4);
-            }
-            e.target.value = value;
-        });
+form.addEventListener('submit', function(e) {
+    let valid = true;
 
-        // Afficher le loader lors de la soumission
-        document.getElementById('payment-form').addEventListener('submit', function() {
-            document.getElementById('pay-button').disabled = true;
-            document.getElementById('loading').style.display = 'block';
-        });
-    </script>
+    const cardInput = document.getElementById('cardNumber');
+    const expiryInput = document.getElementById('expiry');
+    const cvcInput = document.getElementById('cvc');
+
+    const cardNumber = cardInput.value.trim();
+    const expiry = expiryInput.value.trim();
+    const cvc = cvcInput.value.trim();
+    const phoneInput = document.getElementById('phone');
+    const phone = phoneInput.value.trim();
+
+    // Reset style
+    cardInput.style.border = "2px solid #e0e0e0";
+    expiryInput.style.border = "2px solid #e0e0e0";
+    cvcInput.style.border = "2px solid #e0e0e0";
+
+    // =========================
+    // 🔴 CARD NUMBER
+    // =========================
+    if (!/^[0-9 ]+$/.test(cardNumber)) {
+        alert("❌ Numéro de carte invalide (chiffres فقط)");
+        cardInput.style.border = "2px solid red";
+        cardInput.focus();
+        valid = false;
+    } else if (cardNumber.replace(/\s/g, '').length !== 16) {
+        alert("❌ Le numéro de carte doit contenir 16 chiffres");
+        cardInput.style.border = "2px solid red";
+        cardInput.focus();
+        valid = false;
+    }
+
+    // =========================
+    // 🔴 EXPIRY DATE
+    // =========================
+    if (valid) {
+        const match = expiry.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+
+        if (!match) {
+            alert("❌ Format invalide (MM/AA)");
+            expiryInput.style.border = "2px solid red";
+            expiryInput.focus();
+            valid = false;
+        } else {
+            const month = parseInt(match[1]);
+            const year = 2000 + parseInt(match[2]);
+
+            const now = new Date();
+            const expDate = new Date(year, month);
+
+            if (expDate <= now) {
+                alert("❌ La carte est expirée");
+                expiryInput.style.border = "2px solid red";
+                expiryInput.focus();
+                valid = false;
+            }
+        }
+    }
+
+    // =========================
+    // 🔴 CVC
+    // =========================
+    if (valid) {
+        if (!/^[0-9]{3}$/.test(cvc)) {
+            alert("❌ CVC invalide (3 chiffres requis)");
+            cvcInput.style.border = "2px solid red";
+            cvcInput.focus();
+            valid = false;
+        }
+    }
+    // =========================
+// 🔴 PHONE
+// =========================
+if (valid) {
+    if (!/^[0-9]{8}$/.test(phone)) {
+        alert("❌ Numéro de téléphone invalide (8 chiffres requis)");
+        phoneInput.style.border = "2px solid red";
+        phoneInput.focus();
+        valid = false;
+    }
+}
+
+    // =========================
+    // ❌ STOP SI ERREUR
+    // =========================
+    if (!valid) {
+        e.preventDefault();
+        return;
+    }
+
+    // =========================
+    // ✅ OK → LOADER
+    // =========================
+    document.getElementById('pay-button').disabled = true;
+    document.getElementById('loading').style.display = 'block';
+});
+
+
+// =========================
+// FORMAT AUTO
+// =========================
+
+// Carte
+document.getElementById('cardNumber').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    let formatted = value.match(/.{1,4}/g)?.join(' ') || '';
+    e.target.value = formatted;
+});
+
+// Expiry
+document.getElementById('expiry').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.slice(0,2) + '/' + value.slice(2,4);
+    }
+    e.target.value = value;
+});
+</script>
 </body>
 </html>

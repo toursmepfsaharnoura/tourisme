@@ -245,14 +245,14 @@
     <h3>📄 Mes documents</h3>
      <div style="display: flex; gap: 15px; flex-wrap: wrap;">
       {{#if cv}}
-      <a href="/{{cv}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
+      <a href="{{uploadPath cv}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
         📄 Voir mon CV
       </a>
       {{else}}
       <span class="btn btn-secondary" style="background: #aaa; cursor: default;">Aucun CV</span>
       {{/if}}
       {{#if diplome}}
-      <a href="/{{diplome}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
+      <a href="{{uploadPath diplome}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
         🎓 Voir mon diplôme
       </a>
       {{else}}

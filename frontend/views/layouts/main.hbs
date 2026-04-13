@@ -194,7 +194,9 @@
   {{/if}}
 
   <!-- Navigation -->
-  {{> navbar}}
+  {{#unless hideNavbar}}
+    {{> navbar}}
+  {{/unless}}
 
   <!-- MAIN CONTENT -->
   <main class="min-h-screen animate-fade-in">
@@ -202,6 +204,9 @@
   </main>
 
   <!-- Footer -->
+  {{#unless hideFooter}}
+    {{> footer}}
+  {{/unless}}
   {{> footer}}
 
   <!-- Scroll to Top Button -->
