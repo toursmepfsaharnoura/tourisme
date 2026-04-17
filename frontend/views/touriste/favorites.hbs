@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Favoris - Tunisie Authentique</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+  <section class="relative overflow-hidden bg-gradient-to-br from-rose-900 via-pink-900 to-red-600 py-24 text-white">
+    <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.35),_transparent_40%)]"></div>
+    <div class="relative mx-auto max-w-7xl px-6 text-center">
+      <p class="text-sm uppercase tracking-[0.35em] text-pink-200">Vos coups de cœur</p>
+      <h1 class="mt-4 text-5xl font-extrabold sm:text-6xl">Mes Plans Favoris</h1>
+      <p class="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-200/90">
+        Retrouvez tous les circuits que vous avez enregistrés. Cliquez sur "Réserver" pour commencer votre aventure.
+      </p>
+    </div>
+  </section>
+
+  <main class="mx-auto max-w-7xl px-6 py-14">
+    {{#if favorites.length}}
+      <div class="mb-6">
+        <a href="/touriste/plans" class="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 font-semibold">
+          <i class="fas fa-arrow-left"></i> Retour aux circuits
+        </a>
+      </div>
+
+      <div class="space-y-8">
+        {{#each favorites}}
+          <article class="overflow-hidden rounded-2xl bg-white shadow-xl hover:shadow-2xl transition">
+            <div class="grid gap-0 lg:grid-cols-[1.5fr_1fr]">
+              <!-- Left: Plan Details -->
+              <div class="p-8 lg:p-10 space-y-6">
+                <!-- Title & Description -->
+                <div>
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <span class="inline-flex rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-rose-700">Favori</span>
+                      <h2 class="mt-4 text-4xl font-extrabold text-slate-900">{{titre}}</h2>
+                    </div>
+                    <button onclick="removeFavorite({{id_plan}})" class="mt-2 text-2xl transition-transform hover:scale-110 text-rose-500">
+                      <i class="fas fa-heart"></i>
+                    </button>
+                  </div>
+                  <p class="mt-3 text-lg text-slate-600 leading-relaxed">{{description}}</p>
+                </div>
+
+                <!-- Dates -->
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="rounded-xl bg-sky-50 p-4 border border-sky-100">
+                    <div class="font-semibold text-sky-900 text-sm">Départ</div>
+                    <div class="mt-2 text-xl font-bold text-sky-700">{{formatDate date_debut}}</div>
+                  </div>
+                  <div class="rounded-xl bg-emerald-50 p-4 border border-emerald-100">
+                    <div class="font-semibold text-emerald-900 text-sm">Retour</div>
+                    <div class="mt-2 text-xl font-bold text-emerald-700">{{formatDate date_fin}}</div>
+                  </div>
+                </div>
+
+                <!-- Prix -->
+                <div class="rounded-xl bg-gradient-to-r from-sky-100 to-cyan-100 p-5 border-2 border-sky-300">
+                  <span class="text-xs font-bold text-sky-700 uppercase tracking-wider">Prix par personne</span>
+                  <div class="mt-2 text-4xl font-black text-sky-900">{{prix}} <span class="text-2xl">TND</span></div>
+                </div>
+              </div>
+
+              <!-- Right: Guide & Reservation -->
+              <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-8 text-white space-y-6">
+                <!-- Guide Info -->
+                <div class="rounded-xl bg-white/10 backdrop-blur border border-white/20 p-5 space-y-4">
+                  <div class="flex items-center gap-4">
+                    {{#if guide_photo}}
+                      <img src="{{guide_photo}}" alt="{{guide_nom}}" class="h-16 w-16 rounded-full object-cover border-2 border-cyan-400" />
+                    {{else}}
+                      <div class="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-cyan-400 to-sky-500 text-2xl font-bold">{{substring guide_nom 0 1}}</div>
+                    {{/if}}
+                    <div>
+                      <p class="text-xs uppercase tracking-widest text-slate-300">Guide</p>
+                      <p class="text-xl font-bold">{{guide_nom}}</p>
+                    </div>
+                  </div>
+                  <div class="text-sm space-y-2 text-slate-300 border-t border-white/10 pt-4">
+                    <p><strong class="text-white">Email:</strong> {{guide_email}}</p>
+                  </div>
+                </div>
+
+                <!-- Reservation Form -->
+                <form method="POST" action="/reservations/touriste/reservations" class="space-y-4">
+                  <input type="hidden" name="id_plan" value="{{id_plan}}" />
+                  <input type="hidden" name="date_reservation" value="{{date_debut}}" />
+                  
+                  <div>
+                    <label class="block text-sm font-semibold text-slate-200 mb-2">Nombre de personnes</label>
+                    <input type="number" name="nombre_personnes" min="1" value="1" required class="w-full rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-3 text-white font-medium outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50" />
+                  </div>
+                  
+                  <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-sky-600 px-6 py-4 text-lg font-bold text-white transition hover:opacity-90 hover:shadow-lg active:scale-95">
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    Réserver maintenant
+                  </button>
+                </form>
+
+                <p class="text-xs text-slate-400 text-center italic">Départ prévu le {{formatDate date_debut}}</p>
+              </div>
+            </div>
+          </article>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="rounded-2xl border border-slate-200 bg-white p-16 text-center shadow-lg">
+        <i class="fas fa-heart text-6xl text-slate-300 mb-6"></i>
+        <h2 class="text-3xl font-bold text-slate-900">Aucun favori pour le moment</h2>
+        <p class="mt-4 text-lg text-slate-600">Ajoutez des plans à vos favoris en visitant les circuits disponibles.</p>
+        <a href="/touriste/plans" class="mt-8 inline-flex items-center gap-2 bg-sky-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-sky-700">
+          <i class="fas fa-compass"></i> Découvrez les circuits
+        </a>
+      </div>
+    {{/if}}
+  </main>
+
+  <script>
+    async function removeFavorite(planId) {
+      if (confirm('Voulez-vous vraiment retirer ce plan de vos favoris?')) {
+        try {
+          const response = await fetch('/touriste/favorites/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ planId })
+          });
+          
+          const result = await response.json();
+          if (result.success) {
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error('Erreur:', err);
+          alert('Erreur lors de la suppression');
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>

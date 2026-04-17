@@ -24,6 +24,10 @@ exports.getDelegationDetail = async (req, res) => {
     // Filter out current delegation from related
     const otherDelegations = relatedDelegations.filter(d => d.id !== parseInt(delegationId));
 
+    // Get plans for this delegation
+    const Plan = require('../models/Plan');
+    const plans = await Plan.findByDelegation(delegationId);
+
     // Get local guides from database
     const db = require('../config/db');
     const [guidesLocaux] = await db.query(
@@ -39,6 +43,7 @@ exports.getDelegationDetail = async (req, res) => {
       gouvernorat,
       relatedDelegations: otherDelegations.slice(0, 4), // Max 4 related
       guidesLocaux,
+      plans,
       user: req.session.user || null,
       title: `${delegation.nom} - Tunisie Authentique`
     });

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Réservations - Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .glass {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .card-hover:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
+
+  <!-- Hero Section -->
+  <section class="pt-32 pb-16 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-6xl font-black mb-4">
+          Mes <span class="text-yellow-400">Réservations</span>
+        </h1>
+        <p class="text-xl opacity-90 max-w-2xl mx-auto">
+          Gérez les réservations pour vos circuits touristiques
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reservations List -->
+  <section class="px-6 pb-32">
+    <div class="max-w-7xl mx-auto">
+      {{#if reservations.length}}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {{#each reservations}}
+        <div class="glass rounded-3xl p-8 card-hover border-2 border-white/20">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-6">
+            <div>
+              <h3 class="text-2xl font-black mb-2">{{plan.titre}}</h3>
+              <p class="text-lg opacity-80">{{plan.description}}</p>
+            </div>
+            <div class="text-right">
+              {{#if plan.prix}}
+              <div class="text-2xl font-black text-yellow-400 mb-2">
+                {{plan.prix}} TND
+              </div>
+              {{/if}}
+              <div class="px-3 py-1 rounded-full text-sm font-semibold
+                {{#eq statut 'EN_ATTENTE'}}bg-orange-500/20 text-orange-400 border border-orange-500/30
+                {{else if (eq statut 'CONFIRMEE')}}bg-green-500/20 text-green-400 border border-green-500/30
+                {{else}}bg-red-500/20 text-red-400 border border-red-500/30{{/eq}}">
+                {{#eq statut 'EN_ATTENTE'}}En Attente
+                {{else if (eq statut 'CONFIRMEE')}}Confirmée
+                {{else}}Annulée{{/eq}}
+              </div>
+            </div>
+          </div>
+
+          <!-- Tourist Info -->
+          <div class="bg-white/10 rounded-2xl p-6 mb-6">
+            <h4 class="text-lg font-bold mb-4 text-blue-400">
+              <i class="fas fa-user mr-2"></i>
+              Informations du Touriste
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm opacity-75">Nom complet</p>
+                <p class="font-semibold">{{tourist.nom_complet}}</p>
+              </div>
+              <div>
+                <p class="text-sm opacity-75">Email</p>
+                <p class="font-semibold">{{tourist.email}}</p>
+              </div>
+              {{#if tourist.telephone}}
+              <div>
+                <p class="text-sm opacity-75">Téléphone</p>
+                <p class="font-semibold">{{tourist.telephone}}</p>
+              </div>
+              {{/if}}
+              <div>
+                <p class="text-sm opacity-75">Date de création</p>
+                <p class="font-semibold">{{formatDate date_creation}}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reservation Details -->
+          {{#if date_reservation}}
+          <div class="bg-white/10 rounded-2xl p-6 mb-6">
+            <h4 class="text-lg font-bold mb-4 text-green-400">
+              <i class="fas fa-calendar-check mr-2"></i>
+              Détails de la Réservation
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm opacity-75">Date souhaitée</p>
+                <p class="font-semibold">{{formatDate date_reservation}}</p>
+              </div>
+              {{#if nombre_personnes}}
+              <div>
+                <p class="text-sm opacity-75">Nombre de personnes</p>
+                <p class="font-semibold">{{nombre_personnes}}</p>
+              </div>
+              {{/if}}
+            </div>
+            {{#if message}}
+            <div class="mt-4">
+              <p class="text-sm opacity-75">Message</p>
+              <p class="font-semibold italic">{{message}}</p>
+            </div>
+            {{/if}}
+          </div>
+          {{/if}}
+
+          <!-- Actions -->
+          {{#eq statut 'EN_ATTENTE'}}
+          <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/30">
+            <button onclick="confirmReservation({{id}})" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4 rounded-2xl font-bold text-center text-white card-hover">
+              <i class="fas fa-check mr-2"></i>
+              Confirmer
+            </button>
+            <button onclick="rejectReservation({{id}})" class="flex-1 bg-gradient-to-r from-red-500 to-pink-600 px-6 py-4 rounded-2xl font-bold text-center text-white card-hover">
+              <i class="fas fa-times mr-2"></i>
+              Annuler
+            </button>
+          </div>
+          {{else}}
+          <div class="text-center py-4 text-lg opacity-75">
+            {{#eq statut 'CONFIRMEE'}}
+            <i class="fas fa-check-circle text-green-400 mr-2"></i>
+            Réservation confirmée
+            {{else}}
+            <i class="fas fa-times-circle text-red-400 mr-2"></i>
+            Réservation annulée
+            {{/eq}}
+          </div>
+          {{/eq}}
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="text-center py-32">
+        <i class="fas fa-calendar-times text-8xl text-white/20 mb-12"></i>
+        <h2 class="text-4xl font-black mb-6">Aucune Réservation</h2>
+        <p class="text-2xl opacity-80 mb-12 max-w-2xl mx-auto">
+          Vous n'avez pas encore de réservations pour vos circuits
+        </p>
+        <a href="/guide/dashboard" class="bg-gradient-to-r from-yellow-400 to-orange-500 px-12 py-6 rounded-3xl font-bold text-xl card-hover">
+          <i class="fas fa-arrow-left mr-3"></i>
+          Retour au Dashboard
+        </a>
+      </div>
+      {{/if}}
+    </div>
+  </section>
+
+  <script>    async function confirmReservation(reservationId) {
+      if (confirm('Êtes-vous sûr de vouloir confirmer cette réservation ?')) {
+        try {
+          const response = await fetch(`/guide/reservations/${reservationId}/status`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ statut: 'CONFIRMEE' })
+          });
+
+          if (response.ok) {
+            alert('Réservation confirmée avec succès !');
+            location.reload();
+          } else {
+            alert('Erreur lors de la confirmation');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Erreur lors de la confirmation');
+        }
+      }
+    }
+
+    async function rejectReservation(reservationId) {
+      if (confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+        try {
+          const response = await fetch(`/guide/reservations/${reservationId}/status`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ statut: 'ANNULEE' })
+          });
+
+          if (response.ok) {
+            alert('Réservation annulée');
+            location.reload();
+          } else {
+            alert('Erreur lors de l\'annulation');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Erreur lors de l\'annulation');
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>

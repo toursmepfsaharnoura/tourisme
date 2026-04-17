@@ -1,56 +1,36 @@
 const db = require('./config/db');
 
-console.log('Vérification des colonnes de la base de données...');
-
-// Vérifier si la colonne verification_code existe
-db.query('SHOW COLUMNS FROM utilisateurs LIKE ?', ['verification_code'], (err, results) => {
-  if (err) {
-    console.error('Erreur vérification colonne verification_code:', err);
-    process.exit(1);
-  }
-  
+const ensureColumn = async (table, column, definition) => {
+  const [results] = await db.query('SHOW COLUMNS FROM ?? LIKE ?', [table, column]);
   if (results.length === 0) {
-    console.log('Ajout de la colonne verification_code...');
-    db.query('ALTER TABLE utilisateurs ADD COLUMN verification_code VARCHAR(6) NULL', (err) => {
-      if (err) {
-        console.error('Erreur ajout colonne verification_code:', err);
-        process.exit(1);
-      }
-      console.log('✅ Colonne verification_code ajoutée avec succès');
-      checkVerifiedColumn();
-    });
+    console.log(`Ajout de la colonne ${column} dans ${table}...`);
+    await db.query(`ALTER TABLE ?? ADD COLUMN ${column} ${definition}`, [table]);
+    console.log(`✅ Colonne ${column} ajoutée avec succès dans ${table}`);
   } else {
-    console.log('✅ Colonne verification_code existe déjà');
-    checkVerifiedColumn();
+    console.log(`✅ Colonne ${column} existe déjà dans ${table}`);
   }
-});
+};
 
-function checkVerifiedColumn() {
-  // Vérifier si la colonne verified existe
-  db.query('SHOW COLUMNS FROM utilisateurs LIKE ?', ['verified'], (err, results) => {
-    if (err) {
-      console.error('Erreur vérification colonne verified:', err);
-      process.exit(1);
-    }
-    
-    if (results.length === 0) {
-      console.log('Ajout de la colonne verified...');
-      db.query('ALTER TABLE utilisateurs ADD COLUMN verified TINYINT(1) DEFAULT 0', (err) => {
-        if (err) {
-          console.error('Erreur ajout colonne verified:', err);
-          process.exit(1);
-        }
-        console.log('✅ Colonne verified ajoutée avec succès');
-        finishSetup();
-      });
-    } else {
-      console.log('✅ Colonne verified existe déjà');
-      finishSetup();
-    }
-  });
-}
+const ensureDatabaseSchema = async () => {
+  console.log('Vérification des colonnes de la base de données...');
 
-function finishSetup() {
+  await ensureColumn('utilisateurs', 'verification_code', 'VARCHAR(6) NULL');
+  await ensureColumn('utilisateurs', 'verified', 'TINYINT(1) DEFAULT 0');
+  await ensureColumn('plans_touristiques', 'capacite_max', 'INT NULL');
+  await ensureColumn('plan_lieux', 'nom', 'VARCHAR(255) NULL');
+  await ensureColumn('plan_lieux', 'description', 'TEXT NULL');
+  await ensureColumn('plan_lieux', 'date_visite', 'DATE NULL');
+
   console.log('🎉 Configuration de la base de données terminée!');
-  process.exit(0);
+};
+
+if (require.main === module) {
+  ensureDatabaseSchema()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('❌ Erreur configuration base de données:', err);
+      process.exit(1);
+    });
 }
+
+module.exports = { ensureDatabaseSchema };

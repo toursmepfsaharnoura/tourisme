@@ -9,6 +9,7 @@ const { verifGuide, verifTouriste, checkGuideValidated } = require('../middlewar
 // PUBLIC
 // =========================
 router.get('/', planController.getAllPlans);
+router.get('/plans', planController.getAllPlans);
 router.get('/public', planController.getAllPlans);
 router.get('/public/:id', planController.getPlanDetails);
 

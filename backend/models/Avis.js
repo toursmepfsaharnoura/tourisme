@@ -13,11 +13,54 @@ class Avis {
     return rows;
   }
 
+  static async findByTouristAndPlan(touristeId, planId) {
+    const [rows] = await db.query(
+      'SELECT * FROM avis WHERE id_touriste = ? AND id_plan = ? LIMIT 1',
+      [touristeId, planId]
+    );
+    return rows[0] || null;
+  }
+
+  static async findByPlan(planId) {
+    const [rows] = await db.query(
+      'SELECT * FROM avis WHERE id_plan = ? ORDER BY date_creation DESC',
+      [planId]
+    );
+    return rows;
+  }
+
+  static async findByTourist(touristeId) {
+    const [rows] = await db.query(
+      'SELECT * FROM avis WHERE id_touriste = ? ORDER BY date_creation DESC',
+      [touristeId]
+    );
+    return rows;
+  }
+
+  static async findById(id) {
+    const [rows] = await db.query('SELECT * FROM avis WHERE id = ?', [id]);
+    return rows[0] || null;
+  }
+
+  static async getSummaryForGuides(guideIds) {
+    if (!Array.isArray(guideIds) || guideIds.length === 0) {
+      return [];
+    }
+    const [rows] = await db.query(
+      `SELECT id_guide, AVG(note) AS moyenne, COUNT(*) AS total
+       FROM avis
+       WHERE id_guide IN (?)
+       GROUP BY id_guide`,
+      [guideIds]
+    );
+    return rows;
+  }
+
   static async create(data) {
-    const { id_guide, id_touriste, note, commentaire } = data;
+    const { id_guide, id_touriste, id_plan, note, commentaire } = data;
     const [result] = await db.query(
-      'INSERT INTO avis (id_guide, id_touriste, note, commentaire) VALUES (?, ?, ?, ?)',
-      [id_guide, id_touriste, note, commentaire]
+      'INSERT INTO avis (id_guide, id_touriste, id_plan, note, commentaire) VALUES (?, ?, ?, ?, ?)',
+      [id_guide, id_touriste, id_plan, note, commentaire]
     );
     return result.insertId;
   }

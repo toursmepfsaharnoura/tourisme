@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications Admin - Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body class="bg-gray-50">
+  
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <h1 class="text-xl font-bold text-gray-900">
+            <i class="fas fa-bell text-purple-600 mr-2"></i>
+            Notifications Admin
+          </h1>
+          {{#if unreadCount}}
+            <span class="ml-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+              {{unreadCount}} non lues
+            </span>
+          {{/if}}
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">
+            <i class="fas fa-arrow-left mr-1"></i>Retour Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    
+    <!-- Actions Rapides -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-semibold mb-4">
+        <i class="fas fa-paper-plane text-purple-600 mr-2"></i>
+        Envoyer une notification
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Envoyer à un guide spécifique -->
+        <div class="border rounded-lg p-4">
+          <h3 class="font-medium mb-3">Envoyer à un guide</h3>
+          <form id="sendToGuideForm" class="space-y-3">
+            <input type="number" id="guideId" placeholder="ID Guide" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <select id="notificationType" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="">Type de notification</option>
+              <option value="MESSAGE">Message</option>
+              <option value="PLAN_APPROVED">Plan approuvé</option>
+              <option value="PLAN_REJECTED">Plan rejeté</option>
+              <option value="CV_APPROVED">CV approuvé</option>
+              <option value="CV_REJECTED">CV rejeté</option>
+              <option value="PAYMENT_CONFIRMED">Paiement confirmé</option>
+              <option value="PAYMENT_REJECTED">Paiement rejeté</option>
+            </select>
+            <textarea id="notificationMessage" placeholder="Message..." required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      rows="3"></textarea>
+            <button type="submit" 
+                    class="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors">
+              <i class="fas fa-send mr-2"></i>Envoyer
+            </button>
+          </form>
+        </div>
+
+        <!-- Envoyer à tous les guides -->
+        <div class="border rounded-lg p-4">
+          <h3 class="font-medium mb-3">Envoyer à tous les guides</h3>
+          <form id="sendToAllForm" class="space-y-3">
+            <select id="broadcastType" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="">Type d'annonce</option>
+              <option value="ADMIN_ANNOUNCEMENT">Annonce générale</option>
+              <option value="MESSAGE">Message important</option>
+            </select>
+            <input type="text" id="announcementTitle" placeholder="Titre de l'annonce" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <textarea id="announcementMessage" placeholder="Message de l'annonce..." required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      rows="3"></textarea>
+            <button type="submit" 
+                    class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
+              <i class="fas fa-broadcast-tower mr-2"></i>Diffuser
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres et Actions -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div class="flex flex-wrap gap-2">
+          <button onclick="filterNotifications('ALL')" 
+                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+            Toutes
+          </button>
+          <button onclick="filterNotifications('MESSAGE')" 
+                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+            Messages
+          </button>
+          <button onclick="filterNotifications('PLAN_APPROVED')" 
+                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+            Plans
+          </button>
+          <button onclick="filterNotifications('CV_APPROVED')" 
+                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+            CV
+          </button>
+        </div>
+        <div class="flex space-x-2">
+          <button onclick="markAllAsRead()" 
+                  class="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+            <i class="fas fa-check-double mr-1"></i>Tout marquer lu
+          </button>
+          <button onclick="refreshNotifications()" 
+                  class="px-3 py-1 bg-gray-600 text-white rounded-md text-sm hover:bg-gray-700">
+            <i class="fas fa-sync-alt mr-1"></i>Actualiser
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des notifications -->
+    <div class="bg-white rounded-lg shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">
+          Notifications reçues
+          <span id="notificationCount" class="ml-2 text-sm text-gray-500">({{notifications.length}})</span>
+        </h3>
+      </div>
+      
+      <div id="notificationsList" class="divide-y divide-gray-200">
+        {{#each notifications}}
+          <div class="notification-item p-6 hover:bg-gray-50 transition-colors {{#unless this.est_vu}}bg-blue-50{{/unless}}" 
+               data-type="{{this.type}}" data-id="{{this.id}}">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="flex items-center mb-2">
+                  {{#if (eq this.type 'MESSAGE')}}
+                    <i class="fas fa-envelope text-blue-500 mr-2"></i>
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Message</span>
+                  {{else if (eq this.type 'PLAN_APPROVED')}}
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Plan approuvé</span>
+                  {{else if (eq this.type 'PLAN_REJECTED')}}
+                    <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Plan rejeté</span>
+                  {{else if (eq this.type 'CV_APPROVED')}}
+                    <i class="fas fa-file-check text-green-500 mr-2"></i>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">CV approuvé</span>
+                  {{else if (eq this.type 'CV_REJECTED')}}
+                    <i class="fas fa-file-times text-red-500 mr-2"></i>
+                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">CV rejeté</span>
+                  {{else if (eq this.type 'ADMIN_ANNOUNCEMENT')}}
+                    <i class="fas fa-bullhorn text-purple-500 mr-2"></i>
+                    <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Annonce</span>
+                  {{else}}
+                    <i class="fas fa-bell text-gray-500 mr-2"></i>
+                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">{{this.type}}</span>
+                  {{/if}}
+                  
+                  {{#unless this.est_vu}}
+                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded animate-pulse">Nouveau</span>
+                  {{/unless}}
+                </div>
+                
+                <p class="text-gray-800 mb-2">
+                  {{#if (typeof this.contenu 'object')}}
+                    {{this.contenu.message}}
+                  {{else}}
+                    {{this.contenu}}
+                  {{/if}}
+                </p>
+                
+                <div class="text-xs text-gray-500">
+                  <i class="fas fa-clock mr-1"></i>
+                  {{formatRelativeTime this.date_creation}}
+                </div>
+              </div>
+              
+              <div class="flex space-x-2 ml-4">
+                {{#unless this.est_vu}}
+                  <button onclick="markAsRead({{this.id}})" 
+                          class="text-blue-600 hover:text-blue-800 text-sm">
+                    <i class="fas fa-check"></i>
+                  </button>
+                {{/unless}}
+                <button onclick="deleteNotification({{this.id}})" 
+                        class="text-red-600 hover:text-red-800 text-sm">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+        
+        {{#unless notifications.length}}
+          <div class="p-12 text-center text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-4"></i>
+            <p>Aucune notification</p>
+          </div>
+        {{/unless}}
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Messages de confirmation -->
+  <div id="toast" class="fixed bottom-4 right-4 hidden">
+    <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
+      <i class="fas fa-check-circle mr-2"></i>
+      <span id="toastMessage">Succès</span>
+    </div>
+  </div>
+
+  <script>
+    const socket = io();
+    let currentFilter = 'ALL';
+
+    // Rejoindre la room admin
+    socket.emit('joinAdmin');
+    console.log('Admin connecté aux notifications');
+
+    // Écouter les notifications des guides
+    socket.on('admin_notification', (notification) => {
+      console.log('Notification reçue:', notification);
+      showToast('Nouvelle notification reçue', 'info');
+      refreshNotifications();
+    });
+
+    // Envoyer à un guide spécifique
+    document.getElementById('sendToGuideForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const guideId = document.getElementById('guideId').value;
+      const type = document.getElementById('notificationType').value;
+      const message = document.getElementById('notificationMessage').value;
+
+      try {
+        const response = await fetch('/notifications/send-to-guide', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            guideId: parseInt(guideId),
+            type,
+            message
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast('Notification envoyée avec succès', 'success');
+          document.getElementById('sendToGuideForm').reset();
+        } else {
+          showToast('Erreur: ' + data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur de connexion', 'error');
+      }
+    });
+
+    // Envoyer à tous les guides
+    document.getElementById('sendToAllForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const type = document.getElementById('broadcastType').value;
+      const title = document.getElementById('announcementTitle').value;
+      const message = document.getElementById('announcementMessage').value;
+
+      try {
+        const response = await fetch('/notifications/send-to-all-guides', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            type,
+            message: title ? `${title}: ${message}` : message,
+            metadata: { title, message }
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast('Annonce diffusée avec succès', 'success');
+          document.getElementById('sendToAllForm').reset();
+        } else {
+          showToast('Erreur: ' + data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur de connexion', 'error');
+      }
+    });
+
+    // Marquer comme lu
+    async function markAsRead(notificationId) {
+      try {
+        const response = await fetch('/notifications/mark-read', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ notificationId })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          const element = document.querySelector(`[data-id="${notificationId}"]`);
+          if (element) {
+            element.classList.remove('bg-blue-50');
+            const badge = element.querySelector('.animate-pulse');
+            if (badge) badge.remove();
+            const button = element.querySelector('button[onclick*="markAsRead"]');
+            if (button) button.remove();
+          }
+          showToast('Notification marquée comme lue', 'success');
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur', 'error');
+      }
+    }
+
+    // Marquer toutes comme lues
+    async function markAllAsRead() {
+      try {
+        const response = await fetch('/notifications/mark-all-read', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          document.querySelectorAll('.notification-item').forEach(item => {
+            item.classList.remove('bg-blue-50');
+            const badge = item.querySelector('.animate-pulse');
+            if (badge) badge.remove();
+            const button = item.querySelector('button[onclick*="markAsRead"]');
+            if (button) button.remove();
+          });
+          showToast(`${data.count} notifications marquées comme lues`, 'success');
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur', 'error');
+      }
+    }
+
+    // Supprimer une notification
+    async function deleteNotification(notificationId) {
+      if (!confirm('Supprimer cette notification?')) return;
+
+      try {
+        const response = await fetch(`/notifications/${notificationId}`, {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          const element = document.querySelector(`[data-id="${notificationId}"]`);
+          if (element) {
+            element.remove();
+            updateCount();
+          }
+          showToast('Notification supprimée', 'success');
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur', 'error');
+      }
+    }
+
+    // Filtrer les notifications
+    function filterNotifications(type) {
+      currentFilter = type;
+      
+      // Mettre à jour les boutons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-purple-100', 'text-purple-800');
+        btn.classList.add('bg-gray-100', 'text-gray-800');
+      });
+      event.target.classList.remove('bg-gray-100', 'text-gray-800');
+      event.target.classList.add('bg-purple-100', 'text-purple-800');
+
+      // Filtrer les éléments
+      document.querySelectorAll('.notification-item').forEach(item => {
+        if (type === 'ALL' || item.dataset.type === type) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      updateCount();
+    }
+
+    // Actualiser les notifications
+    async function refreshNotifications() {
+      try {
+        const response = await fetch('/notifications/admin');
+        const html = await response.text();
+        // Option: recharger la page ou mettre à jour le DOM
+        window.location.reload();
+      } catch (error) {
+        console.error('Erreur:', error);
+      }
+    }
+
+    // Mettre à jour le compteur
+    function updateCount() {
+      const visibleItems = document.querySelectorAll('.notification-item:not([style*="display: none"])');
+      document.getElementById('notificationCount').textContent = `(${visibleItems.length})`;
+    }
+
+    // Afficher un message toast
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      toastMessage.textContent = message;
+      
+      // Changer la couleur selon le type
+      const toastDiv = toast.querySelector('div');
+      toastDiv.className = `${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} text-white px-6 py-3 rounded-lg shadow-lg flex items-center`;
+      
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Helper pour formater le temps
+    function formatRelativeTime(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      
+      if (diff < 60000) return 'À l\'instant';
+      if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
+      if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)} h`;
+      return `Il y a ${Math.floor(diff / 86400000)} j`;
+    }
+  </script>
+
+</body>
+</html>

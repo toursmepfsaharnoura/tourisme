@@ -61,7 +61,7 @@
     </div>
     
     <!-- Responsive Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {{#each gouvernorats}}
       <div class="group relative">
         <!-- Card -->
@@ -83,7 +83,7 @@
             {{/if}}
             
             <!-- Heart Button -->
-            <button class="absolute top-3 right-3 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 border border-white/30">
+            <button onclick="event.stopPropagation(); handleFavoriteClick(event, {{id}})" class="absolute top-3 right-3 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 border border-white/30">
               <i class="far fa-heart text-lg"></i>
             </button>
             
@@ -220,13 +220,17 @@ document.querySelectorAll('section').forEach(section => {
 // Add smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';
 
-// Add heart button functionality
-document.querySelectorAll('.fa-heart').forEach(heart => {
-  heart.parentElement.addEventListener('click', function(e) {
-    e.stopPropagation();
-    heart.classList.toggle('far');
-    heart.classList.toggle('fas');
-    heart.classList.toggle('text-red-500');
-  });
-});
+function handleFavoriteClick(event, gouvernoratId) {
+  event.stopPropagation();
+  const isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+
+  if (!isLoggedIn) {
+    const redirect = encodeURIComponent(`/gouvernorats/${gouvernoratId}/delegations`);
+    window.location.href = `/login?redirect=${redirect}`;
+    return;
+  }
+
+  alert('Vous êtes connecté. Les fonctionnalités de favoris seront bientôt disponibles.');
+}
+
 </script>

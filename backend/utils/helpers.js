@@ -6,7 +6,7 @@ module.exports = {
     return d.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: '2-digit',
-      year: '2-digit'
+      year: 'numeric'
     });
   },
   eq: function (a, b) { return a === b; },

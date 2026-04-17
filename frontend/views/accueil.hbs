@@ -62,7 +62,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
             <!-- Favorite Button -->
-            <button class="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+            <button onclick="event.stopPropagation(); toggleFavoriteDestination(this)" data-gouvernorat="{{id}}" class="favorite-btn absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
               <i class="far fa-heart"></i>
             </button>
             
@@ -248,5 +248,25 @@ if (mobileMenuButton) {
     // Toggle mobile menu logic here
     console.log('Mobile menu clicked');
   });
+}
+
+// Favorite toggle function
+async function toggleFavoriteDestination(button) {
+  // For now, this redirects to the plans page with the gouvernorat filter
+  // When a full favorite system is implemented, this will save to user's favorites
+  const gouvernoratId = button.dataset.gouvernorat;
+  
+  // Check if user is logged in
+  const isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+  
+  if (!isLoggedIn) {
+    // Redirect to login
+    alert('Veuillez vous connecter pour ajouter aux favoris');
+    window.location.href = '/auth/login?redirect=/gouvernorats/' + gouvernoratId + '/delegations';
+  } else {
+    // Show message and redirect to view plans
+    window.location.href = '/gouvernorats/' + gouvernoratId + '/delegations';
+  }
+}
 }
 </script>

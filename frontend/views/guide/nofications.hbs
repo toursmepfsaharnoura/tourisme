@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide Notifications</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-100">
+  
+  <!-- Header -->
+  <header class="bg-blue-600 text-white p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">
+        <i class="fas fa-bell"></i> Mes Notifications
+      </h1>
+      <div class="flex items-center space-x-4">
+        <span class="text-sm">Connecté: {{guide.nom_complet}}</span>
+        <a href="/guide/dashboard" class="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-100">
+          <i class="fas fa-arrow-left"></i> Retour
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto p-4">
+    
+    <!-- Stats -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-blue-600" id="totalCount">{{notifications.length}}</div>
+          <div class="text-gray-600">Total</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600" id="unreadCount">0</div>
+          <div class="text-gray-600">Non lues</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-orange-600" id="realtimeCount">0</div>
+          <div class="text-gray-600">En temps réel</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Container -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">
+          <i class="fas fa-inbox"></i> Notifications reçues
+        </h2>
+      </div>
+      
+      <div id="notifications" class="p-4 space-y-3 max-h-96 overflow-y-auto">
+        
+        <!-- Notifications existantes -->
+        {{#each notifications}}
+          <div class="notification-item border rounded-lg p-4 hover:shadow-md transition-shadow {{#unless this.est_vu}}bg-blue-50 border-blue-200{{/unless}}" data-id="{{this.id}}">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="flex items-center mb-2">
+                  {{#if (eq this.type 'MESSAGE')}}
+                    <i class="fas fa-envelope text-blue-500 mr-2"></i>
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Message</span>
+                  {{else if (eq this.type 'RESERVATION')}}
+                    <i class="fas fa-calendar text-green-500 mr-2"></i>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Plan</span>
+                  {{else if (eq this.type 'CV')}}
+                    <i class="fas fa-file-alt text-purple-500 mr-2"></i>
+                    <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Document</span>
+                  {{else}}
+                    <i class="fas fa-bell text-gray-500 mr-2"></i>
+                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">{{this.type}}</span>
+                  {{/if}}
+                  
+                  {{#unless this.est_vu}}
+                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded">Nouveau</span>
+                  {{/unless}}
+                </div>
+                
+                <p class="text-gray-800 mb-2">
+                  {{#if this.isObject}}
+                    {{this.contenu.message}}
+                  {{else}}
+                    {{this.contenu}}
+                  {{/if}}
+                </p>
+                
+                <div class="text-xs text-gray-500">
+                  <i class="fas fa-clock"></i> {{formatRelativeTimeSimple this.date_creation}}
+                </div>
+              </div>
+              
+              <div class="flex space-x-2">
+                {{#if (eq this.type 'MESSAGE')}}
+                  <a href="/guide/conversation" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 inline-block">
+                    <i class="fas fa-comments"></i> Voir conversation et répondre
+                  </a>
+                {{else if (eq this.type 'RESERVATION')}}
+                  <a href="/guide/conversation" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 inline-block">
+                    <i class="fas fa-comments"></i> Voir conversation et répondre
+                  </a>
+                {{else if (eq this.type 'PLAN')}}
+                  <a href="/guide/conversation" class="bg-purple-500 text-white px-3 py-1 rounded text-sm hover:bg-purple-600 inline-block">
+                    <i class="fas fa-comments"></i> Voir conversation et répondre
+                  </a>
+                {{else if (eq this.type 'PAYMENT')}}
+                  <a href="/guide/conversation" class="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 inline-block">
+                    <i class="fas fa-comments"></i> Voir conversation 
+                  </a>
+                {{else}}
+                  <a href="/guide/conversation" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 inline-block">
+                    <i class="fas fa-comments"></i> Voir conversation 
+                  </a>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        {{/each}}
+
+        <!-- Message si aucune notification -->
+        {{#unless notifications.length}}
+          <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-3"></i>
+            <p>Aucune notification pour le moment</p>
+            <p class="text-sm">Les nouvelles notifications apparaîtront ici en temps réel</p>
+          </div>
+        {{/unless}}
+        
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <h3 class="font-semibold text-yellow-800 mb-2">
+        <i class="fas fa-info-circle"></i> Instructions
+      </h3>
+      <ul class="text-sm text-yellow-700 space-y-1">
+        <li>Les notifications de l'admin apparaissent instantanément sans rafraîchir la page</li>
+        <li>Les messages de l'admin sont marqués comme "reply"</li>
+        <li>Les décisions sur les plans sont marquées comme "plan"</li>
+        <li>Les autorisations de paiement sont marquées comme "payment"</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- Modal pour la conversation et réponse -->
+  <div id="conversationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+      <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+        <h3 class="text-lg font-semibold">
+          <i class="fas fa-comments"></i> Conversation avec l'Admin
+        </h3>
+        <button onclick="closeConversation()" class="text-white hover:text-gray-200">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <div class="p-4">
+        <!-- Message original de l'admin -->
+        <div class="bg-gray-100 p-3 rounded-lg mb-4">
+          <div class="flex items-center mb-2">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-2">
+              A
+            </div>
+            <div>
+              <div class="font-semibold">Admin</div>
+              <div class="text-xs text-gray-500">Message de notification</div>
+            </div>
+          </div>
+          <p id="adminMessage" class="text-gray-800"></p>
+          <div class="text-xs text-gray-500 mt-2">
+            <i class="fas fa-clock"></i> <span id="messageTime"></span>
+          </div>
+        </div>
+        
+        <!-- Zone de réponse -->
+        <div class="border-t pt-4">
+          <h4 class="font-semibold mb-3">
+            <i class="fas fa-reply"></i> Votre réponse
+          </h4>
+          <textarea id="responseMessage" 
+                    placeholder="Tapez votre réponse ici..." 
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    rows="4"></textarea>
+          
+          <div class="flex justify-end space-x-2 mt-3">
+            <button onclick="closeConversation()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              Annuler
+            </button>
+            <button onclick="sendResponse()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <i class="fas fa-paper-plane"></i> Envoyer la réponse
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript pour Socket.IO -->
+  <script>
+    const socket = io();
+    let realtimeNotifications = 0;
+
+    // Rejoindre la room du guide (IMPORTANT)
+    socket.emit('joinGuide', '{{guide.id}}');
+    console.log('Guide {{guide.id}} connecté');
+
+    // Écouter les notifications de l'admin
+    socket.on('guide_notification', (data) => {
+      console.log('Notification reçue:', data);
+      
+      realtimeNotifications++;
+      document.getElementById('realtimeCount').textContent = realtimeNotifications;
+      
+      // Créer la notification en temps réel
+      const notificationBox = document.createElement('div');
+      notificationBox.className = 'notification-item border rounded-lg p-4 hover:shadow-md transition-shadow bg-green-50 border-green-200';
+      notificationBox.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="flex items-center mb-2">
+              ${getTypeIcon(data.type)}
+              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded ml-2">${data.type}</span>
+              <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded animate-pulse">Nouveau</span>
+            </div>
+            <p class="text-gray-800 mb-2">${data.message}</p>
+            <div class="text-xs text-gray-500">
+              <i class="fas fa-clock"></i> À l'instant
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            ${getActionButton(data.type)}
+          </div>
+        </div>
+      `;
+      
+      // Ajouter au début de la liste
+      const container = document.getElementById('notifications');
+      container.insertBefore(notificationBox, container.firstChild);
+      
+      // Mettre à jour le compteur total
+      const totalCount = document.getElementById('totalCount');
+      totalCount.textContent = parseInt(totalCount.textContent) + 1;
+      
+      // Mettre à jour le compteur non lus
+      const unreadCount = document.getElementById('unreadCount');
+      unreadCount.textContent = parseInt(unreadCount.textContent) + 1;
+      
+      // Animation d'arrivée
+      notificationBox.style.opacity = '0';
+      notificationBox.style.transform = 'translateY(-20px)';
+      setTimeout(() => {
+        notificationBox.style.transition = 'all 0.3s ease';
+        notificationBox.style.opacity = '1';
+        notificationBox.style.transform = 'translateY(0)';
+      }, 100);
+    });
+
+    // Fonctions utilitaires
+    function getTypeIcon(type) {
+      const icons = {
+        'reply': '<i class="fas fa-reply text-blue-500 mr-2"></i>',
+        'plan': '<i class="fas fa-calendar text-green-500 mr-2"></i>',
+        'payment': '<i class="fas fa-credit-card text-purple-500 mr-2"></i>',
+        'message': '<i class="fas fa-envelope text-blue-500 mr-2"></i>'
+      };
+      return icons[type] || '<i class="fas fa-bell text-gray-500 mr-2"></i>';
+    }
+
+    function getActionButton(type) {
+      const buttons = {
+        'reply': '<button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"><i class="fas fa-reply"></i> Répondre</button>',
+        'plan': '<button class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"><i class="fas fa-eye"></i> Voir</button>',
+        'payment': '<button class="bg-purple-500 text-white px-3 py-1 rounded text-sm hover:bg-purple-600"><i class="fas fa-credit-card"></i> Paiement</button>'
+      };
+      return buttons[type] || '';
+    }
+
+    // Marquer comme lu quand on clique
+    document.addEventListener('click', function(e) {
+      const notificationItem = e.target.closest('.notification-item');
+      if (notificationItem && notificationItem.querySelector('.bg-red-500')) {
+        const badge = notificationItem.querySelector('.bg-red-500');
+        if (badge) {
+          badge.remove();
+          
+          // Mettre à jour le compteur non lus
+          const unreadCount = document.getElementById('unreadCount');
+          unreadCount.textContent = Math.max(0, parseInt(unreadCount.textContent) - 1);
+        }
+      }
+    });
+
+    // Fonctions pour la modal de conversation
+    function openConversation(notificationId, adminMessage) {
+      document.getElementById('adminMessage').textContent = adminMessage;
+      document.getElementById('messageTime').textContent = new Date().toLocaleString('fr-FR');
+      document.getElementById('conversationModal').classList.remove('hidden');
+      document.getElementById('conversationModal').classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeConversation() {
+      document.getElementById('conversationModal').classList.add('hidden');
+      document.getElementById('conversationModal').classList.remove('flex');
+      document.body.style.overflow = 'auto';
+      document.getElementById('responseMessage').value = '';
+    }
+
+    function sendResponse() {
+      const response = document.getElementById('responseMessage').value.trim();
+      if (!response) {
+        alert('Veuillez taper une réponse avant d\'envoyer.');
+        return;
+      }
+
+      // Envoyer la réponse au serveur
+      fetch('/guide/send-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: response,
+          isResponse: true
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Afficher confirmation
+          const confirmation = document.createElement('div');
+          confirmation.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+          confirmation.innerHTML = '<i class="fas fa-check"></i> Réponse envoyée avec succès!';
+          document.body.appendChild(confirmation);
+          
+          // Fermer la modal
+          closeConversation();
+          
+          // Supprimer la confirmation après 3 secondes
+          setTimeout(() => {
+            confirmation.remove();
+          }, 3000);
+        } else {
+          alert('Erreur lors de l\'envoi de la réponse: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur de connexion. Veuillez réessayer.');
+      });
+    }
+
+    // Fermer la modal avec la touche Escape
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeConversation();
+      }
+    });
+
+  </script>
+
+</body>
+</html>

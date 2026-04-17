@@ -7,16 +7,16 @@ class PlanLieu {
   }
 
   static async create(data) {
-    const { id_plan, id_delegation, type, image } = data;
+    const { id_plan, id_delegation, type, image, nom, description, date_visite } = data;
     const [result] = await db.query(
-      'INSERT INTO plan_lieux (id_plan, id_delegation, type, image) VALUES (?, ?, ?, ?)',
-      [id_plan, id_delegation, type, image || null]
+      'INSERT INTO plan_lieux (id_plan, id_delegation, type, image, nom, description, date_visite) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [id_plan, id_delegation, type, image || null, nom || null, description || null, date_visite || null]
     );
     return result.insertId;
   }
 
   static async update(id, updates) {
-    const allowedFields = ['id_delegation', 'type', 'image'];
+    const allowedFields = ['id_delegation', 'type', 'image', 'nom', 'description', 'date_visite'];
     const entries = Object.entries(updates).filter(([key]) => allowedFields.includes(key));
     if (entries.length === 0) return false;
 

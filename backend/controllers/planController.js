@@ -11,7 +11,20 @@ const db = require('../config/db');
  */
 exports.getNewPlan = async (req, res) => {
   try {
-    // Get delegations with governorat names for the form
+    const userId = req.session.user.id;
+
+    // 🔥 نجيب guide
+    const guide = await Guide.findByUserId(userId);
+
+    // 🔥 نتحقق من date_fin
+    const today = new Date();
+    const dateFin = guide?.abonnement_fin ? new Date(guide.abonnement_fin) : null;
+
+    if (!dateFin || dateFin < today) {
+      return res.send("❌ Votre abonnement a expiré. Veuillez renouveler votre abonnement.");
+    }
+
+    // ✅ إذا abonnement valide
     const delegations = await db.query(`
       SELECT d.*, g.nom as gouvernorat_nom 
       FROM delegations d 
@@ -23,6 +36,7 @@ exports.getNewPlan = async (req, res) => {
       user: req.session.user,
       delegations: delegations[0]
     });
+
   } catch (err) {
     console.error('Error getting new plan form:', err);
     res.status(500).send('Server error');
@@ -86,7 +100,7 @@ exports.getEditPlan = async (req, res) => {
 // À mettre à la place de l'ancien createPlan
 exports.createPlan = async (req, res) => {
   const userId = req.session.user.id;
-  const { titre, description, date_debut, date_fin, prix } = req.body;
+  const { titre, description, date_debut, date_fin, prix, capacite_max } = req.body;
   const lieux = req.body.delegations || req.body['delegations[]'] || req.body.lieux || req.body['lieux[]'];
 
   try {
@@ -94,12 +108,17 @@ exports.createPlan = async (req, res) => {
     if (dateError) {
       return res.redirect('/guide/create-plan?error=' + encodeURIComponent(dateError));
     }
+
+    const capacity = parseInt(capacite_max, 10);
+    if (Number.isNaN(capacity) || capacity <= 0) {
+      return res.redirect('/guide/create-plan?error=' + encodeURIComponent('Veuillez renseigner une capacité maximale de personnes valide.'));
+    }
     // 1. Vérifier ou créer l'entrée dans la table guides
     let guide = await Guide.findByUserId(userId);
     if (!guide) {
       await Guide.create(userId);
       guide = await Guide.findByUserId(userId);
-      console.log('✅ Ligne guides créée pour user', userId);
+      
     }
 
     // 2. Créer le plan
@@ -109,7 +128,8 @@ exports.createPlan = async (req, res) => {
       description,
       date_debut,
       date_fin,
-      prix
+      prix,
+      capacite_max: capacity
     });
 
     // 3. Ajouter les lieux (si existent)
@@ -202,7 +222,7 @@ exports.getPlanDetails = async (req, res) => {
  */
 exports.updatePlan = async (req, res) => {
   const planId = req.params.id;
-  const { titre, description, date_debut, date_fin, prix } = req.body;
+  const { titre, description, date_debut, date_fin, prix, capacite_max } = req.body;
   const userId = req.session.user.id;
 
   try {
@@ -220,7 +240,12 @@ exports.updatePlan = async (req, res) => {
       return res.redirect(`/guide/plans/${planId}/edit?error=${encodeURIComponent(dateError)}`);
     }
 
-    await Plan.update(planId, { titre, description, date_debut, date_fin, prix });
+    const capacity = parseInt(capacite_max, 10);
+    if (Number.isNaN(capacity) || capacity <= 0) {
+      return res.redirect(`/guide/plans/${planId}/edit?error=${encodeURIComponent('Veuillez renseigner une capacité maximale de personnes valide.')}`);
+    }
+
+    await Plan.update(planId, { titre, description, date_debut, date_fin, prix, capacite_max: capacity });
     res.redirect(`/guide/plans/${planId}?success=${encodeURIComponent('Plan modifié avec succès.')}`);
   } catch (err) {
     console.error('Error updating plan:', err);
@@ -258,7 +283,7 @@ exports.deletePlan = async (req, res) => {
  */
 exports.addLieuToPlan = async (req, res) => {
   const planId = req.params.id;
-  const { type } = req.body;
+const { type, nom, description, date_visite } = req.body;
   const userId = req.session.user.id;
   const imagePath = req.file ? `/uploads/lieu/${req.file.filename}` : null;
 
@@ -295,7 +320,10 @@ exports.addLieuToPlan = async (req, res) => {
       id_plan: planId,
       id_delegation: defaultDelegation,
       type: dbType,
-      image: imagePath
+      image: imagePath,
+      nom: nom && nom.trim() ? nom.trim() : null,
+      description: description && description.trim() ? description.trim() : null,
+      date_visite: date_visite || null
     });
 
     res.json({ success: true });
@@ -399,7 +427,8 @@ exports.getAllPlans = async (req, res) => {
     
     res.render(template, {
       user: req.session.user,
-      plans
+      plans,
+      layout: false
     });
   } catch (err) {
     console.error('Error getting all plans:', err);

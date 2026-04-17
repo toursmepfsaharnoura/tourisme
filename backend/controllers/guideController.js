@@ -16,16 +16,21 @@ exports.getDashboard = async (req, res) => {
     }
     const user = await User.findById(userId);
     
-    res.render('guide/dashboard', {
-      user,
-      guide,
-      cv_approved: guide.cv_approved || 0,
-      abonnement_actif: guide.abonnement_actif || 0,
-      abonnement_fin: guide.abonnement_fin,
-      statut: guide.statut || 'ATTENTE',
-      hideNavbar: true,
-      hideFooter: true
-    });
+const today = new Date();
+const dateFin = guide.abonnement_fin ? new Date(guide.abonnement_fin) : null;
+
+const abonnement_valide = dateFin && dateFin >= today;
+
+res.render('guide/dashboard', {
+  user,
+  guide,
+  cv_approved: guide.cv_approved || 0,
+  abonnement_valide, // 👈 الجديد
+  abonnement_fin: guide.abonnement_fin,
+  statut: guide.statut || 'ATTENTE',
+  hideNavbar: true,
+  hideFooter: true
+});
   } catch (err) {
     console.error(err);
     res.status(500).send('Erreur serveur');

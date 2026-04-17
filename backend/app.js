@@ -7,6 +7,7 @@ const cors = require('cors');
 
 // Connexion DB (sera utilisée par les modèles)
 require('./config/db');
+const { ensureDatabaseSchema } = require('./setup_database');
 
 // Import des routeurs
 const indexRoutes = require('./routes/index');
@@ -73,6 +74,7 @@ app.use('/admin', adminRoutes);
 app.use('/touriste', touristeRoutes);
 app.use('/', planRoutes); // Mount planRoutes without prefix to handle /guide/create-plan directly
 app.use('/reservations', reservationRoutes);
+app.use('/', reservationRoutes); // alias routes so /touriste/reservations exists without /reservations prefix
 app.use('/avis', avisRoutes);
 app.use('/abonnement', abonnementRoutes);
 app.use('/messages', messageRoutes);
@@ -97,10 +99,12 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3002;
-
 // Démarrer le serveur avec test de connexion
 const startServer = async () => {
   try {
+    // Vérifier le schéma de la base de données
+    await ensureDatabaseSchema();
+
     // Importer et tester la connexion DB
     const db = require('./config/db');
     const isConnected = await db.testConnection();
@@ -113,13 +117,8 @@ const startServer = async () => {
     // Démarrer le serveur
     app.listen(PORT, () => {
       console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
-      console.log('📋 Routes disponibles:');
-      console.log('   - GET  /');
-      console.log('   - GET  /delegation/:id');
-      console.log('   - GET  /guides');
-      console.log('   - GET  /gouvernorats/:id/delegations');
-      console.log('   - POST /inscription');
-      console.log('   - POST /login');
+      
+      
     });
     
   } catch (error) {

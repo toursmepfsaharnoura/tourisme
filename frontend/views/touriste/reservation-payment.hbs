@@ -1,0 +1,263 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white flex items-center justify-center px-4 py-10">
+  <div class="relative w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 shadow-[0_35px_80px_rgba(15,23,42,0.55)] backdrop-blur-xl">
+    <div class="absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.25),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(16,185,129,0.18),_transparent_30%)]"></div>
+    <div class="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] p-8 lg:p-12">
+      <section class="space-y-6">
+        <span class="inline-flex rounded-full bg-cyan-400/10 px-4 py-2 text-sm font-semibold tracking-widest text-cyan-200">INTERFACE DE PAIEMENT</span>
+        <div class="space-y-3">
+          <h1 class="text-4xl font-black tracking-tight">Finalisez votre réservation</h1>
+          <p class="max-w-2xl text-slate-300 leading-7">Le paiement confirme votre réservation et la rend visible dans votre liste. Tant que le paiement n'est pas effectué, le guide ne peut pas voir cette réservation.</p>
+        </div>
+
+        <div class="space-y-5 rounded-[1.75rem] border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-cyan-500/10">
+          <h2 class="text-2xl font-semibold text-white">Détails du circuit</h2>
+          <div class="grid gap-4 text-slate-300">
+            <div class="rounded-3xl bg-slate-800/80 p-4">
+              <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">Circuit</p>
+              <p class="mt-2 text-lg font-semibold text-white">{{pending.plan.titre}}</p>
+              <p class="mt-1 text-sm leading-6">{{pending.plan.description}}</p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-3xl bg-slate-800/80 p-4">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Départ prévu</p>
+                <p class="mt-2 text-lg font-semibold text-white">{{formatDate pending.plan.date_debut}}</p>
+              </div>
+              <div class="rounded-3xl bg-slate-800/80 p-4">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Personnes</p>
+                <p class="mt-2 text-lg font-semibold text-white">{{pending.nombre_personnes}} personne{{#unless (eq pending.nombre_personnes 1)}}s{{/unless}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-[1.75rem] border border-cyan-400/10 bg-cyan-400/5 p-6">
+          <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">Total à payer</p>
+          <p class="mt-4 text-5xl font-black text-white">{{totalAmount}} TND</p>
+          <p class="mt-3 text-sm text-slate-400">Prix total pour {{pending.nombre_personnes}} personne{{#unless (eq pending.nombre_personnes 1)}}s{{/unless}}, calculé depuis le tarif par personne.</p>
+        </div>
+      </section>
+
+      <section class="rounded-[1.75rem] border border-white/10 bg-slate-900/95 p-8 shadow-xl shadow-cyan-500/5">
+        <div class="mb-8">
+          <h2 class="text-3xl font-black text-white">Payer maintenant</h2>
+          <p class="mt-3 text-slate-400">Remplissez les informations ci-dessous pour confirmer votre réservation.</p>
+        </div>
+
+        <form action="/touriste/reservations/paiement" method="POST" class="space-y-5" id="payment-form">
+          
+          <div class="grid gap-4 sm:grid-cols-[0.95fr_1.05fr]">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-200">Code pays</label>
+              <select id="countryCode" name="countryCode" class="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-white outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20">
+                <option value="+213">Algérie (+213)</option>
+                <option value="+49">Allemagne (+49)</option>
+                <option value="+54">Argentine (+54)</option>
+                <option value="+61">Australie (+61)</option>
+                <option value="+43">Autriche (+43)</option>
+                <option value="+32">Belgique (+32)</option>
+                <option value="+55">Brésil (+55)</option>
+                <option value="+56">Chili (+56)</option>
+                <option value="+351">Chypre (+351)</option>
+                <option value="+385">Croatie (+385)</option>
+                <option value="+45">Danemark (+45)</option>
+                <option value="+20">Égypte (+20)</option>
+                <option value="+971">Émirats arabes unis (+971)</option>
+                <option value="+34">Espagne (+34)</option>
+                <option value="+358">Finlande (+358)</option>
+                <option value="+33">France (+33)</option>
+                <option value="+30">Grèce (+30)</option>
+                <option value="+36">Hongrie (+36)</option>
+                <option value="+39">Italie (+39)</option>
+                <option value="+81">Japon (+81)</option>
+                <option value="+52">Mexique (+52)</option>
+                <option value="+212">Maroc (+212)</option>
+                <option value="+31">Pays-Bas (+31)</option>
+                <option value="+351">Portugal (+351)</option>
+                <option value="+40">Roumanie (+40)</option>
+                <option value="+44">Royaume-Uni (+44)</option>
+                <option value="+7">Russie (+7)</option>
+                <option value="+41">Suisse (+41)</option>
+                <option value="+90">Turquie (+90)</option>
+                <option value="+216">Tunisie (+216)</option>
+                <option value="+1">États-Unis (+1)</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-200">Numéro de téléphone</label>
+              <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">+</span>
+                <input type="tel" id="phone" name="phone" placeholder="12345678" maxlength="8" required class="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-12 py-3 text-white outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" />
+              </div>
+              <p id="phone-note" class="text-xs text-slate-500">Entrez 8 chiffres pour un numéro tunisien, sans le préfixe +216.</p>
+            </div>
+          </div>
+          <input type="hidden" id="fullPhone" name="fullPhone" value="" />
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-200">Carte</label>
+              <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 1234 1234 1234" maxlength="19" required class="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-white outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-200">Nom sur la carte</label>
+              <input type="text" id="cardholder" name="cardholder" placeholder="Jean Dupont" required class="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-white outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" />
+            </div>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-200">Expiration</label>
+              <input type="text" id="expiry" name="expiry" placeholder="MM/AA" maxlength="5" required class="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-white outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-200">CVC</label>
+              <input type="text" id="cvc" name="cvc" placeholder="123" maxlength="3" required class="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-white outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" />
+            </div>
+          </div>
+
+         
+
+          <button type="submit" id="pay-button" class="w-full rounded-3xl bg-gradient-to-r from-cyan-400 to-sky-500 px-5 py-4 text-lg font-bold text-slate-950 transition hover:scale-[1.01]">Payer {{totalAmount}} TND</button>
+        </form>
+
+        <p class="mt-6 text-sm leading-6 text-slate-400">Votre paiement est simulé ici pour l'interface. Une fois validé, la réservation sera enregistrée.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('payment-form');
+  const payButton = document.getElementById('pay-button');
+  const cardNumberInput = document.getElementById('cardNumber');
+  const expiryInput = document.getElementById('expiry');
+  const cvcInput = document.getElementById('cvc');
+  const phoneInput = document.getElementById('phone');
+  const countryCodeSelect = document.getElementById('countryCode');
+  const fullPhoneInput = document.getElementById('fullPhone');
+
+  const formatCardNumber = (value) => {
+    const digits = value.replace(/\D/g, '');
+    return digits.match(/.{1,4}/g)?.join(' ') || digits;
+  };
+
+  const isValidLuhn = (number) => {
+    const digits = number.replace(/\D/g, '');
+    let sum = 0;
+    let alternate = false;
+
+    for (let i = digits.length - 1; i >= 0; i--) {
+      let n = parseInt(digits.charAt(i), 10);
+      if (alternate) {
+        n *= 2;
+        if (n > 9) n -= 9;
+      }
+      sum += n;
+      alternate = !alternate;
+    }
+
+    return digits.length >= 12 && sum % 10 === 0;
+  };
+
+  const parseExpiry = (value) => {
+    const match = value.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+    if (!match) return null;
+    const month = parseInt(match[1], 10);
+    const year = 2000 + parseInt(match[2], 10);
+    return { month, year };
+  };
+
+  const isExpiryValid = ({ month, year }) => {
+    if (!month || !year) return false;
+    const now = new Date();
+    const expiryDate = new Date(year, month - 1, 1);
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+    return expiryDate > now;
+  };
+
+  cardNumberInput.addEventListener('input', function(e) {
+    e.target.value = formatCardNumber(e.target.value);
+  });
+
+  expiryInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    e.target.value = value;
+  });
+
+  const phoneNote = document.getElementById('phone-note');
+
+  const updatePhoneRules = () => {
+    const countryCode = countryCodeSelect.value;
+    const countryName = countryCodeSelect.selectedOptions[0]?.textContent.split(' (')[0] || 'le pays sélectionné';
+
+    if (countryCode === '+216') {
+      phoneInput.maxLength = 8;
+      phoneInput.placeholder = '12345678';
+      phoneNote.textContent = 'En Tunisie, entrez exactement 8 chiffres sans le préfixe +216.';
+    } else {
+      phoneInput.maxLength = 15;
+      phoneInput.placeholder = '123456789012345';
+      phoneNote.textContent = `Pour ${countryName}, entrez 6 à 15 chiffres sans le signe +.`;
+    }
+    phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, phoneInput.maxLength);
+  };
+
+  phoneInput.addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 15);
+  });
+
+  countryCodeSelect.addEventListener('change', updatePhoneRules);
+  updatePhoneRules();
+
+  form.addEventListener('submit', function(event) {
+    let valid = true;
+    [cardNumberInput, expiryInput, cvcInput, phoneInput].forEach(input => input.style.borderColor = '');
+
+    const cardNumber = cardNumberInput.value.trim();
+    const expiryValue = expiryInput.value.trim();
+    const cvc = cvcInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const countryCode = countryCodeSelect.value;
+
+    if (!/^[0-9 ]+$/.test(cardNumber) || cardNumber.replace(/\s/g, '').length !== 16) {
+      cardNumberInput.style.borderColor = '#fb7185';
+      cardNumberInput.focus();
+      valid = false;
+    }
+
+    const expiryData = parseExpiry(expiryValue);
+    if (!expiryData || !isExpiryValid(expiryData)) {
+      expiryInput.style.borderColor = '#fb7185';
+      if (valid) expiryInput.focus();
+      valid = false;
+    }
+
+    if (!/^[0-9]{3}$/.test(cvc)) {
+      cvcInput.style.borderColor = '#fb7185';
+      if (valid) cvcInput.focus();
+      valid = false;
+    }
+
+    if (countryCode === '+216') {
+      if (!/^[0-9]{8}$/.test(phone)) {
+        phoneInput.style.borderColor = '#fb7185';
+        if (valid) phoneInput.focus();
+        valid = false;
+      }
+    } else if (!/^[0-9]{6,15}$/.test(phone)) {
+      phoneInput.style.borderColor = '#fb7185';
+      if (valid) phoneInput.focus();
+      valid = false;
+    }
+
+    if (!valid) {
+      event.preventDefault();
+      return;
+    }
+
+    fullPhoneInput.value = `${countryCode}${phone}`;
+    payButton.disabled = true;
+    payButton.textContent = 'Paiement en cours...';
+  });
+</script>

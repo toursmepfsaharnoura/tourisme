@@ -173,6 +173,7 @@ CREATE TABLE IF NOT EXISTS `plans_touristiques` (
   `date_debut` date DEFAULT NULL,
   `date_fin` date DEFAULT NULL,
   `prix` decimal(10,2) DEFAULT NULL,
+  `capacite_max` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_guide` (`id_guide`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -189,6 +190,8 @@ CREATE TABLE IF NOT EXISTS `plan_lieux` (
   `id_plan` int NOT NULL,
   `id_delegation` int NOT NULL,
   `type` enum('HOTEL','RESTAURANT','MUSEE','AUTRE') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nom` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
   `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_plan` (`id_plan`),

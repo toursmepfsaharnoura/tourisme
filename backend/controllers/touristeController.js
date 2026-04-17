@@ -1,16 +1,59 @@
 const Plan = require('../models/Plan');
+const Avis = require('../models/Avis');
 const Message = require('../models/Message');
+const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 
 /**
- * Tableau de bord touriste : affiche la liste des plans disponibles.
+ * Tableau de bord touriste : affiche la liste des guides et plans disponibles.
  */
 exports.getDashboard = async (req, res) => {
   try {
-    const plans = await Plan.findAll();
+    const plans = await Plan.findAllWithDetails();
+    const guideIds = [...new Set(plans.map(plan => plan.id_guide))];
+
+    const guideRatings = await Avis.getSummaryForGuides(guideIds);
+    const ratingByGuide = guideRatings.reduce((acc, row) => {
+      acc[row.id_guide] = {
+        moyenne: row.moyenne ? Number(row.moyenne.toFixed(1)) : 0,
+        total: row.total || 0
+      };
+      return acc;
+    }, {});
+
+    const guides = Object.values(plans.reduce((acc, plan) => {
+      if (!acc[plan.id_guide]) {
+        acc[plan.id_guide] = {
+          id: plan.id_guide,
+          nom: plan.guide_nom,
+          email: plan.guide_email,
+          photo_profil: plan.guide_photo,
+          statut: plan.guide_statut,
+          abonnement: plan.guide_abonnement,
+          avis: ratingByGuide[plan.id_guide] || { moyenne: 0, total: 0 },
+          plans: []
+        };
+      }
+      acc[plan.id_guide].plans.push(plan);
+      return acc;
+    }, {}));
+
+    const plansCount = guides.reduce((count, guide) => count + guide.plans.length, 0);
+
+    const reservations = await Reservation.findByTourist(req.session.user.id);
+    const enrichedReservations = await Promise.all(
+      reservations.map(async (reservation) => {
+        const plan = await Plan.findById(reservation.id_plan);
+        return { ...reservation, plan };
+      })
+    );
+
     res.render('touriste/dashboard', {
+      title: 'Dashboard Touriste',
       user: req.session.user,
-      plans
+      guides,
+      plansCount,
+      reservations: enrichedReservations
     });
   } catch (err) {
     console.error('Erreur dashboard touriste:', err);
