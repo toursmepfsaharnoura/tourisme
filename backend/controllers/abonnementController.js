@@ -17,7 +17,7 @@ exports.getSubscription = async (req, res) => {
       guide,
       abonnement,
       isSubscribed: guide.abonnement_actif === 1,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Error getting subscription:', err);
@@ -66,7 +66,7 @@ exports.getPayment = async (req, res) => {
     res.render('guide/paiement', {
       user: req.session.user,
       guide,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Error getting payment page:', err);
@@ -160,7 +160,7 @@ exports.getSubscriptionHistory = async (req, res) => {
     res.render('guide/abonnement-history', {
       user: req.session.user,
       abonnements,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Error getting subscription history:', err);

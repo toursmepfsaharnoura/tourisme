@@ -42,10 +42,28 @@ class User {
     }
     return false;
   }
-static async findAdmin() {
-  const [rows] = await db.query('SELECT id FROM utilisateurs WHERE role = "ADMIN" LIMIT 1');
-  return rows[0];
-}
+
+  static async findAdmin() {
+    const [rows] = await db.query('SELECT id FROM utilisateurs WHERE role = "ADMIN" LIMIT 1');
+    return rows[0];
+  }
+
+  static async findGuidesWithConversations(touristeId) {
+    const [rows] = await db.query(`
+      SELECT DISTINCT u.id, u.nom_complet, u.photo_profil, u.role,
+             MAX(m.date_envoi) as last_message_date,
+             (SELECT COUNT(*) FROM messages WHERE id_expediteur = ? AND id_destinataire = u.id AND lu = 0) as unread_count
+      FROM utilisateurs u
+      INNER JOIN messages m ON (u.id = m.id_expediteur OR u.id = m.id_destinataire)
+      WHERE u.role = 'GUIDE' 
+      AND (m.id_expediteur = ? OR m.id_destinataire = ?)
+      AND u.id != ?
+      GROUP BY u.id, u.nom_complet, u.photo_profil, u.role
+      ORDER BY last_message_date DESC
+    `, [touristeId, touristeId, touristeId, touristeId]);
+    
+    return rows;
+  }
 }
 
 module.exports = User;

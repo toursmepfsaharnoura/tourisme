@@ -2,7 +2,12 @@ const db = require('../config/db');
 
 class Delegation {
   static async findAll() {
-    const [rows] = await db.query('SELECT * FROM delegations ORDER BY nom');
+    const [rows] = await db.query(`
+      SELECT d.*, g.nom as gouvernorat_nom, g.image as gouvernorat_image
+      FROM delegations d
+      LEFT JOIN gouvernorats g ON d.id_gouvernorat = g.id
+      ORDER BY d.nom
+    `);
     return rows;
   }
 

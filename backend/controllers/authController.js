@@ -191,24 +191,24 @@ exports.postInscription = async (req, res) => {
   }
 };
 exports.getLogin = (req, res) => {
-  res.render('login');
+  res.render('auth/login');
 };
 
 exports.postLogin = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.render('login', { error: 'Veuillez remplir tous les champs' });
+    return res.render('auth/login', { error: 'Veuillez remplir tous les champs' });
   }
 
   try {
     const user = await User.findByEmail(email);
     if (!user) {
-      return res.render('login', { error: 'Email ou mot de passe incorrect' });
+      return res.render('auth/login', { error: 'Email ou mot de passe incorrect' });
     }
 
     const match = bcrypt.compareSync(password, user.mot_de_passe);
     if (!match) {
-      return res.render('login', { error: 'Mot de passe incorrect' });
+      return res.render('auth/login', { error: 'Mot de passe incorrect' });
     }
 
     req.session.user = {
@@ -229,52 +229,9 @@ exports.postLogin = async (req, res) => {
 };
 
 exports.getRegister = (req, res) => {
-  res.render('inscription');
+  res.render('auth/inscription');
 };
 
-// exports.postInscription = async (req, res) => {
-//   const nom_complet = req.body.nomcomplet || 'Utilisateur';
-//   const email = req.body.email;
-//   const mot_de_passe = req.body.motdepasse;
-//   const role = req.body.role || 'TOURISTE';
-//   const code = Math.floor(100000 + Math.random() * 900000);
-
-//   try {
-//     const existing = await User.findByEmail(email);
-//     if (existing) {
-//       return res.json({ success: false, message: 'Email existe déjà' });
-//     }
-
-//     const hash = await bcrypt.hash(mot_de_passe, 10);
-//     const userId = await User.create({
-//       nom_complet,
-//       email,
-//       mot_de_passe: hash,
-//       role,
-//       verification_code: code
-//     });
-
-//     if (role === 'GUIDE') {
-//       await Guide.create(userId);
-//     } else if (role === 'TOURISTE') {
-//       await Touriste.create(userId);
-//     }
-
-//     // Envoyer l'email
-//     await transporter.sendMail({
-//       from: '"Découvrez Tunisie" <' + (process.env.GMAIL_USER || 'VOTRE.EMAIL@gmail.com') + '>',
-//       to: email,
-//       subject: 'Votre code de vérification Découvrez Tunisie',
-//       html: `...` // votre template
-//     });
-
-//     console.log(`✅ Email envoyé à ${email} avec code ${code}`);
-//     res.json({ success: true, message: 'Code envoyé par email ! Vérifiez votre boîte (et spam)' });
-//   } catch (error) {
-//     console.log('❌ ERREUR EMAIL:', error.message);
-//     res.json({ success: false, message: 'Erreur envoi email: ' + error.message });
-//   }
-// };
 
 exports.logout = (req, res) => {
   req.session.destroy((err) => {
@@ -286,7 +243,7 @@ exports.logout = (req, res) => {
 
 exports.getVerification = (req, res) => {
   const email = req.query.email || '';
-  res.render('verification', { email });
+  res.render('auth/verification', { email });
 };
 
 exports.postVerification = async (req, res) => {

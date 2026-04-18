@@ -48,7 +48,7 @@ exports.getGovernoratWithDelegations = async (req, res) => {
       return res.status(404).render('404', { url: req.originalUrl });
     }
 
-    res.render('gouvernorat-details', {
+    res.render('public/gouvernorat-details', {
       gouvernorat,
       delegations,
       user: req.session.user || null

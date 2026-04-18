@@ -19,7 +19,7 @@ exports.getAllDelegations = async (req, res) => {
       })
     );
     
-    res.render('delegations', {
+    res.render('public/delegations', {
       delegations: delegationsWithGouvernorat,
       user: req.session.user
     });
@@ -62,7 +62,7 @@ exports.getDelegationDetail = async (req, res) => {
        LIMIT 6`
     );
 
-    res.render('delegation-detail', {
+    res.render('public/delegation-detail', {
       delegation,
       gouvernorat,
       relatedDelegations: otherDelegations.slice(0, 4), // Max 4 related
@@ -77,9 +77,9 @@ exports.getDelegationDetail = async (req, res) => {
 };
 
 /**
- * Get all delegations
+ * Get all delegations (API)
  */
-exports.getAllDelegations = async (req, res) => {
+exports.getAllDelegationsAPI = async (req, res) => {
   try {
     const db = require('../config/db');
     const [delegations] = await db.query(`
