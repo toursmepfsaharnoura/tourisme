@@ -1,0 +1,132 @@
+<!-- Search Results Header -->
+<section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font-playfair">
+        {{#if query}}Résultats pour "{{query}}"{{else}}Tous les Gouvernorats{{/if}}
+      </h1>
+      <p class="text-xl text-gray-600">
+        {{#if query}}
+          Trouvé {{resultsCount}} gouvernorat{{#if (gt resultsCount 1)}}s{{/if}}
+        {{else}}
+          Explorez tous les gouvernorats de la Tunisie
+        {{/if}}
+      </p>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="max-w-2xl mx-auto mb-12">
+      <form action="/search" method="GET" class="glass-morphism rounded-2xl p-2 backdrop-blur-xl border border-white/20 shadow-2xl">
+        <div class="flex flex-col md:flex-row gap-2">
+          <div class="flex-1 flex items-center px-6">
+            <i class="fas fa-search text-gray-400 mr-4 text-lg"></i>
+            <input 
+              type="text" 
+              name="q"
+              value="{{query}}"
+              placeholder="Rechercher un gouvernorat..." 
+              class="w-full bg-transparent text-gray-900 placeholder-gray-400 outline-none py-4 text-lg"
+            >
+          </div>
+          <button type="submit" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <i class="fas fa-search mr-2"></i>
+            Rechercher
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Results -->
+    {{#if gouvernorats.length}}
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {{#each gouvernorats}}
+        <div class="group relative">
+          <!-- Card -->
+          <div class="relative overflow-hidden rounded-2xl shadow-lg card-hover bg-white">
+            <!-- Image Container -->
+            <div class="relative h-48 overflow-hidden">
+              {{#if image}}
+                <img src="{{image}}" alt="{{nom}}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerpolicy="no-referrer">
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              {{else}}
+                <!-- Gradient Placeholder -->
+                <div class="w-full h-full bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 relative">
+                  <div class="absolute inset-0 bg-black/20"></div>
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fas fa-map-marked-alt text-white text-4xl opacity-50"></i>
+                  </div>
+                </div>
+              {{/if}}
+              
+              <!-- Heart Button -->
+              <button class="absolute top-3 right-3 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 border border-white/30">
+                <i class="far fa-heart text-lg"></i>
+              </button>
+              
+              <!-- Rating Badge -->
+              <div class="absolute bottom-3 left-3 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/30">
+                <div class="flex items-center text-white text-sm">
+                  <i class="fas fa-star text-yellow-400 mr-1"></i>
+                  <span>4.8</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-4">
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{nom}}</h3>
+              <p class="text-gray-600 text-sm mb-3">Découvrez les merveilles de {{nom}}</p>
+              
+              <!-- Location Info -->
+              <div class="flex items-center text-gray-500 text-sm mb-4">
+                <i class="fas fa-map-pin mr-2"></i>
+                <span>Tunisie</span>
+              </div>
+              
+              <!-- Discover Button -->
+              <button onclick="window.location.href='/gouvernorats/{{id}}/delegations'" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg">
+                <i class="fas fa-compass mr-2"></i>
+                Découvrir
+              </button>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <!-- No Results -->
+      <div class="text-center py-16">
+        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i class="fas fa-search text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Aucun résultat trouvé</h3>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+          Nous n'avons trouvé aucun gouvernorat correspondant à "{{query}}". Essayez avec d'autres termes.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
+            <i class="fas fa-home mr-2"></i>
+            Retour à l'accueil
+          </a>
+          <a href="/gouvernorats" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
+            <i class="fas fa-map mr-2"></i>
+            Voir tous les gouvernorats
+          </a>
+        </div>
+      </div>
+    {{/if}}
+  </div>
+</section>
+
+<script>
+// Add heart button functionality
+document.querySelectorAll('.fa-heart').forEach(heart => {
+  heart.parentElement.addEventListener('click', function(e) {
+    e.stopPropagation();
+    heart.classList.toggle('far');
+    heart.classList.toggle('fas');
+    heart.classList.toggle('text-red-500');
+  });
+});
+</script>

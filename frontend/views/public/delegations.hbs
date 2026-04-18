@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Délégations de Tunisie</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .delegations-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .delegations-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .delegations-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .delegations-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .delegation-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .delegation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .delegation-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .delegation-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .delegation-card:hover .delegation-image img {
+            transform: scale(1.05);
+        }
+
+        .delegation-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        .delegation-content {
+            padding: 25px;
+        }
+
+        .delegation-name {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .delegation-gouvernorat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .delegation-gouvernorat i {
+            color: #667eea;
+        }
+
+        .delegation-stats {
+            display: flex;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .stat-item i {
+            color: #764ba2;
+        }
+
+        .delegation-description {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+
+        .empty-delegations {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .empty-delegations-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .empty-delegations-text {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .back-to-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 1em;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-to-home:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .delegations-header h1 { font-size: 2em; }
+            .delegations-header p { font-size: 1em; }
+            .delegations-container { 
+                grid-template-columns: 1fr;
+                padding: 20px 15px;
+            }
+            .delegation-content { padding: 20px; }
+            .delegation-name { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+    <!-- BACK TO HOME -->
+    <a href="/" class="back-to-home">
+        <i class="fas fa-arrow-left"></i> Accueil
+    </a>
+
+    <!-- HEADER -->
+    <div class="delegations-header">
+        <h1><i class="fas fa-map-marked-alt"></i> Délégations de Tunisie</h1>
+        <p>Découvrez toutes les délégations tunisiennes et explorez leurs merveilles touristiques</p>
+    </div>
+
+    <!-- DELEGATIONS GRID -->
+    <div class="delegations-container">
+        {{#if delegations.length}}
+            {{#each delegations}}
+                <a href="/delegation/{{id}}" class="delegation-card">
+                    <div class="delegation-image">
+                        {{#if image}}
+                            <img src="{{image}}" alt="{{nom}}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {{else}}
+                            <i class="fas fa-map-pin"></i>
+                        {{/if}}
+                    </div>
+                    <div class="delegation-content">
+                        <h3 class="delegation-name">{{nom}}</h3>
+                        <div class="delegation-gouvernorat">
+                            <i class="fas fa-globe"></i>
+                            <span>{{gouvernorat_nom}}</span>
+                        </div>
+                        <div class="delegation-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-route"></i>
+                                <span>Explorer</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-camera"></i>
+                                <span>Découvrir</span>
+                            </div>
+                        </div>
+                        <p class="delegation-description">
+                            {{#if description}}
+                                {{description}}
+                            {{else}}
+                                Découvrez la délégation de {{nom}}, située dans le gouvernorat de {{gouvernorat_nom}}. 
+                                Explorez ses paysages magnifiques, son patrimoine culturel et ses attractions touristiques uniques.
+                            {{/if}}
+                        </p>
+                    </div>
+                </a>
+            {{/each}}
+        {{else}}
+            <div class="empty-delegations">
+                <div class="empty-delegations-icon">
+                    <i class="fas fa-map"></i>
+                </div>
+                <div class="empty-delegations-text">Aucune délégation trouvée</div>
+                <p>Les délégations seront bientôt disponibles</p>
+            </div>
+        {{/if}}
+    </div>
+
+    <script>
+        // Animation d'entrée pour les cartes
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.delegation-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Effet de parallaxe sur le header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.delegations-header');
+            const scrolled = window.pageYOffset;
+            header.style.transform = `translateY(${scrolled * 0.5}px)`;
+        });
+    </script>
+</body>
+</html>

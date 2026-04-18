@@ -1,0 +1,163 @@
+<!-- Home Button -->
+<div class="fixed top-6 left-6 z-50 animate-bounce-in">
+  <a href="/" class="gradient-border px-6 py-3 rounded-2xl font-medium transition-all duration-300 flex items-center space-x-2 button-glow">
+    <i class="fas fa-home text-ocean-blue animate-rotate"></i>
+    <span class="neon-text">Accueil</span>
+  </a>
+</div>
+
+<!-- Animated Background Elements -->
+<div class="fixed inset-0 z-0">
+  <!-- Base gradient -->
+  <div class="absolute inset-0 nature-pattern"></div>
+  
+  <!-- Floating elements with more energy -->
+  <div class="absolute top-20 left-20 w-32 h-32 bg-ocean-blue/10 rounded-full blur-3xl floating-element"></div>
+  <div class="absolute top-40 right-32 w-40 h-40 bg-desert-orange/10 rounded-full blur-3xl floating-element" style="animation-delay: 1s;"></div>
+  <div class="absolute bottom-32 left-1/3 w-48 h-48 bg-sage-green/10 rounded-full blur-3xl floating-element" style="animation-delay: 2s;"></div>
+  <div class="absolute top-1/2 right-1/4 w-24 h-24 bg-neon-purple/10 rounded-full blur-2xl floating-element" style="animation-delay: 3s;"></div>
+  
+  <!-- Wave animation overlay -->
+  <div class="absolute inset-0 wave-animation opacity-40"></div>
+  
+  <!-- Main background image with overlay -->
+  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80" 
+       alt="Tunisian Landscape" class="w-full h-full object-cover mix-blend-overlay opacity-20">
+  <div class="absolute inset-0 bg-gradient-to-b from-white/50 via-blue-50/40 to-green-50/60"></div>
+</div>
+
+<!-- Main Content -->
+<div class="relative z-10 pt-24 pb-12">
+  <div class="max-w-7xl mx-auto px-6">
+    
+    <!-- Hero Section -->
+    <section class="text-center mb-24 animate-scale-in">
+      <div class="mb-12">
+        <div class="inline-flex items-center justify-center w-32 h-32 ocean-gradient rounded-full mb-8 shadow-2xl floating-element animate-glow">
+          <i class="fas fa-user-tie text-5xl text-white animate-pulse-slow"></i>
+        </div>
+      </div>
+      
+      <h1 class="font-space text-5xl md:text-7xl font-bold text-gray-900 mb-6 text-shadow-glow">
+        <span class="block text-ocean-blue">Nos Guides</span>
+        <span class="text-transparent bg-clip-text neon-text">Professionnels Certifiés</span>
+      </h1>
+      
+      <p class="text-xl md:text-2xl text-gray-800 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+        Découvrez nos guides experts qui vous feront vivre une 
+        <span class="text-desert-orange font-bold animate-pulse-slow">expérience tunisienne authentique</span>
+      </p>
+      
+      <!-- Animated Stats -->
+      <div class="flex items-center justify-center space-x-8 text-lg">
+        <div class="flex items-center space-x-2 px-6 py-3 glass-morphism rounded-full border border-gray-200 animate-slide-up" style="animation-delay: 0.1s;">
+          <i class="fas fa-award text-desert-orange animate-glow"></i>
+          <span class="font-medium text-gray-800">{{#if guides}}{{guides.length}}{{else}}0{{/if}} Guide{{#if guides}}{{#if (gt guides.length 1)}}s{{/if}}{{/if}} Certifié{{#if guides}}{{#if (gt guides.length 1)}}s{{/if}}{{/if}}</span>
+        </div>
+        <div class="flex items-center space-x-2 px-6 py-3 glass-morphism rounded-full border border-gray-200 animate-slide-up" style="animation-delay: 0.2s;">
+          <i class="fas fa-star text-sand-warm animate-glow"></i>
+          <span class="font-medium text-gray-800">Excellence Garantie</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Guides Section -->
+    <section class="animate-fade-in">
+      {{#if guides.length}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {{#each guides}}
+          <div class="glass-morphism rounded-3xl overflow-hidden card-hover border border-gray-200 animate-scale-in" style="animation-delay: {{@index}}0.05s;">
+            
+            <!-- Photo Profil -->
+            <div class="relative h-64 overflow-hidden">
+              {{#if photo_profil}}
+                <img src="{{photo_profil}}" alt="{{nom_complet}}" class="w-full h-full object-cover transition-transform duration-700">
+              {{else}}
+                <div class="w-full h-full ocean-gradient flex items-center justify-center">
+                  <i class="fas fa-user-circle text-8xl text-white/60 animate-rotate"></i>
+                </div>
+              {{/if}}
+              
+              <!-- Badge Certifié -->
+              <div class="absolute top-4 right-4 desert-gradient text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center space-x-1 button-glow animate-glow">
+                <i class="fas fa-check-circle"></i>
+                <span>Certifié</span>
+              </div>
+              
+              <!-- Overlay Gradient -->
+              <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"></div>
+            </div>
+            
+            <!-- Infos Guide -->
+            <div class="p-8">
+              <div class="text-center mb-6">
+                <h3 class="font-space text-2xl font-bold text-gray-900 mb-4">{{nom_complet}}</h3>
+                
+                {{#if bio}}
+                  <p class="text-gray-700 mb-6 leading-relaxed line-clamp-3 font-light">{{bio}}</p>
+                {{/if}}
+              </div>
+              
+              <!-- Contact Info -->
+              <div class="space-y-3 mb-8">
+                {{#if telephone}}
+                  <div class="flex items-center justify-center text-lg text-gray-700">
+                    <div class="w-8 h-8 ocean-light/20 rounded-2xl flex items-center justify-center mr-3">
+                      <i class="fas fa-phone text-ocean-blue text-sm animate-pulse-slow"></i>
+                    </div>
+                    <span>{{telephone}}</span>
+                  </div>
+                {{/if}}
+                {{#if email}}
+                  <div class="flex items-center justify-center text-lg text-gray-700">
+                    <div class="w-8 h-8 ocean-light/20 rounded-2xl flex items-center justify-center mr-3">
+                      <i class="fas fa-envelope text-ocean-blue text-sm animate-pulse-slow"></i>
+                    </div>
+                    <span class="text-sm">{{email}}</span>
+                  </div>
+                {{/if}}
+              </div>
+              
+              <!-- Actions -->
+              <div class="flex gap-3">
+                <a href="mailto:{{email}}" class="flex-1 glass-morphism px-4 py-3 rounded-2xl text-center font-medium hover:bg-gray-50 transition-all duration-300 border border-gray-200 text-gray-700">
+                  <i class="fas fa-envelope mr-2 text-sage-green"></i>
+                  <span>Contacter</span>
+                </a>
+                {{#if ../user}}
+                  <form method="POST" action="/message/envoyer/{{id}}" class="flex-1">
+                    <input type="hidden" name="message" value="Bonjour {{nom_complet}}, je souhaite réserver un circuit">
+                    <button type="submit" class="w-full desert-gradient text-white px-4 py-3 rounded-2xl font-bold transition-all duration-300 shadow-lg button-glow animate-glow">
+                      <i class="fas fa-calendar-check mr-2"></i>
+                      <span>Réserver</span>
+                    </button>
+                  </form>
+                {{else}}
+                  <a href="/login" class="flex-1 desert-gradient text-white px-4 py-3 rounded-2xl font-bold text-center transition-all duration-300 shadow-lg button-glow animate-glow">
+                    <i class="fas fa-calendar-check mr-2"></i>
+                    <span>Réserver</span>
+                  </a>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="text-center py-20">
+          <div class="glass-morphism rounded-3xl p-16 max-w-2xl mx-auto border border-gray-200 animate-scale-in">
+            <div class="inline-flex items-center justify-center w-24 h-24 mountain-gradient rounded-full mb-8 floating-element">
+              <i class="fas fa-users text-4xl text-white animate-pulse-slow"></i>
+            </div>
+            <h3 class="font-space text-3xl font-bold text-gray-900 mb-4">Guides Bientôt Disponibles</h3>
+            <p class="text-gray-600 text-lg mb-8">Nos guides certifiés sont en cours de formation</p>
+            <a href="/inscription?role=GUIDE" class="inline-flex items-center px-8 py-4 glass-morphism rounded-2xl font-medium hover:bg-gray-50 transition-all duration-300 border border-gray-200 text-gray-700 button-glow">
+              <i class="fas fa-user-plus mr-3 text-sage-green"></i>
+              <span>Devenir Guide</span>
+            </a>
+          </div>
+        </div>
+      {{/if}}
+    </section>
+  </div>
+</div>

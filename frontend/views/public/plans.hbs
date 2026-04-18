@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plans Touristiques - Inside Tunisia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .text-shadow-glow { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+    .desert-gradient { background: linear-gradient(135deg, #f59e0b, #dc2626); }
+    .ocean-gradient { background: linear-gradient(135deg, #0891b2, #0e7490); }
+    .glass-morphism { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  {{> navbar}}
+  
+  <!-- Hero Section -->
+  <section class="relative h-96 flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');">
+    <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+      <h1 class="text-5xl md:text-6xl font-bold mb-6 font-playfair">Plans Touristiques</h1>
+      <p class="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
+        Découvrez nos circuits guidés à travers les merveilles de la Tunisie
+      </p>
+    </div>
+  </section>
+
+  <!-- Plans Grid -->
+  <section class="py-16 px-4 max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4 font-playfair">Nos Circuits Disponibles</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Explorez la Tunisie avec nos guides certifiés et découvrez des expériences uniques
+      </p>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <form method="GET" action="/plans" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+          <input 
+            type="text" 
+            id="search" 
+            name="search" 
+            value="{{currentFilters.search}}"
+            placeholder="Rechercher un plan..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+        </div>
+        
+        <div>
+          <label for="gouvernorat_id" class="block text-sm font-medium text-gray-700 mb-2">Gouvernorat</label>
+          <select 
+            id="gouvernorat_id" 
+            name="gouvernorat_id"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Tous les gouvernorats</option>
+            {{#each governorates}}
+              <option value="{{this.id}}" {{#if (eq this.id ../currentFilters.gouvernorat_id)}}selected{{/if}}>
+                {{this.nom}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+        
+        <div>
+          <label for="min_price" class="block text-sm font-medium text-gray-700 mb-2">Prix min</label>
+          <input 
+            type="number" 
+            id="min_price" 
+            name="min_price"
+            value="{{currentFilters.min_price}}"
+            placeholder="0 TND"
+            min="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+        </div>
+        
+        <div>
+          <label for="max_price" class="block text-sm font-medium text-gray-700 mb-2">Prix max</label>
+          <input 
+            type="number" 
+            id="max_price" 
+            name="max_price"
+            value="{{currentFilters.max_price}}"
+            placeholder="1000 TND"
+            min="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+        </div>
+        
+        <div class="md:col-span-4 flex gap-2">
+          <button type="submit" class="ocean-gradient text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+            <i class="fas fa-search mr-2"></i>
+            Filtrer
+          </button>
+          <a href="/plans" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors text-center">
+            <i class="fas fa-times mr-2"></i>
+            Réinitialiser
+          </a>
+        </div>
+      </form>
+    </div>
+
+    {{#if plans.length}}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {{#each plans}}
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105">
+            {{#if image}}
+              <div class="h-48 bg-cover bg-center" style="background-image: url('{{image}}');"></div>
+            {{else}}
+              <div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <i class="fas fa-route text-white text-4xl"></i>
+              </div>
+            {{/if}}
+            
+            <div class="p-6">
+              <!-- Guide Info -->
+              <div class="flex items-center mb-4">
+                {{#if guide_photo}}
+                  <img src="/uploads/photos-profil/{{guide_photo}}" alt="{{guide_nom}}" class="w-10 h-10 rounded-full mr-3">
+                {{else}}
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mr-3">
+                    <span class="text-white font-semibold">{{substring guide_nom 0 1}}</span>
+                  </div>
+                {{/if}}
+                <div>
+                  <h3 class="font-semibold text-gray-900">{{guide_nom}}</h3>
+                  <p class="text-sm text-gray-600">Guide certifié {{#if guide_abonnement}}✅{{/if}}</p>
+                </div>
+              </div>
+              
+              <!-- Plan Info -->
+              <h3 class="text-xl font-bold text-gray-900 mb-2 font-playfair">{{titre}}</h3>
+              <p class="text-gray-600 mb-4 line-clamp-2">{{description}}</p>
+              
+              <!-- Locations -->
+              {{#if delegations}}
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-500 mb-2">
+                    <i class="fas fa-map-marker-alt mr-2"></i>
+                    <span class="font-medium">Délégations:</span>
+                  </div>
+                  <div class="flex flex-wrap gap-1">
+                    {{#each (split delegations ',')}}
+                      <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">{{this}}</span>
+                    {{/each}}
+                  </div>
+                </div>
+              {{/if}}
+              
+              {{#if gouvernorats}}
+                <div class="mb-4">
+                  <div class="flex items-center text-sm text-gray-500 mb-2">
+                    <i class="fas fa-globe-africa mr-2"></i>
+                    <span class="font-medium">Gouvernorats:</span>
+                  </div>
+                  <div class="flex flex-wrap gap-1">
+                    {{#each (split gouvernorats ',')}}
+                      <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">{{this}}</span>
+                    {{/each}}
+                  </div>
+                </div>
+              {{/if}}
+              
+              <!-- Date and Price -->
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center text-sm text-gray-500">
+                  <i class="fas fa-calendar mr-2"></i>
+                  <span>{{date_debut}} - {{date_fin}}</span>
+                </div>
+                <div class="text-2xl font-bold text-ocean-blue">{{prix}} TND</div>
+              </div>
+              
+              <!-- Action Button -->
+              <button class="w-full ocean-gradient text-white py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                <i class="fas fa-info-circle mr-2"></i>
+                Voir les détails
+              </button>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="text-center py-16">
+        <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i class="fas fa-route text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Aucun plan disponible</h3>
+        <p class="text-gray-600 mb-8">Revenez bientôt pour découvrir nos nouveaux circuits touristiques</p>
+        <a href="/" class="inline-block ocean-gradient text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+          <i class="fas fa-home mr-2"></i>
+          Retour à l'accueil
+        </a>
+      </div>
+    {{/if}}
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <div class="max-w-4xl mx-auto text-center px-4">
+      <h2 class="text-4xl font-bold mb-6 font-playfair">Vous êtes guide ?</h2>
+      <p class="text-xl mb-8 opacity-90">
+        Rejoignez notre communauté et partagez votre passion de la Tunisie
+      </p>
+      <a href="/inscription?role=GUIDE" class="inline-block bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors">
+        <i class="fas fa-user-plus mr-2"></i>
+        Devenir guide
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  {{> footer}}
+
+  <script>
+    // Add entrance animations
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.bg-white.rounded-2xl');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('animate-slide-up');
+        }, index * 100);
+      });
+    });
+  </script>
+
+  <style>
+    .animate-slide-up {
+      animation: slideUp 0.6s ease-out forwards;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</body>
+</html>

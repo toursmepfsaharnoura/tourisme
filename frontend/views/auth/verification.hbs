@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vérification - Tunisie Authentique</title>
+  {{#if isDevelopment}}
+    <script src="https://cdn.tailwindcss.com"></script>
+  {{else}}
+    <link rel="stylesheet" href="/css/style.css">
+  {{/if}}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .glass { 
+      background: rgba(255,255,255,0.1); 
+      backdrop-filter: blur(20px); 
+      border: 1px solid rgba(255,255,255,0.2); 
+    }
+    
+    .code-input {
+      width: 3rem;
+      height: 3rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transition: all 0.3s;
+    }
+    
+    .code-input:focus {
+      border-color: #fbbf24;
+      outline: none;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    }
+    
+    .code-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4">
+  <!-- Background Hero Fullscreen -->
+  <div class="fixed inset-0 z-0">
+    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80" 
+         alt="Tropical Beach" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-b from-purple-900/80 to-blue-900/80"></div>
+  </div>
+
+  <!-- Main Content Centré -->
+  <div class="relative z-10 flex items-center justify-center min-h-screen px-4">
+    <div class="w-full max-w-md">
+      <!-- Verification Form Glass -->
+      <div class="glass rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-6 shadow-lg">
+            <i class="fas fa-shield-alt text-3xl text-white"></i>
+          </div>
+          <h1 class="text-4xl font-black text-white mb-2">VÉRIFICATION</h1>
+          <p class="text-xl text-white/90">Tunisie Authentique</p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-blue-500/20 border border-blue-500 text-blue-100 px-4 py-3 rounded-xl mb-6 backdrop-blur-sm">
+          <div class="flex items-center">
+            <i class="fas fa-info-circle mr-3 text-xl"></i>
+            <span class="text-sm">Entrez le code à 6 chiffres envoyé à votre email</span>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden bg-red-500/20 border border-red-500 text-red-100 px-4 py-3 rounded-xl mb-6 backdrop-blur-sm">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-triangle mr-3 text-xl"></i>
+            <span class="font-medium" id="errorText"></span>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="successMessage" class="hidden bg-green-500/20 border border-green-500 text-green-100 px-4 py-3 rounded-xl mb-6 backdrop-blur-sm">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle mr-3 text-xl"></i>
+            <span class="font-medium" id="successText"></span>
+          </div>
+        </div>
+
+        <!-- Verification Form -->
+        <form id="verificationForm" class="space-y-6">
+          <!-- Email -->
+          <div class="group">
+            <label class="block text-white font-semibold mb-3 text-lg">Adresse Email</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                <i class="fas fa-envelope text-gray-400 group-focus-within:text-yellow-400 transition-colors"></i>
+              </div>
+              <input type="email" 
+                     name="email" 
+                     value="{{email}}"
+                     required
+                     placeholder="votre@email.com"
+                     class="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-yellow-400 focus:bg-white/20 transition-all">
+            </div>
+          </div>
+
+          <!-- Code Input -->
+          <div class="group">
+            <label class="block text-white font-semibold mb-3 text-lg">Code de Vérification</label>
+            <div class="flex justify-center space-x-2 mb-4">
+              <input type="text" maxlength="1" class="code-input" name="code1" required>
+              <input type="text" maxlength="1" class="code-input" name="code2" required>
+              <input type="text" maxlength="1" class="code-input" name="code3" required>
+              <input type="text" maxlength="1" class="code-input" name="code4" required>
+              <input type="text" maxlength="1" class="code-input" name="code5" required>
+              <input type="text" maxlength="1" class="code-input" name="code6" required>
+            </div>
+            <input type="hidden" name="code" id="fullCode" required>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" 
+                  class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 rounded-xl font-bold text-xl hover:shadow-yellow-400/30 transform hover:scale-[1.02] transition-all duration-300 shadow-xl backdrop-blur-sm flex items-center justify-center space-x-3">
+            <i class="fas fa-check-circle text-xl"></i>
+            <span>Vérifier et Activer</span>
+          </button>
+        </form>
+
+        <!-- Back to Login -->
+        <div class="text-center mt-6">
+          <a href="/login" class="text-white/80 hover:text-yellow-400 transition-colors flex items-center justify-center space-x-2">
+            <i class="fas fa-arrow-left"></i>
+            <span>Retour à la connexion</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Auto-focus next input
+    const codeInputs = document.querySelectorAll('.code-input');
+    const fullCodeInput = document.getElementById('fullCode');
+    
+    codeInputs.forEach((input, index) => {
+      input.addEventListener('input', (e) => {
+        if (e.target.value.length === 1) {
+          if (index < codeInputs.length - 1) {
+            codeInputs[index + 1].focus();
+          }
+        }
+        updateFullCode();
+      });
+      
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+          codeInputs[index - 1].focus();
+        }
+      });
+      
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').slice(0, 6);
+        for (let i = 0; i < pastedData.length && i < codeInputs.length; i++) {
+          codeInputs[i].value = pastedData[i];
+        }
+        if (pastedData.length < codeInputs.length) {
+          codeInputs[pastedData.length].focus();
+        }
+        updateFullCode();
+      });
+    });
+    
+    function updateFullCode() {
+      const code = Array.from(codeInputs).map(input => input.value).join('');
+      fullCodeInput.value = code;
+    }
+    
+    // Form submission
+    document.getElementById('verificationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const data = {
+        email: formData.get('email'),
+        code: formData.get('code')
+      };
+      
+      // Hide previous messages
+      document.getElementById('errorMessage').classList.add('hidden');
+      document.getElementById('successMessage').classList.add('hidden');
+      
+      try {
+        const response = await fetch('/verification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          document.getElementById('successText').textContent = result.message;
+          document.getElementById('successMessage').classList.remove('hidden');
+          
+          // Redirect after delay
+          setTimeout(() => {
+            window.location.href = result.redirect || '/';
+          }, 1500);
+        } else {
+          document.getElementById('errorText').textContent = result.message;
+          document.getElementById('errorMessage').classList.remove('hidden');
+          
+          // Clear code inputs on error
+          codeInputs.forEach(input => input.value = '');
+          codeInputs[0].focus();
+          updateFullCode();
+        }
+      } catch (error) {
+        document.getElementById('errorText').textContent = 'Erreur de connexion. Veuillez réessayer.';
+        document.getElementById('errorMessage').classList.remove('hidden');
+      }
+    });
+    
+    // Focus first code input when email is entered
+    document.querySelector('input[name="email"]').addEventListener('blur', () => {
+      if (document.querySelector('input[name="email"]').value) {
+        codeInputs[0].focus();
+      }
+    });
+  </script>
+</body>
+</html>
