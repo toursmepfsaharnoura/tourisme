@@ -128,7 +128,7 @@ exports.createPlan = async (req, res) => {
       id_gouvernorat: parseInt(id_gouvernorat),
       id_delegation: parseInt(id_delegation),
       image: imagePath
-    };
+    });
 
     // 3. Ajouter les lieux (si existent)
     const delegationIds = Array.isArray(lieux)

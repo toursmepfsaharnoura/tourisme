@@ -56,17 +56,12 @@ exports.photo = multer({
 const lieuStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, '../../frontend/public/uploads/lieu');
-// Stockage pour les images des plans touristiques
-const planImageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../frontend/public/uploads/plan-images');
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
   filename: (req, file, cb) => {
     const ext = file.originalname.split('.').pop();
     const uniqueName = `lieu-${Date.now()}.${ext}`;
-    const uniqueName = `plan-${Date.now()}.${ext}`;
     cb(null, uniqueName);
   }
 });
@@ -74,13 +69,31 @@ const planImageStorage = multer.diskStorage({
 exports.lieu = multer({
   storage: lieuStorage,
   fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Le fichier doit être une image'), false);
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+// Stockage pour les images des plans touristiques
+const planImageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '../../frontend/public/uploads/plan-images');
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = file.originalname.split('.').pop();
+    const uniqueName = `plan-${Date.now()}.${ext}`;
+    cb(null, uniqueName);
+  }
+});
+
 exports.planImage = multer({
   storage: planImageStorage,
   fileFilter: (req, file, cb) => {
-    // If no file, don't filter anything - let it pass
-    if (!file) {
-      return cb(null, true);
-    }
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('Le fichier doit être une image'), false);
     }
@@ -93,7 +106,6 @@ exports.planImage = multer({
 exports.planImageOptional = multer({
   storage: planImageStorage,
   fileFilter: (req, file, cb) => {
-    // If no file, don't filter anything - let it pass
     // Allow empty file uploads
     if (!file) {
       return cb(null, false);

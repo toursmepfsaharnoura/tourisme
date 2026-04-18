@@ -198,6 +198,7 @@ module.exports = {
     const diffTime = Math.abs(end - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 pour inclure le jour de départ
     return diffDays;
+  },
   json: function (obj) {
     return JSON.stringify(obj);
   }
