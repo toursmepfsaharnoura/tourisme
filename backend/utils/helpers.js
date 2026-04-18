@@ -201,5 +201,17 @@ module.exports = {
   },
   json: function (obj) {
     return JSON.stringify(obj);
+  },
+  sumField: function (array, field) {
+    if (!Array.isArray(array)) return 0;
+    return array.reduce((sum, item) => sum + (parseInt(item[field]) || 0), 0);
+  },
+  countWhere: function (array, field, value) {
+    if (!Array.isArray(array)) return 0;
+    return array.filter(item => item[field] === value).length;
+  },
+  countGreaterThan: function (array, field, value) {
+    if (!Array.isArray(array)) return 0;
+    return array.filter(item => (parseInt(item[field]) || 0) > value).length;
   }
 };

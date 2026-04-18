@@ -84,7 +84,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm text-gray-600">Conversations Actives</p>
-            <p class="text-xl font-semibold">{{#each guides}}{{#if unread_count}}1{{/if}}{{/each}}</p>
+            <p class="text-xl font-semibold">{{countGreaterThan guides 'unread_count' 0}}</p>
           </div>
         </div>
       </div>
@@ -96,7 +96,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm text-gray-600">Messages Non Lus</p>
-            <p class="text-xl font-semibold">{{#each guides}}{{unread_count}}{{/each}}</p>
+            <p class="text-xl font-semibold">{{sumField guides 'unread_count'}}</p>
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@
           </div>
           <div class="ml-4">
             <p class="text-sm text-gray-600">Guides Actifs</p>
-            <p class="text-xl font-semibold">{{#each guides}}{{#if (eq statut 'ACTIF')}}1{{/if}}{{/each}}</p>
+            <p class="text-xl font-semibold">{{countWhere guides 'statut' 'ACTIF'}}</p>
           </div>
         </div>
       </div>

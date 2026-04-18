@@ -171,7 +171,7 @@ exports.getGuidePlans = async (req, res) => {
       plans,
       success: req.query.success || null,
       error: req.query.error || null,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Erreur getGuidePlans:', err);
@@ -207,7 +207,7 @@ exports.getPlanDetails = async (req, res) => {
       plan,
       success: req.query.success || null,
       error: req.query.error || null,
-      layout: 'minimal'
+      layout: 'main'
     });
   } catch (err) {
     console.error('Error getting plan details:', err);
