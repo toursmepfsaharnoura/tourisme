@@ -134,29 +134,48 @@
 </head>
 <body>
   <div class="guide-container">
-    <div class="sidebar">
-      <h2>🏛️ Guide Panel</h2>
-      <a href="/guide/dashboard" class="nav-btn active">📊 Dashboard</a>
-      <a href="/guide/profile" class="nav-btn">👤 Mon Profil</a>
-      <a href="/guide/plans" class="nav-btn">🗺️ Mes Plans</a>
-      <a href="/guide/reservations" class="nav-btn">📅 Réservations</a>
-      <a href="/guide/messages" class="nav-btn">💬 Messages</a>
-      <a href="/guide/upload-docs" class="nav-btn">📄 Documents</a>
-      <a href="/logout" class="nav-btn">🚪 Déconnexion</a>
-    </div>
 
-    <div class="main-content">
+  <!-- ✅ SIDEBAR (ثابتة) -->
+  <div class="sidebar">
+    <h2>🏛️ Guide Panel</h2>
+
+    <button class="nav-btn" onclick="loadPage('/guide/dashboard')">📊 Dashboard</button>
+    <button class="nav-btn" onclick="loadPage('/guide/profile')">👤 Mon Profil</button>
+    <button class="nav-btn" onclick="loadPage('/guide/plans')">🗺️ Mes Plans</button>
+    <button class="nav-btn" onclick="loadPage('/guide/reservations')">📅 Réservations</button>
+    <button class="nav-btn" onclick="loadPage('/guide/messages')">💬 Messages</button>
+    <button class="nav-btn" onclick="loadPage('/guide/upload-docs')">📄 Documents</button>
+
+    <a href="/logout" class="nav-btn">🚪 Déconnexion</a>
+  </div>
+
+  <!-- ✅ CONTENT -->
+  <div class="main-content">
+    <div id="content-area">
+
+      <!-- 🔥 Dashboard content (initial) -->
       <div class="header">
         <h1>Dashboard Guide</h1>
         <div>Bienvenue, {{user.nom_complet}} 👋</div>
       </div>
 
-      <!-- Statistiques -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-number">{{nb_plans}}</div>
           <div class="stat-label">Plans créés</div>
         </div>
+      </div>
+
+      <div class="card">
+        <h3>⚡ Actions rapides</h3>
+        <button onclick="loadPage('/guide/create-plan')" class="btn btn-primary">
+          ➕ Créer un plan
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
         <div class="stat-card">
           <div class="stat-number">0</div>
           <div class="stat-label">Réservations</div>
@@ -289,6 +308,20 @@
   <script>
     const guideId = {{user.id}};
     const adminId = 13; // À adapter si nécessaire
+    function loadPage(url) {
+  fetch(url)
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("content-area").innerHTML = html;
+
+      // تبديل URL بدون reload
+      window.history.pushState({}, '', url);
+    })
+    .catch(err => {
+      document.getElementById("content-area").innerHTML =
+        "<p style='color:red'>Erreur de chargement</p>";
+    });
+}
 function verifierAbonnement() {
   const cvApproved = {{cv_approved}};
 

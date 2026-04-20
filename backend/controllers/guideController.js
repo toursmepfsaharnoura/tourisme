@@ -72,7 +72,8 @@ exports.uploadDocs = async (req, res) => {
 exports.getUploadDocs = (req, res) => {
   res.render('guide/upload-cv',{
     hideNavbar: true,
-    hideFooter: true
+    hideFooter: true,
+     layout: false 
   });
 };
 
@@ -101,7 +102,10 @@ exports.getProfile = async (req, res) => {
       hideFooter: true
     };
     
-    res.render('guide/profile', profileData);
+    res.render('guide/profile', {
+  ...profileData,
+  layout: false
+});
   } catch (err) {
     console.error('Error getting profile:', err);
     res.status(500).send('Erreur serveur');
@@ -220,7 +224,8 @@ exports.getMessages = async (req, res) => {
       adminId,
       admin: admin,
       hideNavbar: true,
-      hideFooter: true
+      hideFooter: true,
+       layout: false 
     });
   } catch (err) {
     console.error('Erreur dans getMessages:', err);

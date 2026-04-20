@@ -4,7 +4,6 @@ const { engine } = require('express-handlebars');
 const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
-
 // Connexion DB (sera utilisée par les modèles)
 require('./config/db');
 const { ensureDatabaseSchema } = require('./setup_database');
