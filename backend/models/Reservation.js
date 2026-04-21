@@ -6,7 +6,7 @@ class Reservation {
     return rows;
   }
 
-  static async findByTouriste(touristeId) {
+  static async findByTourist(touristeId) {
     const [rows] = await db.query(
       'SELECT * FROM reservations WHERE id_touriste = ? ORDER BY date_creation DESC',
       [touristeId]
@@ -14,8 +14,36 @@ class Reservation {
     return rows;
   }
 
+  static async findByTouriste(touristeId) {
+    return this.findByTourist(touristeId);
+  }
+
+  static async findByTouristPaid(touristeId) {
+    const [rows] = await db.query(
+      'SELECT * FROM reservations WHERE id_touriste = ? AND statut = ? ORDER BY date_creation DESC',
+      [touristeId, 'CONFIRMEE']
+    );
+    return rows;
+  }
+
   static async findByPlan(planId) {
     const [rows] = await db.query('SELECT * FROM reservations WHERE id_plan = ?', [planId]);
+    return rows;
+  }
+
+  static async findByGuide(guideId) {
+    const [rows] = await db.query(
+      'SELECT r.* FROM reservations r JOIN plans_touristiques p ON r.id_plan = p.id WHERE p.id_guide = ? ORDER BY r.date_creation DESC',
+      [guideId]
+    );
+    return rows;
+  }
+
+  static async findByGuidePaid(guideId) {
+    const [rows] = await db.query(
+      'SELECT r.* FROM reservations r JOIN plans_touristiques p ON r.id_plan = p.id WHERE p.id_guide = ? AND r.statut = ? ORDER BY r.date_creation DESC',
+      [guideId, 'CONFIRMEE']
+    );
     return rows;
   }
 

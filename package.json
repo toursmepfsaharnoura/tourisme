@@ -32,6 +32,7 @@
     "glob": "^13.0.6",
     "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.3",
+    "method-override": "^3.0.0",
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.17.1",

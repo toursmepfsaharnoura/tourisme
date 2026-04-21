@@ -93,9 +93,6 @@ const year = dateFin.getFullYear();
 const month = String(dateFin.getMonth() + 1).padStart(2, '0');
 const day = String(dateFin.getDate()).padStart(2, '0');
 const dateFinStr = `${year}-${month}-${day}`;
-
-console.log("📅 Date de fin d'abonnement formatée :", dateFinStr);
-
 await Guide.update(guideId, {
   abonnement_actif: 1,
   abonnement_fin: dateFinStr
@@ -103,7 +100,6 @@ await Guide.update(guideId, {
 
 // Vérification immédiate
 const updatedGuide = await Guide.findByUserId(guideId);
-console.log("✅ Après update, abonnement_fin =", updatedGuide.abonnement_fin);
 
     // ✅ إنشاء abonnement
     await Abonnement.create({
@@ -113,7 +109,7 @@ console.log("✅ Après update, abonnement_fin =", updatedGuide.abonnement_fin);
       statut: 'ACTIF'
     });
 
-    console.log("✅ abonnement activé");
+    
 
     res.redirect('/guide/dashboard');
 

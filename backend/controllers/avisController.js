@@ -23,6 +23,7 @@ exports.createAvis = async (req, res) => {
     }
 
     const avisId = await Avis.create({
+      id_guide: plan.id_guide,
       id_touriste: touristeId,
       id_plan,
       note,

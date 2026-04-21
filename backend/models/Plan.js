@@ -131,7 +131,15 @@ class Plan {
   }
 
   static async findByGuide(guideId) {
-    const [rows] = await db.query('SELECT * FROM plans_touristiques WHERE id_guide = ? ORDER BY date_debut DESC', [guideId]);
+    const [rows] = await db.query(`
+      SELECT p.*, COALESCE((SELECT SUM(nombre_personnes) FROM reservations r WHERE r.id_plan = p.id AND r.statut = 'CONFIRMEE'), 0) as reserved_personnes
+      FROM plans_touristiques p
+      WHERE id_guide = ?
+      ORDER BY date_debut DESC
+    `, [guideId]);
+    rows.forEach(plan => {
+      plan.places_restantes = plan.capacite_max != null ? Math.max(0, plan.capacite_max - plan.reserved_personnes) : null;
+    });
     return rows;
   }
 
@@ -203,6 +211,7 @@ class Plan {
   }
 
   static async delete(id) {
+    await db.query('DELETE FROM plan_lieux WHERE id_plan = ?', [id]);
     const [result] = await db.query('DELETE FROM plans_touristiques WHERE id = ?', [id]);
     return result.affectedRows > 0;
   }
@@ -229,10 +238,17 @@ class Plan {
       WHERE pl.id_plan = ?
     `, [planId]);
 
-    return {
+    const delegations = lieux.filter(lieu => !lieu.type && !lieu.image);
+    const actualLieux = lieux.filter(lieu => lieu.type || lieu.image);
+
+    const planData = {
       ...plan[0],
       lieux: lieux || []
     };
+
+    planData.places_restantes = planData.capacite_max != null ? Math.max(0, planData.capacite_max - planData.reserved_personnes) : null;
+
+    return planData;
   }
 }
 

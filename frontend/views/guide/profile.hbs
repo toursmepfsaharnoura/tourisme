@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+
 <head>
   <title>Mon Profil Guide</title>
   <meta charset="UTF-8">
@@ -293,7 +293,7 @@
     }
   </style>
 </head>
-<body>
+
   <div class="profile-container">
     <!-- PROFILE HEADER -->
     <div class="profile-header">
@@ -348,7 +348,7 @@
         {{#if guide.cv}}
           {{#if guide.cv_approved}}
             <div class="card-value" style="color: #28a745;">✅ Approuvé</div>
-            <a href="/{{guide.cv}}" target="_blank" class="action-link" style="margin-top: 10px;">Voir CV →</a>
+            <a href="{{uploadPath guide.cv}}" target="_blank" class="action-link" style="margin-top: 10px;">Voir CV →</a>
           {{else}}
             <div class="card-value" style="color: #ffc107;">⏳ En validation</div>
             <div class="card-subtitle">Vérifié par l'administrateur</div>
@@ -373,7 +373,7 @@
             <span class="doc-badge badge-{{#if guide.cv_approved}}approved{{else}}pending{{/if}}">
               {{#if guide.cv_approved}}✅ Approuvé{{else}}⏳ En attente{{/if}}
             </span>
-            <a href="/{{guide.cv}}" target="_blank" class="action-link" style="margin-left: 10px;">Voir</a>
+            <a href="{{uploadPath guide.cv}}" target="_blank" class="action-link" style="margin-left: 10px;">Voir</a>
           </div>
         </div>
       {{else}}
@@ -395,7 +395,7 @@
             <span class="doc-badge badge-{{#if guide.diplome_approved}}approved{{else}}pending{{/if}}">
               {{#if guide.diplome_approved}}✅ Approuvé{{else}}⏳ En attente{{/if}}
             </span>
-            <a href="/{{guide.diplome}}" target="_blank" class="action-link" style="margin-left: 10px;">Voir</a>
+            <a href="{{uploadPath guide.diplome}}" target="_blank" class="action-link" style="margin-left: 10px;">Voir</a>
           </div>
         </div>
       {{/if}}
@@ -584,5 +584,4 @@
       if (e.key === 'Escape') closePhotoModal();
     });
   </script>
-</body>
-</html>
+

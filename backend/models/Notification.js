@@ -1,5 +1,5 @@
 const db = require('../config/db');
-
+ 
 class Notification {
   static async findAll() {
     const [rows] = await db.query(`
@@ -34,7 +34,6 @@ class Notification {
     );
     return rows[0].count;
   }
-
   static async create(data) {
     const { id_utilisateur, type, contenu } = data;
     const [result] = await db.query(`
@@ -43,7 +42,6 @@ class Notification {
     `, [id_utilisateur, type, contenu]);
     return result.insertId;
   }
-
   static async markAsRead(notificationId) {
     const [result] = await db.query(
       'UPDATE notifications SET est_vu = 1 WHERE id = ?',
@@ -51,7 +49,6 @@ class Notification {
     );
     return result.affectedRows;
   }
-
   static async markAllAsRead(userId) {
     const [result] = await db.query(
       'UPDATE notifications SET est_vu = 1 WHERE id_utilisateur = ?',
@@ -59,7 +56,6 @@ class Notification {
     );
     return result.affectedRows;
   }
-
   static async findById(notificationId) {
     const [rows] = await db.query(
       'SELECT * FROM notifications WHERE id = ?',
@@ -67,7 +63,6 @@ class Notification {
     );
     return rows[0];
   }
-
   static async delete(notificationId) {
     const [result] = await db.query(
       'DELETE FROM notifications WHERE id = ?',
@@ -76,5 +71,5 @@ class Notification {
     return result.affectedRows;
   }
 }
-
+ 
 module.exports = Notification;

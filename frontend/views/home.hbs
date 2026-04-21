@@ -224,6 +224,7 @@
         </p>
       </div>
       
+<<<<<<< HEAD
       <!-- Responsive Grid -->
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {{#each gouvernorats}}
@@ -256,10 +257,52 @@
                 <div class="flex items-center text-white text-sm">
                   <i class="fas fa-star text-yellow-400 mr-1"></i>
                   <span>4.8</span>
+=======
+          </div>
+  </div>
+  
+  <!-- Scroll Indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+    <i class="fas fa-chevron-down text-2xl"></i>
+  </div>
+</section>
+
+<!-- Governorats Grid Section -->
+<section class="py-20 bg-gradient-to-b from-gray-50 to-white">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-playfair">
+        Tous les Gouvernorats
+      </h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Explorez chaque région de la Tunisie et découvrez ses attractions uniques, son histoire et sa culture
+      </p>
+    </div>
+    
+    <!-- Responsive Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {{#each gouvernorats}}
+      <div class="group relative">
+        <!-- Card -->
+        <div class="relative overflow-hidden rounded-2xl shadow-lg card-hover bg-white">
+          <!-- Image Container -->
+          <div class="relative h-48 overflow-hidden">
+            {{#if image}}
+              <img src="{{image}}" alt="{{nom}}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerpolicy="no-referrer">
+              <!-- Gradient Overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            {{else}}
+              <!-- Gradient Placeholder -->
+              <div class="w-full h-full bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 relative">
+                <div class="absolute inset-0 bg-black/20"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <i class="fas fa-map-marked-alt text-white text-4xl opacity-50"></i>
+>>>>>>> main
                 </div>
               </div>
             </div>
             
+<<<<<<< HEAD
             <!-- Content -->
             <div class="p-4">
               <h3 class="text-lg font-bold text-gray-900 mb-2">{{nom}}</h3>
@@ -352,6 +395,18 @@
             <div class="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-ocean-blue to-desert-orange p-1">
               <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
                 <i class="fas fa-user text-4xl text-gray-400"></i>
+=======
+            <!-- Heart Button -->
+            <button onclick="event.stopPropagation(); handleFavoriteClick(event, {{id}})" class="absolute top-3 right-3 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 border border-white/30">
+              <i class="far fa-heart text-lg"></i>
+            </button>
+            
+            <!-- Rating Badge -->
+            <div class="absolute bottom-3 left-3 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/30">
+              <div class="flex items-center text-white text-sm">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span>4.8</span>
+>>>>>>> main
               </div>
             </div>
             <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
@@ -632,6 +687,7 @@
       });
     }, observerOptions);
 
+<<<<<<< HEAD
     // Observe all sections
     document.querySelectorAll('section').forEach(section => {
       observer.observe(section);
@@ -675,3 +731,19 @@
   </script>
 </body>
 </html>
+=======
+function handleFavoriteClick(event, gouvernoratId) {
+  event.stopPropagation();
+  const isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+
+  if (!isLoggedIn) {
+    const redirect = encodeURIComponent(`/gouvernorats/${gouvernoratId}/delegations`);
+    window.location.href = `/login?redirect=${redirect}`;
+    return;
+  }
+
+  alert('Vous êtes connecté. Les fonctionnalités de favoris seront bientôt disponibles.');
+}
+
+</script>
+>>>>>>> main

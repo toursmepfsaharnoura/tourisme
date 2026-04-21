@@ -43,6 +43,13 @@
         <!-- User Actions -->
         <div class="flex items-center space-x-4">
           {{#if user}}
+            <!-- Favorites (only for tourists) -->
+            {{#if (eq user.role 'TOURISTE')}}
+              <a href="/touriste/favorites" class="text-gray-700 hover:text-rose-600 transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50" title="Mes favoris">
+                <i class="fas fa-heart text-lg"></i>
+              </a>
+            {{/if}}
+            
             <!-- Notifications -->
             <div class="relative">
               {{#if (eq user.role 'GUIDE')}}

@@ -228,5 +228,29 @@ document.querySelectorAll('.fa-heart').forEach(heart => {
     heart.classList.toggle('fas');
     heart.classList.toggle('text-red-500');
   });
+
 });
+
+
+
+// Favorite toggle function
+async function toggleFavoriteDestination(button) {
+  // For now, this redirects to the plans page with the gouvernorat filter
+  // When a full favorite system is implemented, this will save to user's favorites
+  const gouvernoratId = button.dataset.gouvernorat;
+  
+  // Check if user is logged in
+  const isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+  
+  if (!isLoggedIn) {
+    // Redirect to login
+    alert('Veuillez vous connecter pour ajouter aux favoris');
+    window.location.href = '/auth/login?redirect=/gouvernorats/' + gouvernoratId + '/delegations';
+  } else {
+    // Show message and redirect to view plans
+    window.location.href = '/gouvernorats/' + gouvernoratId + '/delegations';
+  }
+}
+}
+
 </script>

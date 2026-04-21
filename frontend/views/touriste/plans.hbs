@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plans Touristiques - Tunisie Authentique</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+  <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-600 py-24 text-white">
+    <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.35),_transparent_40%)]"></div>
+    <div class="relative mx-auto max-w-7xl px-6">
+      <!-- Top Action Bar -->
+      <div class="flex items-center justify-between mb-8">
+        <div></div>
+        <div class="flex items-center gap-3">
+          <a href="/touriste/reservations" class="inline-flex items-center gap-2 rounded-2xl bg-blue-600/90 hover:bg-blue-700 px-5 py-3 text-white font-semibold transition shadow-lg">
+            <i class="fas fa-calendar-check"></i>
+            Mes Réservations
+          </a>
+          <a href="/touriste/favorites" class="inline-flex items-center gap-2 rounded-2xl bg-rose-600/90 hover:bg-rose-700 px-5 py-3 text-white font-semibold transition shadow-lg">
+            <i class="fas fa-heart"></i>
+            Mes Favoris
+          </a>
+          <a href="/logout" class="inline-flex items-center gap-2 rounded-2xl bg-red-600/90 hover:bg-red-700 px-5 py-3 text-white font-semibold transition shadow-lg">
+            <i class="fas fa-sign-out-alt"></i>
+            Déconnexion
+          </a>
+        </div>
+      </div>
+      
+      <!-- Header Content -->
+      <div class="text-center">
+        <p class="text-sm uppercase tracking-[0.35em] text-cyan-200">Espace touriste</p>
+        <h1 class="mt-4 text-5xl font-extrabold sm:text-6xl">Découvrez les circuits et réservez simplement</h1>
+        <p class="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-200/90">
+          Bienvenue {{user.nom_complet}}, voici tous les plans disponibles avec leurs guides. Cliquez sur "Réserver" pour démarrer votre commande.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <main class="mx-auto max-w-7xl px-6 py-14">
+    {{#if plans.length}}
+      <div class="space-y-8">
+        {{#each plans}}
+          <article class="overflow-hidden rounded-2xl bg-white shadow-xl hover:shadow-2xl transition">
+            <div class="grid gap-0 lg:grid-cols-[1.5fr_1fr]">
+              <!-- Left: Plan Details -->
+              <div class="p-8 lg:p-10 space-y-6">
+                <!-- Title & Description -->
+                <div>
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <span class="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-sky-700">Circuit</span>
+                      <h2 class="mt-4 text-4xl font-extrabold text-slate-900">{{titre}}</h2>
+                    </div>
+                    <button onclick="togglePlanFavorite({{id}}, this)" class="favorite-btn mt-2 text-2xl transition-transform hover:scale-110" data-plan-id="{{id}}">
+                      <i class="far fa-heart text-red-500"></i>
+                    </button>
+                  </div>
+                  <p class="mt-3 text-lg text-slate-600 leading-relaxed">{{description}}</p>
+                </div>
+
+                <!-- Dates -->
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="rounded-xl bg-sky-50 p-4 border border-sky-100">
+                    <div class="font-semibold text-sky-900 text-sm">Départ</div>
+                    <div class="mt-2 text-xl font-bold text-sky-700">{{formatDate date_debut}}</div>
+                  </div>
+                  <div class="rounded-xl bg-emerald-50 p-4 border border-emerald-100">
+                    <div class="font-semibold text-emerald-900 text-sm">Retour</div>
+                    <div class="mt-2 text-xl font-bold text-emerald-700">{{formatDate date_fin}}</div>
+                  </div>
+                </div>
+
+                <!-- Zones & Gouvernorats -->
+                <div class="space-y-3">
+                  {{#if delegations}}
+                    <div>
+                      <div class="font-semibold text-slate-700 text-sm mb-2">Zones visitées</div>
+                      <div class="flex flex-wrap gap-2">
+                        {{#each (split delegations ',')}}
+                          <span class="rounded-lg bg-sky-100 px-3 py-1 text-sm font-medium text-sky-800">{{this}}</span>
+                        {{/each}}
+                      </div>
+                    </div>
+                  {{/if}}
+                  {{#if gouvernorats}}
+                    <div>
+                      <div class="font-semibold text-slate-700 text-sm mb-2">Gouvernorats</div>
+                      <div class="flex flex-wrap gap-2">
+                        {{#each (split gouvernorats ',')}}
+                          <span class="rounded-lg bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-800">{{this}}</span>
+                        {{/each}}
+                      </div>
+                    </div>
+                  {{/if}}
+                </div>
+
+                <!-- Hotels Section -->
+                {{#if locations.hotels.length}}
+                  <div class="rounded-xl bg-orange-50 p-4 border border-orange-200">
+                    <div class="font-semibold text-orange-900 text-sm mb-3 flex items-center gap-2">
+                      <i class="fas fa-hotel"></i> Hôtels ({{{locations.hotels.length}}})
+                    </div>
+                    <div class="space-y-2">
+                      {{#each locations.hotels}}
+                        <div class="text-sm text-orange-800 bg-white p-2 rounded border border-orange-100">
+                          {{#if nom}}
+                            <div class="font-medium">{{nom}}</div>
+                            {{#if description}}<div class="text-xs text-gray-600 mt-1">{{description}}</div>{{/if}}
+                          {{else}}
+                            <span>📍 {{delegation_nom}}</span>
+                          {{/if}}
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <!-- Restaurants Section -->
+                {{#if locations.restaurants.length}}
+                  <div class="rounded-xl bg-amber-50 p-4 border border-amber-200">
+                    <div class="font-semibold text-amber-900 text-sm mb-3 flex items-center gap-2">
+                      <i class="fas fa-utensils"></i> Restaurants ({{{locations.restaurants.length}}})
+                    </div>
+                    <div class="space-y-2">
+                      {{#each locations.restaurants}}
+                        <div class="rounded-3xl border border-amber-100 bg-white p-4 shadow-sm flex gap-4 items-start">
+                          {{#if image}}
+                            <img src="{{image}}" alt="Restaurant" class="h-16 w-16 rounded-2xl object-cover border border-amber-200" />
+                          {{/if}}
+                          <div>
+                            {{#if nom}}
+                              <div class="font-semibold text-amber-900">{{nom}}</div>
+                              {{#if description}}<div class="text-sm text-slate-600 mt-1">{{description}}</div>{{/if}}
+                            {{else}}
+                              <span class="font-semibold">🍽️ {{delegation_nom}}</span>
+                            {{/if}}
+                          </div>
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <!-- Museums Section -->
+                {{#if locations.musees.length}}
+                  <div class="rounded-xl bg-purple-50 p-4 border border-purple-200">
+                    <div class="font-semibold text-purple-900 text-sm mb-3 flex items-center gap-2">
+                      <i class="fas fa-landmark"></i> Musées ({{{locations.musees.length}}})
+                    </div>
+                    <div class="space-y-2">
+                      {{#each locations.musees}}
+                        <div class="text-sm text-purple-800 bg-white p-2 rounded border border-purple-100">
+                          {{#if nom}}
+                            <div class="font-medium">{{nom}}</div>
+                            {{#if description}}<div class="text-xs text-gray-600 mt-1">{{description}}</div>{{/if}}
+                          {{else}}
+                            <span>🏛️ {{delegation_nom}}</span>
+                          {{/if}}
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <!-- Other Locations Section -->
+                {{#if locations.autres.length}}
+                  <div class="rounded-xl bg-teal-50 p-4 border border-teal-200">
+                    <div class="font-semibold text-teal-900 text-sm mb-3 flex items-center gap-2">
+                      <i class="fas fa-map-marker-alt"></i> Lieux ({{{locations.autres.length}}})
+                    </div>
+                    <div class="space-y-2">
+                      {{#each locations.autres}}
+                        <div class="text-sm text-teal-800 bg-white p-2 rounded border border-teal-100">
+                          {{#if nom}}
+                            <div class="font-medium">{{nom}}</div>
+                            {{#if description}}<div class="text-xs text-gray-600 mt-1">{{description}}</div>{{/if}}
+                          {{else}}
+                            <span>📍 {{delegation_nom}}</span>
+                          {{/if}}
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                <!-- Price -->
+                <div class="rounded-xl bg-gradient-to-r from-sky-100 to-cyan-100 p-5 border-2 border-sky-300">
+                  <span class="text-xs font-bold text-sky-700 uppercase tracking-wider">Prix par personne</span>
+                  <div class="mt-2 text-4xl font-black text-sky-900">{{prix}} <span class="text-2xl">TND</span></div>
+                </div>
+                <div class="rounded-xl bg-white/80 p-4 border border-slate-200 text-slate-800">
+                  <div class="text-xs uppercase tracking-widest text-slate-500">Capacité maximale</div>
+                  <div class="mt-2 text-2xl font-bold">{{#if capacite_max}}{{capacite_max}}{{else}}--{{/if}}</div>
+                  {{#if places_restantes}}
+                    <div class="mt-1 text-sm text-emerald-700">{{places_restantes}} place{{#unless (eq places_restantes 1)}}s{{/unless}} restantes</div>
+                  {{else}}
+                    <div class="mt-1 text-sm text-orange-600">Complet ou capacité non définie</div>
+                  {{/if}}
+                </div>
+              </div>
+
+              <!-- Right: Guide & Reservation -->
+              <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-8 text-white space-y-6">
+                <!-- Guide Info -->
+                <div class="rounded-xl bg-white/10 backdrop-blur border border-white/20 p-5 space-y-4">
+                  <div class="flex items-center gap-4">
+                    {{#if guide_photo}}
+                      <img src="{{guide_photo}}" alt="{{guide_nom}}" class="h-16 w-16 rounded-full object-cover border-2 border-cyan-400" />
+                    {{else}}
+                      <div class="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-cyan-400 to-sky-500 text-2xl font-bold">{{substring guide_nom 0 1}}</div>
+                    {{/if}}
+                    <div>
+                      <p class="text-xs uppercase tracking-widest text-slate-300">Guide</p>
+                      <p class="text-xl font-bold">{{guide_nom}}</p>
+                    </div>
+                  </div>
+                  <div class="text-sm space-y-2 text-slate-300 border-t border-white/10 pt-4">
+                    <p><strong class="text-white">Email:</strong> {{guide_email}}</p>
+                    <p>{{#if guide_abonnement}}<span class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-lg text-xs font-semibold">✓ Abonnement actif</span>{{else}}<span class="text-slate-400">Plan public</span>{{/if}}</p>
+                  </div>
+                </div>
+
+                <!-- Reservation Form -->
+                {{#if places_restantes}}
+                  <form method="POST" action="/reservations/touriste/reservations" class="space-y-4">
+                    <input type="hidden" name="id_plan" value="{{id}}" />
+                    <input type="hidden" name="date_reservation" value="{{date_debut}}" />
+                    
+                    <div>
+                      <label class="block text-sm font-semibold text-slate-200 mb-2">Nombre de personnes</label>
+                      <input type="number" name="nombre_personnes" min="1" max="{{places_restantes}}" value="1" required class="w-full rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-3 text-white font-medium outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/50" />
+                      <p class="mt-2 text-xs text-slate-300">Maximum {{places_restantes}} place{{#unless (eq places_restantes 1)}}s{{/unless}} disponibles.</p>
+                    </div>
+                    
+                    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-sky-600 px-6 py-4 text-lg font-bold text-white transition hover:opacity-90 hover:shadow-lg active:scale-95">
+                      <i class="fas fa-shopping-cart mr-2"></i>
+                      Réserver maintenant
+                    </button>
+                  </form>
+                {{else}}
+                  <div class="rounded-2xl bg-red-500/10 border border-red-200 p-4 text-red-700 text-center font-semibold">
+                    Ce circuit est complet ou la capacité n'a pas été définie.
+                  </div>
+                {{/if}}
+
+                <p class="text-xs text-slate-400 text-center italic">Départ prévu le {{formatDate date_debut}}</p>
+              </div>
+            </div>
+          </article>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="rounded-2xl border border-slate-200 bg-white p-16 text-center shadow-lg">
+        <i class="fas fa-plane text-6xl text-slate-300 mb-6"></i>
+        <h2 class="text-3xl font-bold text-slate-900">Aucun plan disponible</h2>
+        <p class="mt-4 text-lg text-slate-600">Nous préparons de nouvelles offres. Revenez bientôt pour réserver votre voyage.</p>
+      </div>
+    {{/if}}
+  </main>
+
+  <script>
+    // Toggle favorite for a plan
+    async function togglePlanFavorite(planId, button) {
+      try {
+        const response = await fetch('/touriste/favorites/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planId })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success && result.redirect) {
+          // User not logged in, redirect to login
+          window.location.href = result.redirect;
+          return;
+        }
+        
+        if (result.success) {
+          // Update the heart icon
+          const icon = button.querySelector('i');
+          if (result.isFavorite) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            button.style.color = 'red';
+          } else {
+            icon.classList.add('far');
+            icon.classList.remove('fas');
+            button.style.color = 'inherit';
+          }
+          
+          // Show feedback message
+          const message = result.isFavorite ? '❤️ Ajouté à vos favoris!' : '♡ Retiré de vos favoris';
+          console.log(message);
+        }
+      } catch (err) {
+        console.error('Erreur toggle favorite:', err);
+        alert('Erreur lors de l\'ajout aux favoris');
+      }
+    }
+  </script>
+
+</body>
+</html>

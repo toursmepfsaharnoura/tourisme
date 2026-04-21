@@ -219,7 +219,7 @@ exports.postLogin = async (req, res) => {
       photo_profil: user.photo_profil
     };
 
-    if (user.role === 'TOURISTE') res.redirect('/');
+    if (user.role === 'TOURISTE') res.redirect('/touriste/plans');
     else if (user.role === 'GUIDE') res.redirect('/guide/dashboard');
     else res.redirect('/admin/dashboard');
   } catch (err) {

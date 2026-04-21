@@ -147,19 +147,48 @@
       <a href="/logout" class="nav-btn"> Déconnexion</a>
     </div>
 
-    <div class="main-content">
+  <!-- ✅ SIDEBAR (ثابتة) -->
+  <div class="sidebar">
+    <h2>🏛️ Guide Panel</h2>
+
+    <button class="nav-btn" onclick="loadPage('/guide/dashboard')">📊 Dashboard</button>
+    <button class="nav-btn" onclick="loadPage('/guide/profile')">👤 Mon Profil</button>
+    <button class="nav-btn" onclick="loadPage('/guide/plans')">🗺️ Mes Plans</button>
+    <button class="nav-btn" onclick="loadPage('/guide/reservations')">📅 Réservations</button>
+    <button class="nav-btn" onclick="loadPage('/guide/messages')">💬 Messages</button>
+    <button class="nav-btn" onclick="loadPage('/guide/upload-docs')">📄 Documents</button>
+
+    <a href="/logout" class="nav-btn">🚪 Déconnexion</a>
+  </div>
+
+  <!-- ✅ CONTENT -->
+  <div class="main-content">
+    <div id="content-area">
+
+      <!-- 🔥 Dashboard content (initial) -->
       <div class="header">
         <h1>Dashboard Guide</h1>
         <div>Bienvenue, {{user.nom_complet}} </div>
         <div>Bienvenue, {{user.nom_complet}} 👋</div>
       </div>
 
-      <!-- Statistiques -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-number">{{nb_plans}}</div>
           <div class="stat-label">Plans créés</div>
         </div>
+      </div>
+
+      <div class="card">
+        <h3>⚡ Actions rapides</h3>
+        <button onclick="loadPage('/guide/create-plan')" class="btn btn-primary">
+          ➕ Créer un plan
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
         <div class="stat-card">
           <div class="stat-number">0</div>
           <div class="stat-label">Réservations</div>
@@ -207,7 +236,7 @@
       {{/if}}
 
       <!-- Statut de l'abonnement -->
-      {{#if abonnement_actif}}
+      {{#if abonnement_valide}}
   <div class="alert alert-success">
     <i class="fas fa-check-circle"></i> <strong>Abonnement actif</strong>
     <p>Votre abonnement est valide jusqu'au {{{formatDate guide.abonnement_fin}}}.</p>
@@ -233,10 +262,19 @@
       <!-- Actions rapides -->
       <div class="card">
         <h3>⚡ Actions rapides</h3>
-        {{#if abonnement_actif}}
-          <a href="/guide/create-plan" class="btn btn-primary">➕ Créer un plan</a>
-          <a href="/guide/plans" class="btn btn-secondary">📋 Voir mes plans</a>
-        {{/if}}
+        {{#if abonnement_valide}}
+
+<a href="/guide/create-plan" class="btn btn-primary">
+  ➕ Créer un plan
+</a>
+
+{{else}}
+
+<button class="btn btn-secondary" style="cursor:not-allowed; opacity:0.6;">
+  🔒 Abonnement expiré
+</button>
+
+{{/if}}
         <a href="/guide/upload-docs" class="btn btn-warning">📤 Mettre à jour mes documents</a>
         <a href="/guide/profile" class="btn btn-primary">✏️ Modifier mon profil</a>
       </div>
@@ -245,14 +283,14 @@
     <h3>📄 Mes documents</h3>
      <div style="display: flex; gap: 15px; flex-wrap: wrap;">
       {{#if cv}}
-      <a href="/{{cv}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
+      <a href="{{uploadPath cv}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
         📄 Voir mon CV
       </a>
       {{else}}
       <span class="btn btn-secondary" style="background: #aaa; cursor: default;">Aucun CV</span>
       {{/if}}
       {{#if diplome}}
-      <a href="/{{diplome}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
+      <a href="{{uploadPath diplome}}" target="_blank" class="btn btn-secondary" style="background: #6c757d;">
         🎓 Voir mon diplôme
       </a>
       {{else}}

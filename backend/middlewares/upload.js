@@ -7,8 +7,8 @@ const docsStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let subfolder = '';
     if (file.fieldname === 'cv') subfolder = 'cv';
-    else if (file.fieldname === 'diplome') subfolder = 'diplome';
-    const dir = path.join(__dirname, '../frontend/public/uploads', subfolder);
+    else if (file.fieldname === 'diplome') subfolder = 'diplomes';
+    const dir = path.join(__dirname, '../../frontend/public/uploads', subfolder);
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -31,7 +31,7 @@ exports.docs = multer({
 // Stockage pour les photos de profil
 const photoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../frontend/public/uploads/photos-profil');
+    const dir = path.join(__dirname, '../../frontend/public/uploads/photos-profil');
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
