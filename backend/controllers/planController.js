@@ -19,58 +19,12 @@ const truncateText = (text, maxLength = 150) => {
 };
 
 /**
-<<<<<<< HEAD
- * Get all plans for a guide
- */
-exports.getGuidePlans = async (req, res) => {
-  const userId = req.session.user.id;
 
-  try {
-    console.log('🔍 userId:', userId);
-    const guide = await Guide.findByUserId(userId);
-    console.log('🔍 guide trouvé:', guide);
-    
-    if (!guide) {
-      return res.status(404).send('Guide not found');
-    }
-
-    console.log('🔍 guide.id_utilisateur:', guide.id_utilisateur);
-    const plans = await Plan.findByGuide(guide.id_utilisateur);
-    console.log('🔍 plans trouvés:', plans);
-    
-    // Format dates and truncate descriptions for better display
-    const formattedPlans = plans.map(plan => ({
-      ...plan,
-      date_debut_formatee: formatDate(plan.date_debut),
-      date_fin_formatee: formatDate(plan.date_fin),
-      periode: `${formatDate(plan.date_debut)} - ${formatDate(plan.date_fin)}`,
-      description_courte: truncateText(plan.description, 150)
-    }));
-    
-    res.render('guide/plans', {
-      user: req.session.user,
-      plans: formattedPlans,
-      guide,
-      success: req.query.success || null,
-      error: req.query.error || null
-    });
-  } catch (err) {
-    console.error('Error getting guide plans:', err);
-    res.status(500).send('Server error');
-  }
-};
-
-/**
-=======
->>>>>>> main
  * Get form to create a new plan
  */
 exports.getNewPlan = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const [gouvernorats] = await db.query('SELECT * FROM gouvernorats ORDER BY nom');
-    const [delegations] = await db.query(`
-=======
+
     const userId = req.session.user.id;
 
     // 🔥 نجيب guide
@@ -86,7 +40,7 @@ exports.getNewPlan = async (req, res) => {
 
     // ✅ إذا abonnement valide
     const delegations = await db.query(`
->>>>>>> main
+
       SELECT d.*, g.nom as gouvernorat_nom 
       FROM delegations d 
       LEFT JOIN gouvernorats g ON d.id_gouvernorat = g.id 
@@ -403,11 +357,7 @@ exports.updatePlan = async (req, res) => {
   const userId = req.session.user.id;
 
   try {
-<<<<<<< HEAD
-    const isOwner = await Plan.checkPlanOwnership(planId, userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Unauthorized' });
-=======
+
     const plan = await Plan.findById(planId);
     if (!plan) {
       return res.redirect('/guide/plans?error=' + encodeURIComponent('Plan introuvable.'));
@@ -415,7 +365,7 @@ exports.updatePlan = async (req, res) => {
 
     if (plan.id_guide !== userId) {
       return res.redirect('/guide/plans?error=' + encodeURIComponent('Vous n\'avez pas accès à ce plan.'));
->>>>>>> main
+
     }
 
     const dateError = validatePlanDates(date_debut, date_fin);
@@ -432,11 +382,7 @@ exports.updatePlan = async (req, res) => {
     res.redirect(`/guide/plans/${planId}?success=${encodeURIComponent('Plan modifié avec succès.')}`);
   } catch (err) {
     console.error('Error updating plan:', err);
-<<<<<<< HEAD
-    res.status(500).json({ error: err.message });
-=======
-    res.redirect(`/guide/plans/${planId}/edit?error=${encodeURIComponent('Erreur serveur lors de la modification.')}`);
->>>>>>> main
+
   }
 };
 
@@ -448,17 +394,14 @@ exports.deletePlan = async (req, res) => {
   const userId = req.session.user.id;
 
   try {
-<<<<<<< HEAD
-    const isOwner = await Plan.checkPlanOwnership(planId, userId);
-    if (!isOwner) {
-=======
+
     const plan = await Plan.findById(planId);
     if (!plan) {
       return res.status(404).json({ error: 'Plan not found' });
     }
 
     if (plan.id_guide !== userId) {
->>>>>>> main
+
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
@@ -627,12 +570,9 @@ exports.getAllPlans = async (req, res) => {
     res.render(template, {
       user: req.session.user,
       plans,
-<<<<<<< HEAD
-      governorates: gouvernorats,
-      currentFilters: filters
-=======
+
       layout: false
->>>>>>> main
+
     });
   } catch (err) {
     console.error('Error getting all plans:', err);
