@@ -303,52 +303,39 @@
       form.submit();
     }
     
-    document.addEventListener('DOMContentLoaded', function() {
-      const dateDebut = document.getElementById('date_debut');
-      const dateFin = document.getElementById('date_fin');
-      const gouvernoratSelect = document.getElementById('id_gouvernorat');
-      const delegationSelect = document.getElementById('id_delegation');
-      
-      const today = new Date().toISOString().split('T')[0];
-      dateDebut.min = today;
-      dateFin.min = today;
-      
-      const delegationsData = {{{json delegations}}};
-      console.log('Delegations data loaded:', delegationsData.length, 'items');
-      
-      gouvernoratSelect.addEventListener('change', function() {
-        const selectedGovernoratId = this.value;
-        console.log('Governorat selected:', selectedGovernoratId);
-        
-        delegationSelect.innerHTML = '<option value="">Sélectionner une délégation</option>';
-        
-        if (selectedGovernoratId) {
-          const filteredDelegations = delegationsData.filter(function(delegation) {
-            return delegation.id_gouvernorat == selectedGovernoratId;
-          });
-          
-          console.log('Filtered delegations:', filteredDelegations);
-          
-          filteredDelegations.forEach(function(delegation) {
-            const option = document.createElement('option');
-            option.value = delegation.id;
-            option.textContent = delegation.nom;
-            delegationSelect.appendChild(option);
-          });
-        }
-      });
-      
-      const savedGovernoratId = gouvernoratSelect.value;
-      if (savedGovernoratId) {
-        gouvernoratSelect.dispatchEvent(new Event('change'));
-        setTimeout(function() {
-          const savedDelegationId = '{{#if formData}}{{formData.id_delegation}}{{/if}}';
-          if (savedDelegationId) {
-            delegationSelect.value = savedDelegationId;
-          }
-        }, 100);
+  document.addEventListener('DOMContentLoaded', function() {
+  const dateDebut = document.getElementById('date_debut');
+  const dateFin = document.getElementById('date_fin');
+  const gouvernoratSelect = document.getElementById('id_gouvernorat');
+  const delegationSelect = document.getElementById('id_delegation');
+
+  const today = new Date().toISOString().split('T')[0];
+  if (dateDebut) dateDebut.min = today;
+  if (dateFin) dateFin.min = today;
+
+  const delegationsData = {{{json delegations}}};
+
+  if (gouvernoratSelect) {
+    gouvernoratSelect.addEventListener('change', function() {
+      const selectedGovernoratId = this.value;
+
+      delegationSelect.innerHTML = '<option value="">Sélectionner une délégation</option>';
+
+      if (selectedGovernoratId) {
+        const filtered = delegationsData.filter(d =>
+          d.id_gouvernorat == selectedGovernoratId
+        );
+
+        filtered.forEach(d => {
+          const option = document.createElement('option');
+          option.value = d.id;
+          option.textContent = d.nom;
+          delegationSelect.appendChild(option);
+        });
       }
     });
+  }
+});
   
   </script>
 </body>
