@@ -202,7 +202,6 @@ exports.uploadPhoto = async (req, res) => {
   }
 };
 
-const Plan = require('../models/Plan'); // تأكد من وجوده
 
 /**
  * Afficher la page de création de plan
@@ -324,7 +323,6 @@ exports.getConversation = async (req, res) => {
 
 
     await Message.create({
-
       id_expediteur: guideId,
       id_destinataire: adminId,
       contenu: contenu.trim(),
