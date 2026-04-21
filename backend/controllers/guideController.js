@@ -322,49 +322,9 @@ exports.getConversation = async (req, res) => {
     }
     const adminId = admin.id;
 
-<<<<<<< HEAD
-    // Récupérer la conversation
-    const messages = await Message.findConversation(guideId, adminId);
-    
-    // Marquer les messages de l'admin comme lus
-    await Message.markConversationAsRead(adminId, guideId);
 
-    res.render('guide/conversation', {
-      user: req.session.user,
-      admin: admin,
-      messages: messages,
-      hideNavbar: true
-    });
-  } catch (err) {
-    console.error('❌ Erreur dans getConversation:', err);
-    res.status(500).send('Erreur serveur : ' + err.message);
-  }
-};
-
-/**
- * Envoie un message du guide à l'administrateur.
- */
-exports.sendMessage = async (req, res) => {
-  const guideId = req.session.user.id;
-  const { contenu, isResponse = false, type_message = 'TEXT' } = req.body;
-
-  if (!contenu || contenu.trim() === '') {
-    return res.status(400).json({ success: false, message: 'Le message ne peut pas être vide.' });
-  }
-
-  try {
-    // Trouver l'administrateur
-    const admin = await User.findAdmin();
-    if (!admin) {
-      return res.status(500).json({ success: false, message: 'Aucun administrateur trouvé.' });
-    }
-    const adminId = admin.id;
-
-    // Créer le message
-    const newMessageId = await Message.create({
-=======
     await Message.create({
->>>>>>> main
+
       id_expediteur: guideId,
       id_destinataire: adminId,
       contenu: contenu.trim(),
@@ -396,44 +356,10 @@ exports.sendMessage = async (req, res) => {
       messageId: newMessageId
     });
   } catch (err) {
-<<<<<<< HEAD
-    console.error('❌ Erreur envoi message:', err);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Erreur serveur : ' + err.message 
-    });
-  }
-};
-exports.markMessagesAsRead = async (req, res) => {
-  const guideId = req.session.user.id;
-  const { messageId } = req.body;
 
-  try {
-    if (messageId) {
-      // Marquer un message spécifique comme lu
-      await Message.markAsRead(messageId);
-    } else {
-      // Marquer tous les messages de l'admin comme lus
-      const admin = await User.findAdmin();
-      if (admin) {
-        await Message.markConversationAsRead(admin.id, guideId);
-      }
-    }
-
-    res.json({ 
-      success: true, 
-      message: 'Messages marqués comme lus' 
-    });
-  } catch (err) {
-    console.error('Erreur markMessagesAsRead:', err);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Erreur serveur : ' + err.message 
-    });
-=======
     console.error('Erreur envoi message:', err);
     res.status(500).send('Erreur serveur : ' + err.message);
->>>>>>> main
+
   }
 };
 
