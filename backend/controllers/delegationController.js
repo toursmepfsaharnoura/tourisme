@@ -79,11 +79,23 @@ exports.getDelegationsByGovernorate = async (req, res) => {
   const governorateId = req.params.gouvernoratId;
 
   try {
-    const delegations = await Delegation.findByGovernorate(gouvernoratId);
-    res.json(delegations);
+    const delegations = await Delegation.findByGouvernorat(governorateId);
+    // Formater la réponse pour être cohérent avec l'API gouvernorats
+    res.json({
+      success: true,
+      count: delegations.length,
+      delegations: delegations.map(d => ({
+        id: d.id,
+        nom: d.nom,
+        image: d.image
+      }))
+    });
   } catch (err) {
     console.error('Error getting delegations by governorate:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Server error' 
+    });
   }
 };
 

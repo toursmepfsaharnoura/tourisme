@@ -1,13 +1,17 @@
 const Guide = require('../models/Guide');
 const User = require('../models/User');
 const Plan = require('../models/Plan');
-const Notification = require('../models/Notification');
 const Message = require('../models/Message');
 const path = require('path');
 const fs = require('fs');
 
 exports.getDashboard = async (req, res) => {
-  const userId = req.session.user.id;
+  const userId = req.user?.id;
+  
+  if (!userId) {
+    return res.status(401).send('User not authenticated');
+  }
+  
   try {
     let guide = await Guide.findByUserId(userId);
     if (!guide) {
@@ -39,7 +43,11 @@ res.render('guide/dashboard', {
 
 exports.uploadDocs = async (req, res) => {
   try {
-    const userId = req.session.user.id;
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).send('User not authenticated');
+    }
 
     const cvFile = req.files['cv'] ? `/uploads/cv/${req.files['cv'][0].filename}` : null;
     const diplomeFile = req.files['diplome'] ? `/uploads/diplomes/${req.files['diplome'][0].filename}` : null;
@@ -51,16 +59,6 @@ exports.uploadDocs = async (req, res) => {
       diplome_approved: 0,
       date_soumission: new Date()
     });
-
-    // Trouver l'admin dynamiquement
-    const admin = await User.findAdmin();
-    if (admin) {
-      await Notification.create({
-        id_utilisateur: admin.id,
-        type: 'CV',
-        contenu: 'Nouveau dossier guide à valider'
-      });
-    }
 
     res.redirect('/guide/dashboard');
   } catch (err) {
@@ -81,7 +79,12 @@ exports.getUploadDocs = (req, res) => {
  * Get guide profile
  */
 exports.getProfile = async (req, res) => {
-  const userId = req.session.user.id;
+  const userId = req.user?.id;
+  
+  if (!userId) {
+    return res.status(401).send('User not authenticated');
+  }
+  
   try {
     const user = await User.findById(userId);
     const guide = await Guide.findByUserId(userId);
@@ -116,7 +119,11 @@ exports.getProfile = async (req, res) => {
  * Met à jour les informations du profil (nom, téléphone, bio) et la photo.
  */
 exports.updateProfile = async (req, res) => {
-  const userId = req.session.user.id;
+  const userId = req.user?.id;
+  
+  if (!userId) {
+    return res.status(401).send('User not authenticated');
+  }
   const { nom_complet, telephone, bio } = req.body;
 
   try {
@@ -171,7 +178,11 @@ exports.updateProfile = async (req, res) => {
  * Upload de la photo de profil (appelé en AJAX depuis le formulaire dédié).
  */
 exports.uploadPhoto = async (req, res) => {
-  const userId = req.session.user.id;
+  const userId = req.user?.id;
+  
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'User not authenticated' });
+  }
   
   try {
     if (!req.file) {
@@ -207,7 +218,11 @@ exports.uploadPhoto = async (req, res) => {
  * Affiche la conversation entre le guide et l'administrateur.
  */
 exports.getMessages = async (req, res) => {
-  const guideId = req.session.user.id;
+  const guideId = req.user?.id;
+  
+  if (!guideId) {
+    return res.status(401).send('User not authenticated');
+  }
   try {
     const admin = await User.findAdmin();
     if (!admin) {
@@ -215,11 +230,10 @@ exports.getMessages = async (req, res) => {
     }
     const adminId = admin.id;
 
-    await Message.markConversationAsRead(adminId, guideId);
     const messages = await Message.findConversation(guideId, adminId);
 
     res.render('guide/messages', {
-      user: req.session.user,
+      user: req.user,
       messages,
       adminId,
       admin: admin,
@@ -237,7 +251,11 @@ exports.getMessages = async (req, res) => {
  * Envoie un message du guide à l'administrateur.
  */
 exports.sendMessage = async (req, res) => {
-  const guideId = req.session.user.id;
+  const guideId = req.user?.id;
+  
+  if (!guideId) {
+    return res.status(401).send('User not authenticated');
+  }
   const { contenu, type_message = 'TEXT' } = req.body;
 
   if (!contenu || contenu.trim() === '') {
@@ -258,12 +276,6 @@ exports.sendMessage = async (req, res) => {
       type_message: type_message
     });
 
-    await Notification.create({
-      id_utilisateur: adminId,
-      type: 'MESSAGE',
-      contenu: `Nouveau message de ${req.session.user.nom_complet}`
-    });
-
     res.redirect('/guide/messages');
   } catch (err) {
     console.error('Erreur envoi message:', err);
@@ -271,29 +283,30 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-exports.markNotificationsRead = async (req, res) => {
-  res.send('Marquer notifications lues - à implémenter');
-};
-
-exports.refreshNotifications = async (req, res) => {
-  res.send('Rafraîchir notifications - à implémenter');
-};
-
 /**
- * Get all guides for admin view
+ * Get guide notifications page
  */
-exports.getAllGuides = async (req, res) => {
+exports.getNotifications = async (req, res) => {
   try {
-    const guides = await Guide.findAll();
-    console.log('All guides:', guides);
+    console.log('🔍 GUIDE CONTROLLER: getNotifications called');
+    console.log('🔍 GUIDE CONTROLLER: req.params:', req.params);
+    console.log('🔍 GUIDE CONTROLLER: req.query:', req.query);
     
-    res.render('admin/guides-list', {
-      guides,
-      user: req.session.user
-    });
+    const userId = req.user?.id || req.session?.user?.id;
+    
+    if (!userId) {
+      console.log('❌ GUIDE CONTROLLER: User not authenticated');
+      return res.status(401).send('User not authenticated');
+    }
+
+    // Use the unified notificationController to get notifications
+    const notificationController = require('./notificationController');
+    
+    // Call the unified notifications method
+    return notificationController.getNotifications(req, res);
+    
   } catch (err) {
-    console.error('Error getting guides:', err);
+    console.error('❌ GUIDE CONTROLLER: Erreur getting notifications:', err);
     res.status(500).send('Erreur serveur');
   }
 };
-// ... toutes les autres fonctions : getProfile, updateProfile, uploadPhoto, getAbonnement, getPaiement, postPaiement, getPlans, getNewPlan, postPlan, getMessages, sendMessage, markNotificationsRead, refreshNotifications, etc.

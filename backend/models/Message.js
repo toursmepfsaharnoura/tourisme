@@ -162,6 +162,19 @@ class Message {
     );
     return result.affectedRows;
   }
+
+  static async findByUser(userId, limit = 50) {
+    try {
+      const [rows] = await db.query(
+        'SELECT * FROM messages WHERE id_destinataire = ? ORDER BY date_creation DESC LIMIT ?',
+        [userId, limit]
+      );
+      return rows;
+    } catch (err) {
+      console.error("Message.findByUser ERROR:", err);
+      return [];
+    }
+  }
 }
 
 module.exports = Message;

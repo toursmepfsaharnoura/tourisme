@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>💬 Messagerie Admin Moderne</title>
+  <title>💬 Messages from Guides</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -135,14 +135,14 @@
     }
     
     .message-guide {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(20px);
-      color: #1a202c;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 28px 28px 28px 12px;
       box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(0, 0, 0, 0.05);
+        0 10px 30px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(0, 0, 0, 0.1);
     }
     
     .status-ACTIF { 
@@ -189,6 +189,480 @@
       background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
       box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
       transform: translateY(-3px) scale(1.05);
+    }
+    
+    /* Chatbot-style button design */
+    .btn-chat {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 24px;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 4px 15px rgba(16, 185, 129, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-chat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn-chat:hover::before {
+      left: 100%;
+    }
+    
+    .btn-chat:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 25px rgba(16, 185, 129, 0.4),
+        0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-chat:active {
+      transform: translateY(0);
+      box-shadow: 
+        0 2px 10px rgba(16, 185, 129, 0.3),
+        0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      padding: 12px 24px;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-secondary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn-secondary:hover::before {
+      left: 100%;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-send {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 28px;
+      font-weight: 700;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 4px 15px rgba(59, 130, 246, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-send::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn-send:hover::before {
+      left: 100%;
+    }
+    
+    .btn-send:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 25px rgba(59, 130, 246, 0.4),
+        0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-send:active {
+      transform: translateY(0);
+      box-shadow: 
+        0 2px 10px rgba(59, 130, 246, 0.3),
+        0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Enhanced message container */
+    .message-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .message-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .message-container:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+    }
+    
+    /* Enhanced input area */
+    .reply-input-area {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 20px;
+      padding: 16px;
+      margin-top: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .reply-input-area:focus-within {
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 
+        0 0 0 4px rgba(102, 126, 234, 0.1),
+        0 10px 30px rgba(102, 126, 234, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    /* Typing indicator animation */
+    .typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #667eea;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot:nth-child(3) { animation-delay: 0s; }
+    
+    @keyframes typing {
+      0%, 80%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      40% {
+        transform: scale(1.3);
+        opacity: 1;
+      }
+    }
+    
+    /* Pulse animation for new messages */
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+      }
+    }
+    
+    .new-message {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Enhanced status badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-badge.online {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    
+    .status-badge.away {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: white;
+      box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+    }
+    
+    .status-badge.offline {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      color: white;
+      box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
+    }
+    
+    /* Chat input enhancements */
+    .chat-input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 16px;
+      padding: 12px 16px;
+      color: white;
+      font-size: 15px;
+      resize: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 50px;
+      max-height: 120px;
+    }
+    
+    .chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .chat-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+    
+    /* Message timestamp */
+    .message-time {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    
+    /* Online status indicator */
+    .online-indicator {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 14px;
+      height: 14px;
+      background: #10b981;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .avatar-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    
+    /* Chat Interface Styles */
+    .chat-container {
+      display: flex;
+      height: calc(100vh - 120px);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-sidebar {
+      width: 350px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chat-header {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .search-bar {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: white;
+      width: 100%;
+      margin-top: 12px;
+    }
+    
+    .search-bar::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .message-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+    
+    .message-item {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .message-item:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateX(4px);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+    
+    .message-item.active {
+      background: rgba(102, 126, 234, 0.25);
+      border-color: rgba(102, 126, 234, 0.5);
+    }
+    
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .chat-conversation-header {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .chat-message {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      word-wrap: break-word;
+    }
+    
+    .chat-message.received {
+      background: rgba(255, 255, 255, 0.95);
+      color: #000000;
+      align-self: flex-start;
+      border-bottom-left-radius: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-message.sent {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 6px;
+    }
+    
+    .chat-input-container {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .chat-input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    
+    .empty-chat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+    }
+    
+    .empty-chat-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
     }
     
     .avatar-gradient {
@@ -277,78 +751,275 @@
   <div class="floating-shape" style="top: 10%; left: 10%; width: 100px; height: 100px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%;"></div>
   <div class="floating-shape" style="top: 70%; right: 15%; width: 60px; height: 60px; background: linear-gradient(135deg, #764ba2, #667eea); border-radius: 30%;"></div>
   
-  <div class="glass-morphism p-8 max-w-7xl mx-auto relative z-10">
+  <div class="p-8 max-w-7xl mx-auto relative z-10">
     <!-- Header -->
-    <div class="glass-morphism p-8 mb-8">
+    <div class="glass-morphism p-6 mb-6">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-4xl font-black text-white mb-2 drop-shadow-lg">💬 Messages from Guides</h1>
-          <p class="text-xl text-white/80">Welcome, {{user.nom_complet}} 👋</p>
+          <h1 class="text-3xl font-black text-white mb-2 drop-shadow-lg">💬 Messages from Guides</h1>
+          <p class="text-lg text-white/80">Welcome, {{user.nom_complet}} 👋</p>
         </div>
-        <a href="/admin/dashboard" class="btn-primary text-white px-8 py-4 rounded-2xl font-bold text-xl">
+        <a href="/admin/dashboard" class="btn-primary text-white px-6 py-3 rounded-xl font-bold">
           🏠 Dashboard Admin
         </a>
       </div>
     </div>
 
-    <!-- Messages List -->
-    <div class="glass-morphism p-8">
-      {{#each messages}}
-      <div class="conversation-item p-6">
-        <div class="sender-info mb-4">
-          <strong class="text-xl text-white">{{sender_name}}</strong> 
-          {{#if guide_status}}<span class="status-{{guide_status}} ml-2">({{guide_status}})</span>{{/if}}
-          <span class="text-white/60 text-sm ml-4">{{formatDate date_creation}}</span>
+    <!-- Chat Interface -->
+    <div class="chat-container">
+      <!-- Sidebar -->
+      <div class="chat-sidebar">
+        <div class="chat-header">
+          <h2 class="text-xl font-bold text-white mb-3">Messages</h2>
+          <input type="text" placeholder="Search messages..." class="search-bar" id="searchInput">
         </div>
         
-        <p class="text-lg mb-4 text-white">{{contenu}}</p>
-        
-        <div class="flex gap-3 mb-4">
-          <a href="/admin/reply-message?guideId={{other_user_id}}" 
-             class="btn-primary text-white px-4 py-2 rounded-lg font-semibold text-sm inline-flex items-center gap-2">
-            <i class="fas fa-reply"></i>
-            Reply to Guide
-          </a>
-          <a href="/admin/messages/{{other_user_id}}" 
-             class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold text-sm inline-flex items-center gap-2 transition-all">
-            <i class="fas fa-comments"></i>
-            View Conversation
-          </a>
-        </div>
-        
-        {{#if (eq id_destinataire ../user.id)}}
-        <!-- Reply form -->
-        <form method="POST" action="/admin/reply-message" class="glass-morphism p-4">
-          <input type="hidden" name="message_id" value="{{id}}">
-          <input type="hidden" name="guideId" value="{{other_user_id}}">
-          <div class="flex gap-4">
-            <textarea name="contenu" placeholder="Your reply..." required
-                      class="input-professional flex-1 p-4 resize-none" 
-                      rows="2"></textarea>
-            <button type="submit" class="btn-primary text-white px-6 py-3 font-bold">
-              Send Reply
-            </button>
+        <div class="message-list" id="messageList">
+          {{#each messages}}
+          <div class="message-item" onclick="selectConversation('{{other_user_id}}', '{{sender_name}}', '{{guide_status}}')" data-guide-id="{{other_user_id}}">
+            <div class="flex items-start gap-3">
+              <div class="avatar-wrapper">
+                <div class="avatar-gradient w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  {{#if sender_name}}{{substring sender_name 0 1}}{{else}}G{{/if}}
+                </div>
+                {{#if guide_status}}
+                  {{#if (eq guide_status 'ACTIF')}}
+                    <div class="online-indicator"></div>
+                  {{/if}}
+                {{/if}}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <h3 class="text-white font-bold truncate">{{sender_name}}</h3>
+                  <span class="text-xs text-white/80">{{formatDate date_creation}}</span>
+                </div>
+                <p class="text-white/90 text-sm truncate">{{contenu}}</p>
+                {{#if guide_status}}
+                  <span class="inline-block mt-1 text-xs px-2 py-1 rounded-full 
+                    {{#if (eq guide_status 'ACTIF')}}bg-green-500/20 text-green-300
+                    {{else if (eq guide_status 'EN_ATTENTE')}}bg-yellow-500/20 text-yellow-300
+                    {{else}}bg-red-500/20 text-red-300{{/if}}">
+                    {{guide_status}}
+                  </span>
+                {{/if}}
+              </div>
+            </div>
           </div>
-        </form>
-        {{/if}}
+          {{else}}
+          <div class="empty-chat">
+            <div class="empty-chat-icon">📨</div>
+            <p class="text-lg">No messages yet</p>
+            <p class="text-sm mt-2">Guides will appear here when they send you messages</p>
+          </div>
+          {{/each}}
+        </div>
       </div>
-      {{else}}
-      <div class="text-center py-20">
-        <div class="text-6xl mb-4 text-white/60">📨</div>
-        <div class="text-2xl text-white/80">No messages yet</div>
-        <p class="text-lg mt-4 text-white/60">Guides will appear here when they send you messages</p>
+
+      <!-- Main Chat Area -->
+      <div class="chat-main" id="chatMain">
+        <div class="empty-chat">
+          <div class="empty-chat-icon">💬</div>
+          <h3 class="text-xl font-semibold mb-2">Select a conversation</h3>
+          <p class="text-sm">Choose a message from the sidebar to start chatting</p>
+        </div>
       </div>
-      {{/each}}
     </div>
   </div>
 
   <script>
-    // Auto-refresh every 10 seconds
-    setInterval(() => {
-      location.reload();
-    }, 10000);
+    let currentGuideId = null;
+    let currentGuideName = null;
     
-    // Add keyboard navigation
+    // Function to select a conversation
+    function selectConversation(guideId, guideName, guideStatus) {
+      currentGuideId = guideId;
+      currentGuideName = guideName;
+      
+      // Update active state in sidebar
+      document.querySelectorAll('.message-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.querySelector(`[data-guide-id="${guideId}"]`).classList.add('active');
+      
+      // Load conversation
+      loadConversation(guideId, guideName, guideStatus);
+    }
+    
+    // Function to load conversation
+    async function loadConversation(guideId, guideName, guideStatus) {
+      try {
+        const response = await fetch(`/admin/messages/${guideId}`);
+        const html = await response.text();
+        
+        // Create a temporary div to parse the response
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // Extract the conversation content
+        const conversationContent = tempDiv.querySelector('#conversationContent');
+        
+        if (conversationContent) {
+          document.getElementById('chatMain').innerHTML = conversationContent.innerHTML;
+        } else {
+          // Fallback: create a basic conversation view
+          document.getElementById('chatMain').innerHTML = `
+            <div class="chat-conversation-header">
+              <div class="avatar-wrapper">
+                <div class="avatar-gradient w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  ${guideName ? guideName.charAt(0).toUpperCase() : 'G'}
+                </div>
+                ${guideStatus === 'ACTIF' ? '<div class="online-indicator"></div>' : ''}
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white">${guideName}</h3>
+                <span class="text-sm text-white/70">${guideStatus || 'Offline'}</span>
+              </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="text-center text-white/60 py-8">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Loading conversation...</p>
+              </div>
+            </div>
+            <div class="chat-input-container">
+              <form id="messageForm" class="chat-input-wrapper">
+                <input type="hidden" name="guideId" value="${guideId}">
+                <textarea name="contenu" placeholder="Type your message here..." class="chat-input flex-1" rows="2" required></textarea>
+                <button type="submit" class="btn-send">
+                  <i class="fas fa-paper-plane"></i>
+                  Send
+                </button>
+              </form>
+            </div>
+          `;
+          
+          // Load messages for this conversation
+          loadMessages(guideId);
+        }
+      } catch (error) {
+        console.error('Error loading conversation:', error);
+        document.getElementById('chatMain').innerHTML = `
+          <div class="empty-chat">
+            <div class="empty-chat-icon">❌</div>
+            <h3 class="text-xl font-semibold mb-2">Error loading conversation</h3>
+            <p class="text-sm">Please try again later</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Function to load messages
+    async function loadMessages(guideId) {
+      try {
+        const response = await fetch(`/admin/api/messages/${guideId}`);
+        const messages = await response.json();
+        
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages && messages.length > 0) {
+          chatMessages.innerHTML = messages.map(msg => `
+            <div class="chat-message ${msg.id_destinataire == ${user.id} ? 'sent' : 'received'}">
+              <p>${msg.contenu}</p>
+              <span class="text-xs ${msg.id_destinataire == ${user.id} ? 'text-white/70' : 'text-gray-500'} mt-1 block">
+                ${new Date(msg.date_creation).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
+              </span>
+            </div>
+          `).join('');
+          
+          // Scroll to bottom
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else if (chatMessages) {
+          chatMessages.innerHTML = `
+            <div class="message-bubble message-guide p-4 mb-4">
+              <p class="text-lg text-black font-medium">{{contenu}}</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+      }
+    }
+    
+    // Handle message form submission
+    document.addEventListener('submit', async function(e) {
+      if (e.target.id === 'messageForm') {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const message = formData.get('contenu');
+        
+        if (!message.trim()) return;
+        
+        try {
+          const response = await fetch('/admin/send-message', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Clear the input
+            e.target.querySelector('textarea').value = '';
+            
+            // Reload messages
+            if (currentGuideId) {
+              loadMessages(currentGuideId);
+            }
+          } else {
+            console.error('Failed to send message:', result.error);
+            alert('Erreur: ' + (result.error || 'Impossible d\'envoyer le message'));
+          }
+        } catch (error) {
+          console.error('Error sending message:', error);
+          alert('Erreur de connexion. Veuillez réessayer.');
+        }
+      }
+    });
+    
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const messageItems = document.querySelectorAll('.message-item');
+      
+      messageItems.forEach(item => {
+        const senderName = item.querySelector('h3').textContent.toLowerCase();
+        const messageContent = item.querySelector('p').textContent.toLowerCase();
+        
+        if (senderName.includes(searchTerm) || messageContent.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+    
+    // Auto-refresh message list every 30 seconds
+    setInterval(() => {
+      if (!document.hidden) {
+        fetch('/admin/messages')
+          .then(response => response.text())
+          .then(html => {
+            // Update message list without losing current conversation
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const newMessageList = tempDiv.querySelector('#messageList');
+            if (newMessageList) {
+              document.getElementById('messageList').innerHTML = newMessageList.innerHTML;
+              
+              // Restore active state
+              if (currentGuideId) {
+                const activeItem = document.querySelector(`[data-guide-id="${currentGuideId}"]`);
+                if (activeItem) {
+                  activeItem.classList.add('active');
+                }
+              }
+            }
+          })
+          .catch(error => console.error('Error refreshing messages:', error));
+      }
+    }, 30000);
+    
+    // Keyboard navigation
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         window.location.href = '/admin/dashboard';

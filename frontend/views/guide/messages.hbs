@@ -1,294 +1,427 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <title>Messages Admin</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .messages-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .messages-header a {
-            font-size: 1.8em;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .messages-header a:hover {
-            opacity: 0.8;
-        }
-
-        .admin-info {
-            flex: 1;
-        }
-
-        .admin-name {
-            font-size: 1.3em;
-            margin-bottom: 5px;
-        }
-
-        .admin-role {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .message-item {
-            margin-bottom: 20px;
-            padding: 15px 20px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            max-width: 70%;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message-admin {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            align-self: flex-start;
-            margin-left: 0;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .message-guide {
-            background: white;
-            color: #333;
-            align-self: flex-end;
-            margin-right: 0;
-            border: 1px solid #e0e0e0;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .message-content {
-            font-size: 1em;
-            line-height: 1.4;
-            margin-bottom: 8px;
-            word-wrap: break-word;
-        }
-
-        .message-time {
-            font-size: 0.75em;
-            opacity: 0.7;
-        }
-
-        .message-input-section {
-            background: white;
-            border-top: 1px solid #e0e0e0;
-            padding: 15px 20px;
-            position: sticky;
-            bottom: 0;
-            box-shadow: 0 -3px 10px rgba(0,0,0,0.08);
-        }
-
-        .message-form {
-            display: flex;
-            gap: 10px;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .message-form input {
-            flex: 1;
-            padding: 12px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 1em;
-            font-family: inherit;
-            transition: all 0.3s;
-            background: #f8f9fa;
-        }
-
-        .message-form input:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .message-form button {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 50px;
-        }
-
-        .message-form button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .empty-messages {
-            text-align: center;
-            padding: 80px 20px;
-            color: #999;
-        }
-
-        .empty-messages-icon {
-            font-size: 4em;
-            margin-bottom: 15px;
-        }
-
-        .empty-messages-text {
-            font-size: 1.2em;
-            color: #666;
-        }
-
-        @media (max-width: 600px) {
-            .messages-header { padding: 15px 20px; }
-            .admin-name { font-size: 1.1em; }
-            .message-item { max-width: 85%; }
-            .messages-container { padding: 10px; }
-        }
-    </style>
-</head>
-<body>
-    <!-- HEADER -->
-    <div class="messages-header">
-        <a href="/guide/dashboard">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <div class="admin-info">
-            <div class="admin-name">
-                <i class="fas fa-user-shield"></i>
-                {{#if admin}}{{admin.nom_complet}}{{else}}Administrateur{{/if}}
-            </div>
-            <div class="admin-role">Administration</div>
+<!-- Messages Section for Main Content -->
+<div class="messages-container">
+  <!-- Messages Header -->
+  <div class="messages-header">
+    <div class="messages-header-left">
+      <div class="chat-avatar">
+        <div class="avatar-circle">{{#if admin}}{{substring admin.nom_complet 0 1}}{{else}}A{{/if}}</div>
+      </div>
+      <div class="chat-info">
+        <h3 class="chat-name">{{#if admin}}{{admin.nom_complet}}{{else}}Administrateur{{/if}}</h3>
+        <div class="status-badge status-active">ACTIF</div>
+      </div>
+    </div>
+    <div class="messages-actions">
+      <button class="btn-icon" onclick="refreshMessages()">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Messages Area -->
+  <div class="chat-messages" id="chatMessages">
+    {{#if messages.length}}
+      {{#each messages}}
+        <div class="chat-message {{#if (eq id_expediteur ../user.id)}}sent{{else}}received{{/if}}">
+          <div class="message-bubble">
+            <p class="message-text">{{contenu}}</p>
+            <span class="message-time">{{formatDate date_creation}}</span>
+          </div>
         </div>
-    </div>
+      {{/each}}
+    {{else}}
+      <div class="empty-state">
+        <div class="empty-icon">💬</div>
+        <h3>Aucun message pour le moment</h3>
+        <p>Commencez la conversation avec l'administrateur</p>
+      </div>
+    {{/if}}
+  </div>
+  
+  <!-- Message Input -->
+  <div class="chat-input-container">
+    <form class="chat-input-form" action="/guide/send-message" method="POST">
+      <div class="input-wrapper">
+        <input type="text" name="contenu" placeholder="Tapez votre message ici..." class="message-input" required>
+        <button type="submit" class="send-btn">
+          <i class="fas fa-paper-plane"></i>
+          Envoyer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
-    <!-- MESSAGES -->
-    <div class="messages-container">
-        {{#if messages.length}}
-            {{#each messages}}
-                <div class="message-item {{#if (eq id_expediteur ../user.id)}}message-guide{{else}}message-admin{{/if}}">
-                    <div class="message-content">{{contenu}}</div>
-                    <div class="message-time">{{formatDate date_creation}}</div>
-                </div>
-            {{/each}}
-        {{else}}
-            <div class="empty-messages">
-                <div class="empty-messages-icon">
-                    <i class="fas fa-comments"></i>
-                </div>
-                <div class="empty-messages-text">Aucun message pour le moment</div>
-                <p style="margin-top: 10px; font-size: 0.9em;">Commencez la conversation avec l'administrateur</p>
-            </div>
-        {{/if}}
-    </div>
+<style>
+.messages-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
-    <!-- INPUT SECTION -->
-    <div class="message-input-section">
-        <form class="message-form" action="/guide/send-message" method="POST">
-            <input type="text" name="contenu" placeholder="Tapez votre message..." required>
-            <button type="submit">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </form>
-    </div>
+.messages-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
 
-    <script>
-        // Auto-scroll vers le bas
-        function scrollToBottom() {
-            const container = document.querySelector('.messages-container');
-            container.scrollTop = container.scrollHeight;
+.messages-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.chat-avatar .avatar-circle {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.chat-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background: rgba(212, 237, 218, 0.3);
+  color: #d4edda;
+  border: 1px solid rgba(212, 237, 218, 0.5);
+}
+
+.messages-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chat-message {
+  display: flex;
+  max-width: 80%;
+}
+
+.chat-message.sent {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-message.received {
+  align-self: flex-start;
+}
+
+.message-bubble {
+  padding: 12px 16px;
+  border-radius: 20px;
+  position: relative;
+  max-width: 100%;
+}
+
+.chat-message.sent .message-bubble {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom-right-radius: 6px;
+  margin-left: 10px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.chat-message.received .message-bubble {
+  background: white;
+  color: #333;
+  border: 1px solid #e0e0e0;
+  border-bottom-left-radius: 6px;
+  margin-right: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-text {
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 5px;
+  word-wrap: break-word;
+}
+
+.chat-message .message-time {
+  font-size: 11px;
+  opacity: 0.7;
+  text-align: right;
+}
+
+.chat-message.sent .message-time {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.chat-message.received .message-time {
+  color: #999;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: #999;
+}
+
+.chat-input-container {
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+  background: white;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.message-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  font-size: 14px;
+  background: #f8f9fa;
+  transition: all 0.3s;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.message-input::placeholder {
+  color: #999;
+}
+
+.send-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.send-btn:active {
+  transform: translateY(0);
+}
+
+/* Scrollbar */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-message {
+    max-width: 90%;
+  }
+  
+  .messages-header {
+    padding: 15px;
+  }
+  
+  .chat-messages {
+    padding: 15px;
+  }
+  
+  .chat-input-container {
+    padding: 15px;
+  }
+}
+</style>
+
+  <script>
+    // Auto-scroll to bottom
+    function scrollToBottom() {
+      const chatMessages = document.getElementById('chatMessages');
+      if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
+
+    // Format date helper
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      
+      if (diff < 60000) return 'À l\'instant';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)} min`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)} h`;
+      if (diff < 604800000) return `${Math.floor(diff / 86400000)} j`;
+      
+      return date.toLocaleDateString('fr-FR', { 
+        day: 'numeric', 
+        month: 'short', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    }
+
+    // Refresh messages
+    function refreshMessages() {
+      location.reload();
+    }
+
+    // Handle form submission with AJAX
+    document.addEventListener('submit', async function(e) {
+      if (e.target.classList.contains('chat-input-form')) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const message = formData.get('contenu');
+        
+        if (!message.trim()) return;
+        
+        try {
+          const response = await fetch('/guide/send-message', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (response.ok) {
+            // Clear the input
+            e.target.querySelector('.message-input').value = '';
+            
+            // Reload the page to show the new message
+            setTimeout(() => {
+              location.reload();
+            }, 500);
+          } else {
+            console.error('Failed to send message');
+            alert('Erreur: Impossible d\'envoyer le message');
+          }
+        } catch (error) {
+          console.error('Error sending message:', error);
+          alert('Erreur de connexion. Veuillez réessayer.');
         }
+      }
+    });
 
-        // Formatter la date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diff = now - date;
-            
-            if (diff < 60000) return 'À l\'instant';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)} min`;
-            if (diff < 86400000) return `${Math.floor(diff / 3600000)} h`;
-            if (diff < 604800000) return `${Math.floor(diff / 86400000)} j`;
-            
-            return date.toLocaleDateString('fr-FR', { 
-                day: 'numeric', 
-                month: 'short', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-        }
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Scroll to bottom
+      scrollToBottom();
+      
+      // Focus on the input
+      const messageInput = document.querySelector('.message-input');
+      if (messageInput) {
+        messageInput.focus();
+      }
+    });
 
-        // Helper pour Handlebars
-        if (typeof Handlebars !== 'undefined') {
-            Handlebars.registerHelper('formatDate', formatDate);
-            Handlebars.registerHelper('eq', function(a, b) {
-                return a === b;
-            });
-        }
-
-        // Scroler au chargement et après envoi
-        document.addEventListener('DOMContentLoaded', () => {
-            scrollToBottom();
-            
-            // Scroller après chaque nouveau message
-            const observer = new MutationObserver(() => {
-                scrollToBottom();
-            });
-            
-            observer.observe(document.querySelector('.messages-container'), {
-                childList: true,
-                subtree: true
-            });
-        });
-
-        // Focus sur le champ input
-        document.querySelector('input[name="contenu"]').focus();
-    </script>
+    // Helper for Handlebars
+    if (typeof Handlebars !== 'undefined') {
+      Handlebars.registerHelper('formatDate', formatDate);
+      Handlebars.registerHelper('eq', function(a, b) {
+        return a === b;
+      });
+      Handlebars.registerHelper('substring', function(str, start, end) {
+        if (!str) return '';
+        return str.substring(start, end);
+      });
+    }
+  </script>
 </body>
 </html>

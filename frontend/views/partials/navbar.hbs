@@ -34,6 +34,10 @@
             <i class="fas fa-user-tie text-sm"></i>
             <span>Guides</span>
           </a>
+          <a href="/ai/chat-interactive" class="text-gray-900 hover:text-ocean-blue transition-colors duration-300 font-medium flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1 rounded-full pulse">
+            <i class="fas fa-robot text-sm"></i>
+            <span>IA Interactive</span>
+          </a>
         </div>
         
         <!-- User Actions -->
@@ -46,12 +50,33 @@
               </a>
             {{/if}}
             
-            <!-- Notifications -->
+            <!-- 🔥 PRO NOTIFICATION BELL -->
             <div class="relative">
-              <button class="text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50">
+              <!-- 🔔 BUTTON -->
+              <button onclick="toggleNotif()" class="text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50 relative" title="Notifications" style="display: flex !important; visibility: visible !important;">
                 <i class="fas fa-bell text-lg"></i>
-                <span class="absolute -top-1 -right-1 w-5 h-5 desert-orange rounded-full text-xs font-bold flex items-center justify-center text-white">3</span>
+                
+                <!-- 🔴 BADGE -->
+                <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold" style="display: none !important;">0</span>
               </button>
+              
+              <!-- 📥 DROPDOWN -->
+              <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl z-50 border border-gray-100">
+                
+                <div class="p-4 border-b border-gray-200 font-bold text-gray-900 flex justify-between items-center">
+                  <span>Notifications</span>
+                  <a href="/guide/notifications/{{user.id}}" class="text-xs text-ocean-blue hover:text-ocean-dark font-medium">Voir tout</a>
+                </div>
+                
+                <div id="notifList" class="max-h-80 overflow-y-auto">
+                  <!-- JS will fill here -->
+                  <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-bell-slash text-3xl mb-2"></i>
+                    <p class="text-sm">Aucune notification</p>
+                  </div>
+                </div>
+                
+              </div>
             </div>
             
             <!-- Messages -->
@@ -93,6 +118,12 @@
                     Mon Espace
                   </a>
                 {{/if}}
+                <!-- Notifications (pour tous les utilisateurs) -->
+                <a href="/guide/notifications/{{user.id}}" class="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-300">
+                  <i class="fas fa-bell mr-3 text-ocean-blue"></i>
+                  Notifications
+                  <span id="notifBadgeMobile" class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span>
+                </a>
                 <a href="/profile" class="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-300">
                   <i class="fas fa-user mr-3 text-ocean-blue"></i>
                   Profil
@@ -116,6 +147,14 @@
           {{/if}}
         </div>
       </div>
+      
+      <!-- Mobile Notification Button -->
+      {{#if user}}
+      <button onclick="toggleNotif()" class="lg:hidden text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50 relative" title="Notifications">
+        <i class="fas fa-bell text-lg"></i>
+        <span id="notifBadgeMobileIcon" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold" style="display: none;">0</span>
+      </button>
+      {{/if}}
       
       <!-- Mobile Menu Button -->
       <button class="lg:hidden text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50">

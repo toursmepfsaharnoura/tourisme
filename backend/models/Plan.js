@@ -171,6 +171,19 @@ class Plan {
 
     return planData;
   }
+
+  static async findByGuideId(guideId) {
+    try {
+      const [rows] = await db.query(
+        'SELECT * FROM plans_touristiques WHERE id_guide = ? ORDER BY date_debut DESC',
+        [guideId]
+      );
+      return rows;
+    } catch (err) {
+      console.error("Plan.findByGuideId ERROR:", err);
+      return []; // Return empty array instead of crashing
+    }
+  }
 }
 
 module.exports = Plan;

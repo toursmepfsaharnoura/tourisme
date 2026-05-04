@@ -1,475 +1,447 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
+  <title>Gestion des Notifications - Admin</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notifications Admin - Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="/socket.io/socket.io.js"></script>
+  <style>
+    .notification-item {
+      @apply bg-white border rounded-lg p-4 mb-3 transition-all hover:shadow-md;
+    }
+    .notification-item.unread {
+      @apply border-l-4 border-l-indigo-500 bg-indigo-50;
+    }
+    .notification-item.read {
+      @apply opacity-75;
+    }
+    .notification-icon {
+      @apply w-12 h-12 rounded-full flex items-center justify-center text-white mr-4;
+    }
+    .message-type { @apply bg-blue-500; }
+    .avis-type { @apply bg-yellow-500; }
+    .reservation-type { @apply bg-green-500; }
+    .paiement-type { @apply bg-purple-500; }
+    .abonnement-type { @apply bg-pink-500; }
+    .cv-type { @apply bg-orange-500; }
+    .default-type { @apply bg-gray-500; }
+    .notification-content {
+      @apply flex-1;
+    }
+    .notification-header {
+      @apply flex justify-between items-start mb-2;
+    }
+    .notification-title {
+      @apply font-semibold text-gray-900;
+    }
+    .notification-time {
+      @apply text-sm text-gray-500;
+    }
+    .notification-text {
+      @apply text-gray-700 mb-3;
+    }
+    .notification-actions {
+      @apply flex gap-2;
+    }
+    .notification-actions button {
+      @apply px-3 py-1 text-sm rounded transition-colors;
+    }
+    .mark-read-btn {
+      @apply bg-green-500 text-white hover:bg-green-600;
+    }
+    .delete-notification-btn {
+      @apply bg-red-500 text-white hover:bg-red-600;
+    }
+    .empty-notifications {
+      @apply text-center py-12 text-gray-500;
+    }
+    .empty-icon {
+      @apply text-4xl mb-4 opacity-50;
+    }
+    .notification-tab {
+      @apply px-4 py-2 rounded-lg transition-colors;
+    }
+    .notification-tab.active {
+      @apply bg-indigo-600 text-white;
+    }
+    .notification-tab:not(.active) {
+      @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+    }
+    .notification-badge {
+      @apply absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center;
+    }
+    .notification-toast {
+      @apply fixed top-4 right-4 bg-white border-l-4 border-l-indigo-500 rounded-lg shadow-lg p-4 z-50 max-w-sm;
+      animation: slideIn 0.3s ease-out;
+    }
+    .notification-toast.important {
+      @apply border-l-red-500 bg-red-50;
+      animation: slideInPulse 0.5s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInPulse {
+      0% { transform: translateX(100%); opacity: 0; }
+      50% { transform: translateX(0); opacity: 1; }
+      51% { transform: translateX(-5px); }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+    .toast-content {
+      @apply flex items-start;
+    }
+    .toast-icon {
+      @apply text-2xl mr-3;
+    }
+    .toast-text {
+      @apply flex-1;
+    }
+    .toast-close {
+      @apply ml-4 text-gray-400 hover:text-gray-600;
+    }
+  </style>
 </head>
-
 <body class="bg-gray-50">
-  
-  <!-- Header -->
-  <header class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <div class="flex items-center">
-          <h1 class="text-xl font-bold text-gray-900">
-            <i class="fas fa-bell text-purple-600 mr-2"></i>
-            Notifications Admin
-          </h1>
-          {{#if unreadCount}}
-            <span class="ml-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-              {{unreadCount}} non lues
-            </span>
-          {{/if}}
-        </div>
-        <div class="flex items-center space-x-4">
-          <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">
-            <i class="fas fa-arrow-left mr-1"></i>Retour Dashboard
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gradient-to-b from-indigo-600 to-purple-700 text-white">
+      <div class="p-6">
+        <h2 class="text-2xl font-bold text-center mb-8">Admin Panel</h2>
+        <nav class="space-y-2">
+          <a href="/admin/dashboard" class="block px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+            <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
           </a>
-        </div>
+          <a href="/admin/guides" class="block px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+            <i class="fas fa-users mr-3"></i>Guides
+          </a>
+          <a href="/admin/messages" class="block px-4 py-3 rounded-lg hover:bg-white/20 transition-colors">
+            <i class="fas fa-envelope mr-3"></i>Messages
+          </a>
+          <a href="/admin/notifications" class="block px-4 py-3 rounded-lg bg-white/20 relative">
+            <i class="fas fa-bell mr-3"></i>Notifications
+            <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+          </a>
+        </nav>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    
-    <!-- Actions Rapides -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 class="text-lg font-semibold mb-4">
-        <i class="fas fa-paper-plane text-purple-600 mr-2"></i>
-        Envoyer une notification
-      </h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Envoyer à un guide spécifique -->
-        <div class="border rounded-lg p-4">
-          <h3 class="font-medium mb-3">Envoyer à un guide</h3>
-          <form id="sendToGuideForm" class="space-y-3">
-            <input type="number" id="guideId" placeholder="ID Guide" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <select id="notificationType" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <option value="">Type de notification</option>
-              <option value="MESSAGE">Message</option>
-              <option value="PLAN_APPROVED">Plan approuvé</option>
-              <option value="PLAN_REJECTED">Plan rejeté</option>
-              <option value="CV_APPROVED">CV approuvé</option>
-              <option value="CV_REJECTED">CV rejeté</option>
-              <option value="PAYMENT_CONFIRMED">Paiement confirmé</option>
-              <option value="PAYMENT_REJECTED">Paiement rejeté</option>
-            </select>
-            <textarea id="notificationMessage" placeholder="Message..." required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      rows="3"></textarea>
-            <button type="submit" 
-                    class="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors">
-              <i class="fas fa-send mr-2"></i>Envoyer
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="p-8">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900">Notifications</h1>
+              <p class="text-gray-600 mt-2">Suivez toutes les activités en temps réel</p>
+            </div>
+            <button onclick="markAllRead()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+              <i class="fas fa-check-double mr-2"></i>Tout marquer comme lu
             </button>
-          </form>
+          </div>
         </div>
 
-        <!-- Envoyer à tous les guides -->
-        <div class="border rounded-lg p-4">
-          <h3 class="font-medium mb-3">Envoyer à tous les guides</h3>
-          <form id="sendToAllForm" class="space-y-3">
-            <select id="broadcastType" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <option value="">Type d'annonce</option>
-              <option value="ADMIN_ANNOUNCEMENT">Annonce générale</option>
-              <option value="MESSAGE">Message important</option>
-            </select>
-            <input type="text" id="announcementTitle" placeholder="Titre de l'annonce" 
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <textarea id="announcementMessage" placeholder="Message de l'annonce..." required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      rows="3"></textarea>
-            <button type="submit" 
-                    class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
-              <i class="fas fa-broadcast-tower mr-2"></i>Diffuser
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filtres et Actions -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="flex flex-wrap gap-2">
-          <button onclick="filterNotifications('ALL')" 
-                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-            Toutes
-          </button>
-          <button onclick="filterNotifications('MESSAGE')" 
-                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-            Messages
-          </button>
-          <button onclick="filterNotifications('PLAN_APPROVED')" 
-                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-            Plans
-          </button>
-          <button onclick="filterNotifications('CV_APPROVED')" 
-                  class="filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-            CV
-          </button>
-        </div>
-        <div class="flex space-x-2">
-          <button onclick="markAllAsRead()" 
-                  class="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
-            <i class="fas fa-check-double mr-1"></i>Tout marquer lu
-          </button>
-          <button onclick="refreshNotifications()" 
-                  class="px-3 py-1 bg-gray-600 text-white rounded-md text-sm hover:bg-gray-700">
-            <i class="fas fa-sync-alt mr-1"></i>Actualiser
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Liste des notifications -->
-    <div class="bg-white rounded-lg shadow-sm">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-medium text-gray-900">
-          Notifications reçues
-          <span id="notificationCount" class="ml-2 text-sm text-gray-500">({{notifications.length}})</span>
-        </h3>
-      </div>
-      
-      <div id="notificationsList" class="divide-y divide-gray-200">
-        {{#each notifications}}
-          <div class="notification-item p-6 hover:bg-gray-50 transition-colors {{#unless this.est_vu}}bg-blue-50{{/unless}}" 
-               data-type="{{this.type}}" data-id="{{this.id}}">
-            <div class="flex justify-between items-start">
-              <div class="flex-1">
-                <div class="flex items-center mb-2">
-                  {{#if (eq this.type 'MESSAGE')}}
-                    <i class="fas fa-envelope text-blue-500 mr-2"></i>
-                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Message</span>
-                  {{else if (eq this.type 'PLAN_APPROVED')}}
-                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Plan approuvé</span>
-                  {{else if (eq this.type 'PLAN_REJECTED')}}
-                    <i class="fas fa-times-circle text-red-500 mr-2"></i>
-                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Plan rejeté</span>
-                  {{else if (eq this.type 'CV_APPROVED')}}
-                    <i class="fas fa-file-check text-green-500 mr-2"></i>
-                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">CV approuvé</span>
-                  {{else if (eq this.type 'CV_REJECTED')}}
-                    <i class="fas fa-file-times text-red-500 mr-2"></i>
-                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">CV rejeté</span>
-                  {{else if (eq this.type 'ADMIN_ANNOUNCEMENT')}}
-                    <i class="fas fa-bullhorn text-purple-500 mr-2"></i>
-                    <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Annonce</span>
-                  {{else}}
-                    <i class="fas fa-bell text-gray-500 mr-2"></i>
-                    <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">{{this.type}}</span>
-                  {{/if}}
-                  
-                  {{#unless this.est_vu}}
-                    <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded animate-pulse">Nouveau</span>
-                  {{/unless}}
-                </div>
-                
-                <p class="text-gray-800 mb-2">
-                  {{#if (typeof this.contenu 'object')}}
-                    {{this.contenu.message}}
-                  {{else}}
-                    {{this.contenu}}
-                  {{/if}}
-                </p>
-                
-                <div class="text-xs text-gray-500">
-                  <i class="fas fa-clock mr-1"></i>
-                  {{formatRelativeTime this.date_creation}}
-                </div>
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-bell text-blue-600"></i>
               </div>
-              
-              <div class="flex space-x-2 ml-4">
-                {{#unless this.est_vu}}
-                  <button onclick="markAsRead({{this.id}})" 
-                          class="text-blue-600 hover:text-blue-800 text-sm">
-                    <i class="fas fa-check"></i>
-                  </button>
-                {{/unless}}
-                <button onclick="deleteNotification({{this.id}})" 
-                        class="text-red-600 hover:text-red-800 text-sm">
-                  <i class="fas fa-trash"></i>
-                </button>
+              <div class="ml-4">
+                <p class="text-sm text-gray-600">Total Notifications</p>
+                <p class="text-2xl font-bold text-gray-900" id="totalCount">0</p>
               </div>
             </div>
           </div>
-        {{/each}}
-        
-        {{#unless notifications.length}}
-          <div class="p-12 text-center text-gray-500">
-            <i class="fas fa-inbox text-4xl mb-4"></i>
-            <p>Aucune notification</p>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-envelope text-green-600"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-600">Messages</p>
+                <p class="text-2xl font-bold text-gray-900" id="messageCount">0</p>
+              </div>
+            </div>
           </div>
-        {{/unless}}
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+              <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-star text-yellow-600"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-600">Avis</p>
+                <p class="text-2xl font-bold text-gray-900" id="avisCount">0</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+              <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-crown text-purple-600"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-600">Abonnements</p>
+                <p class="text-2xl font-bold text-gray-900" id="abonnementCount">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-xl shadow-sm mb-6">
+          <div class="p-6 border-b">
+            <div class="flex space-x-2">
+              <button class="notification-tab active" data-tab="all">
+                <i class="fas fa-inbox mr-2"></i>Tout
+              </button>
+              <button class="notification-tab" data-tab="messages">
+                <i class="fas fa-envelope mr-2"></i>Messages
+              </button>
+              <button class="notification-tab" data-tab="avis">
+                <i class="fas fa-star mr-2"></i>Avis
+              </button>
+              <button class="notification-tab" data-tab="reservations">
+                <i class="fas fa-calendar-check mr-2"></i>Réservations
+              </button>
+              <button class="notification-tab" data-tab="paiements">
+                <i class="fas fa-credit-card mr-2"></i>Paiements
+              </button>
+              <button class="notification-tab" data-tab="abonnements">
+                <i class="fas fa-crown mr-2"></i>Abonnements
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="bg-white rounded-xl shadow-sm">
+          <div class="p-6">
+            <div id="notifications-container" class="space-y-4">
+              <!-- Notifications will be loaded here -->
+              <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
+                <p>Chargement des notifications...</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-  </main>
-
-  <!-- Messages de confirmation -->
-  <div id="toast" class="fixed bottom-4 right-4 hidden">
-    <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
-      <i class="fas fa-check-circle mr-2"></i>
-      <span id="toastMessage">Succès</span>
+  <!-- Create Notification Modal -->
+  <div id="createModal" class="fixed inset-0 bg-black/50 hidden z-50">
+    <div class="flex items-center justify-center h-full p-4">
+      <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Créer une Notification</h3>
+        <form id="createForm">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <select name="type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="">Sélectionner un type</option>
+              <option value="message">Message</option>
+              <option value="avis">Avis</option>
+              <option value="reservation">Réservation</option>
+              <option value="paiement">Paiement</option>
+              <option value="abonnement">Abonnement</option>
+              <option value="cv">CV</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Guide</label>
+            <select name="guide_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="">Sélectionner un guide</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+            <input type="text" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+            <textarea name="message" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeCreateModal()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+              Annuler
+            </button>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+              Créer
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
   <script>
-    const socket = io();
-    let currentFilter = 'ALL';
+    // Load guides and notifications
+    let guides = [];
+    let notifications = [];
 
-    // Rejoindre la room admin
-    socket.emit('joinAdmin');
-    console.log('Admin connecté aux notifications');
-
-    // Écouter les notifications des guides
-    socket.on('admin_notification', (notification) => {
-      console.log('Notification reçue:', notification);
-      showToast('Nouvelle notification reçue', 'info');
-      refreshNotifications();
-    });
-
-    // Envoyer à un guide spécifique
-    document.getElementById('sendToGuideForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const guideId = document.getElementById('guideId').value;
-      const type = document.getElementById('notificationType').value;
-      const message = document.getElementById('notificationMessage').value;
-
+    async function loadGuides() {
       try {
-        const response = await fetch('/notifications/send-to-guide', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            guideId: parseInt(guideId),
-            type,
-            message
-          })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          showToast('Notification envoyée avec succès', 'success');
-          document.getElementById('sendToGuideForm').reset();
-        } else {
-          showToast('Erreur: ' + data.message, 'error');
-        }
-      } catch (error) {
-        console.error('Erreur:', error);
-        showToast('Erreur de connexion', 'error');
-      }
-    });
-
-    // Envoyer à tous les guides
-    document.getElementById('sendToAllForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const type = document.getElementById('broadcastType').value;
-      const title = document.getElementById('announcementTitle').value;
-      const message = document.getElementById('announcementMessage').value;
-
-      try {
-        const response = await fetch('/notifications/send-to-all-guides', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            type,
-            message: title ? `${title}: ${message}` : message,
-            metadata: { title, message }
-          })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          showToast('Annonce diffusée avec succès', 'success');
-          document.getElementById('sendToAllForm').reset();
-        } else {
-          showToast('Erreur: ' + data.message, 'error');
-        }
-      } catch (error) {
-        console.error('Erreur:', error);
-        showToast('Erreur de connexion', 'error');
-      }
-    });
-
-    // Marquer comme lu
-    async function markAsRead(notificationId) {
-      try {
-        const response = await fetch('/notifications/mark-read', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ notificationId })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          const element = document.querySelector(`[data-id="${notificationId}"]`);
-          if (element) {
-            element.classList.remove('bg-blue-50');
-            const badge = element.querySelector('.animate-pulse');
-            if (badge) badge.remove();
-            const button = element.querySelector('button[onclick*="markAsRead"]');
-            if (button) button.remove();
-          }
-          showToast('Notification marquée comme lue', 'success');
-        }
-      } catch (error) {
-        console.error('Erreur:', error);
-        showToast('Erreur', 'error');
-      }
-    }
-
-    // Marquer toutes comme lues
-    async function markAllAsRead() {
-      try {
-        const response = await fetch('/notifications/mark-all-read', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          document.querySelectorAll('.notification-item').forEach(item => {
-            item.classList.remove('bg-blue-50');
-            const badge = item.querySelector('.animate-pulse');
-            if (badge) badge.remove();
-            const button = item.querySelector('button[onclick*="markAsRead"]');
-            if (button) button.remove();
+        const response = await fetch('/admin/guides/api');
+        if (response.ok) {
+          guides = await response.json();
+          const select = document.querySelector('select[name="guide_id"]');
+          select.innerHTML = '<option value="">Sélectionner un guide</option>';
+          guides.forEach(guide => {
+            select.innerHTML += `<option value="${guide.id}">${guide.nom_complet}</option>`;
           });
-          showToast(`${data.count} notifications marquées comme lues`, 'success');
         }
       } catch (error) {
-        console.error('Erreur:', error);
-        showToast('Erreur', 'error');
+        console.error('Error loading guides:', error);
+        alert('Erreur lors de la suppression');
       }
     }
 
-    // Supprimer une notification
-    async function deleteNotification(notificationId) {
-      if (!confirm('Supprimer cette notification?')) return;
-
+    async function loadNotifications() {
       try {
-        const response = await fetch(`/notifications/${notificationId}`, {
-          method: 'DELETE',
+        const response = await fetch('/notifications/all');
+        if (response.ok) {
+          notifications = await response.json();
+          displayNotifications();
+          updateStatistics();
+        }
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+      }
+    }
+
+    function displayNotifications() {
+      const container = document.getElementById('notificationsList');
+      
+      if (notifications.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <i class="fas fa-bell-slash text-4xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">Aucune notification trouvée</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = notifications.map(notif => {
+        // Parse content to extract title and message
+        const [title, ...messageParts] = notif.contenu.split(': ');
+        const message = messageParts.join(': ') || notif.contenu;
+        
+        return `
+        <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center mb-2">
+                <span class="px-2 py-1 text-xs rounded-full ${getTypeColor(notif.type)}">
+                  ${notif.type}
+                </span>
+                <span class="ml-2 text-sm text-gray-500">
+                  ${new Date(notif.date_creation).toLocaleDateString('fr-FR')}
+                </span>
+                <span class="ml-2 px-2 py-1 text-xs rounded-full ${notif.est_vu ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                  ${notif.est_vu ? 'Lu' : 'Non lu'}
+                </span>
+              </div>
+              <h4 class="font-semibold text-gray-900">${title || notif.type}</h4>
+              <p class="text-gray-600 mt-1">${message}</p>
+              <p class="text-sm text-gray-500 mt-2">
+                Guide: ${notif.guide_name || `ID: ${notif.id_utilisateur}`} ${notif.lien ? `| Lien: ${notif.lien}` : ''}
+              </p>
+            </div>
+            <button onclick="deleteNotification(${notif.id})" class="ml-4 text-red-600 hover:text-red-800">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+
+    function getTypeColor(type) {
+      const colors = {
+        message: 'bg-blue-100 text-blue-800',
+        avis: 'bg-yellow-100 text-yellow-800',
+        reservation: 'bg-green-100 text-green-800',
+        paiement: 'bg-purple-100 text-purple-800',
+        abonnement: 'bg-indigo-100 text-indigo-800'
+      };
+      return colors[type] || 'bg-gray-100 text-gray-800';
+    }
+
+    function updateStatistics() {
+      document.getElementById('totalCount').textContent = notifications.length;
+      document.getElementById('messageCount').textContent = notifications.filter(n => n.type === 'MESSAGE').length;
+      document.getElementById('avisCount').textContent = notifications.filter(n => n.type === 'AVIS' || n.type === 'RESERVATION').length;
+      document.getElementById('abonnementCount').textContent = notifications.filter(n => n.type === 'ABONNEMENT').length;
+    }
+
+    function openCreateModal() {
+      document.getElementById('createModal').classList.remove('hidden');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('createModal').classList.add('hidden');
+      document.getElementById('createForm').reset();
+    }
+
+    async function createNotification(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      try {
+        const response = await fetch('/notifications/create', {
+          method: 'POST',
           headers: {
-            'Accept': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(Object.fromEntries(formData)),
         });
 
-        const data = await response.json();
-        
-        if (data.success) {
-          const element = document.querySelector(`[data-id="${notificationId}"]`);
-          if (element) {
-            element.remove();
-            updateCount();
-          }
-          showToast('Notification supprimée', 'success');
-        }
-      } catch (error) {
-        console.error('Erreur:', error);
-        showToast('Erreur', 'error');
-      }
-    }
-
-    // Filtrer les notifications
-    function filterNotifications(type) {
-      currentFilter = type;
-      
-      // Mettre à jour les boutons
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('bg-purple-100', 'text-purple-800');
-        btn.classList.add('bg-gray-100', 'text-gray-800');
-      });
-      event.target.classList.remove('bg-gray-100', 'text-gray-800');
-      event.target.classList.add('bg-purple-100', 'text-purple-800');
-
-      // Filtrer les éléments
-      document.querySelectorAll('.notification-item').forEach(item => {
-        if (type === 'ALL' || item.dataset.type === type) {
-          item.style.display = 'block';
+        if (response.ok) {
+          closeCreateModal();
+          loadNotifications();
+          alert('Notification créée avec succès!');
         } else {
-          item.style.display = 'none';
+          alert('Erreur lors de la création de la notification');
         }
-      });
-
-      updateCount();
-    }
-
-    // Actualiser les notifications
-    async function refreshNotifications() {
-      try {
-        const response = await fetch('/notifications/admin');
-        const html = await response.text();
-        // Option: recharger la page ou mettre à jour le DOM
-        window.location.reload();
       } catch (error) {
-        console.error('Erreur:', error);
+        console.error('Error creating notification:', error);
+        alert('Erreur lors de la création de la notification');
       }
     }
 
-    // Mettre à jour le compteur
-    function updateCount() {
-      const visibleItems = document.querySelectorAll('.notification-item:not([style*="display: none"])');
-      document.getElementById('notificationCount').textContent = `(${visibleItems.length})`;
+    async function deleteNotification(id) {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer cette notification ?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/notifications/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          loadNotifications();
+        } else {
+          alert('Erreur lors de la suppression');
+        }
+      } catch (error) {
+        console.error('Error deleting notification:', error);
+        alert('Erreur lors de la suppression');
+      }
     }
 
-    // Afficher un message toast
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toastMessage');
-      
-      toastMessage.textContent = message;
-      
-      // Changer la couleur selon le type
-      const toastDiv = toast.querySelector('div');
-      toastDiv.className = `${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} text-white px-6 py-3 rounded-lg shadow-lg flex items-center`;
-      
-      toast.classList.remove('hidden');
-      
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 3000);
-    }
-
-    // Helper pour formater le temps
-    function formatRelativeTime(dateString) {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diff = now - date;
-      
-      if (diff < 60000) return 'À l\'instant';
-      if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
-      if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)} h`;
-      return `Il y a ${Math.floor(diff / 86400000)} j`;
-    }
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGuides();
+      loadNotifications();
+      document.getElementById('createForm').addEventListener('submit', createNotification);
+    });
   </script>
-
 </body>
 </html>

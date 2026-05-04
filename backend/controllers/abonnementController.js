@@ -47,6 +47,21 @@ exports.activateSubscription = async (req, res) => {
       statut: 'ACTIF'
     });
 
+    // Envoyer une notification en temps réel à l'admin
+    try {
+      const { sendAdminNotification } = require('../config/socket');
+      sendAdminNotification({
+        id: `abo_${abonnementId}`,
+        type: 'abonnement',
+        title: `Nouvel abonnement (${type_abonnement})`,
+        content: `Guide ${guideId} - Abonnement ${type_abonnement} - ${duree} mois - Actif depuis ${new Date().toLocaleDateString('fr-FR')}`,
+        sender_id: guideId,
+        created_at: new Date().toISOString()
+      });
+    } catch (socketError) {
+      console.error('Error sending real-time abonnement notification to admin:', socketError);
+    }
+
     res.json({ success: true, abonnementId });
   } catch (err) {
     console.error('Error activating subscription:', err);
@@ -102,14 +117,27 @@ await Guide.update(guideId, {
 const updatedGuide = await Guide.findByUserId(guideId);
 
     // ✅ إنشاء abonnement
-    await Abonnement.create({
+    const abonnementId = await Abonnement.create({
       id_guide: guideId,
       date_debut: dateDebut,
       date_fin: dateFin,
       statut: 'ACTIF'
     });
 
-    
+    // Envoyer une notification en temps réel à l'admin
+    try {
+      const { sendAdminNotification } = require('../config/socket');
+      sendAdminNotification({
+        id: `abo_${abonnementId}`,
+        type: 'abonnement',
+        title: `Nouvel abonnement (30 jours)`,
+        content: `Guide ${guideId} - Abonnement activé - Du ${dateDebut.toLocaleDateString('fr-FR')} au ${dateFin.toLocaleDateString('fr-FR')}`,
+        sender_id: guideId,
+        created_at: new Date().toISOString()
+      });
+    } catch (socketError) {
+      console.error('Error sending real-time abonnement notification to admin:', socketError);
+    }
 
     res.redirect('/guide/dashboard');
 

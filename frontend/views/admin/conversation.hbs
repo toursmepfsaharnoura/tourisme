@@ -31,7 +31,8 @@
   </style>
 </head>
 <body>
-  <div class="chat-container">
+  <div id="conversationContent">
+    <div class="chat-container">
     <!-- Header avec actions rapides -->
     <div class="chat-header">
       <div class="guide-info">
@@ -75,7 +76,8 @@
     </div>
 
     <!-- Formulaire envoi -->
-    <form method="POST" action="/admin/messages/{{guide.id}}" class="input-form">
+    <form id="messageForm" class="input-form">
+      <input type="hidden" name="guideId" value="{{guide.id}}">
       <input type="text" name="contenu" placeholder="Tapez votre message..." required>
       <button type="submit">Envoyer</button>
     </form>
@@ -86,10 +88,47 @@
     const messagesContainer = document.querySelector('.messages');
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // Auto-refresh messages every 5 seconds
+    // Handle message form submission
+    document.addEventListener('submit', async function(e) {
+      if (e.target.id === 'messageForm') {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const message = formData.get('contenu');
+        
+        if (!message.trim()) return;
+        
+        try {
+          const response = await fetch('/admin/send-message', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Clear the input
+            e.target.querySelector('input[name="contenu"]').value = '';
+            
+            // Reload the page to show the new message
+            location.reload();
+          } else {
+            console.error('Failed to send message:', result.error);
+            alert('Erreur: ' + (result.error || 'Impossible d\'envoyer le message'));
+          }
+        } catch (error) {
+          console.error('Error sending message:', error);
+          alert('Erreur de connexion. Veuillez réessayer.');
+        }
+      }
+    });
+    
+    // Auto-refresh messages every 10 seconds (reduced from 5 to avoid conflicts)
     setInterval(() => {
       location.reload();
-    }, 5000);
+    }, 10000);
   </script>
+    </div>
+  </div>
 </body>
 </html>

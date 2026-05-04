@@ -1,0 +1,200 @@
+<nav class="admin-navbar">
+  <div class="admin-nav-container">
+    <!-- Logo -->
+    <div class="admin-logo">
+      <a href="/admin/dashboard">
+        <i class="fas fa-cogs"></i>
+        <span>Admin Panel</span>
+      </a>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="admin-menu">
+      <div class="nav-item {{#if (eq activePage 'dashboard')}}active{{/if}}">
+        <a href="/admin/dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </div>
+
+      <div class="nav-item {{#if (eq activePage 'guides')}}active{{/if}}">
+        <a href="/admin/guides-management">
+          <i class="fas fa-users"></i>
+          <span>Guides</span>
+        </a>
+      </div>
+
+      <div class="nav-item {{#if (eq activePage 'cv-attente')}}active{{/if}}">
+        <a href="/admin/cv-attente">
+          <i class="fas fa-file-alt"></i>
+          <span>CV en attente</span>
+        </a>
+      </div>
+
+      <div class="nav-item {{#if (eq activePage 'guides-docs')}}active{{/if}}">
+        <a href="/admin/guides-docs">
+          <i class="fas fa-file-contract"></i>
+          <span>Documents Guides</span>
+        </a>
+      </div>
+
+      <div class="nav-item {{#if (eq activePage 'messages')}}active{{/if}}">
+        <a href="/admin/messages">
+          <i class="fas fa-envelope"></i>
+          <span>Messages</span>
+        </a>
+      </div>
+
+      <div class="nav-item {{#if (eq activePage 'notifications')}}active{{/if}}">
+        <a href="/admin/notifications">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- User Menu -->
+    <div class="admin-user">
+      <div class="user-info">
+        <i class="fas fa-user-shield"></i>
+        <span>{{user.nom_complet}}</span>
+      </div>
+      <a href="/logout" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Déconnexion</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<style>
+.admin-navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.admin-nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 70px;
+}
+
+.admin-logo a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  text-decoration: none;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.admin-logo i {
+  font-size: 1.5rem;
+}
+
+.admin-menu {
+  display: flex;
+  gap: 5px;
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.nav-item:hover a,
+.nav-item.active a {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: #ffd700;
+  border-radius: 2px;
+}
+
+.admin-user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.logout-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .admin-nav-container {
+    flex-direction: column;
+    height: auto;
+    padding: 15px 20px;
+  }
+  
+  .admin-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 15px 0;
+  }
+  
+  .nav-item a {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .admin-user {
+    margin-top: 10px;
+  }
+}
+</style>

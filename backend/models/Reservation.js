@@ -114,6 +114,28 @@ class Reservation {
     );
     return rows[0];
   }
+
+  static async findByPlans(planIds) {
+    try {
+      if (!Array.isArray(planIds) || planIds.length === 0) {
+        return [];
+      }
+      
+      const placeholders = planIds.map(() => '?').join(',');
+      const [rows] = await db.query(
+        `SELECT r.*, p.titre as plan_titre 
+         FROM reservations r 
+         JOIN plans_touristiques p ON r.id_plan = p.id 
+         WHERE r.id_plan IN (${placeholders}) 
+         ORDER BY r.date_creation DESC`,
+        planIds
+      );
+      return rows;
+    } catch (err) {
+      console.error("Reservation.findByPlans ERROR:", err);
+      return [];
+    }
+  }
 }
 
 module.exports = Reservation;

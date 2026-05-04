@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Guides - Admin</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+  
+  <!-- Header Admin -->
+  <header class="bg-white shadow-lg border-b">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3 space-x-reverse">
+          <i class="fas fa-users-cog text-2xl text-blue-600"></i>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Gestion des Guides</h1>
+            <p class="text-sm text-gray-600">Administration des guides certifiés</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <a href="/admin/dashboard" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+          </a>
+          <a href="/admin/notifications" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+            <i class="fas fa-bell mr-2"></i>Notifications
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Statistics Cards -->
+      <div class="lg:col-span-3">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <i class="fas fa-users text-3xl text-blue-500"></i>
+              <div class="mr-4">
+                <p class="text-2xl font-bold text-gray-900" id="totalGuides">0</p>
+                <p class="text-sm text-gray-600">Total Guides</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-3xl text-green-500"></i>
+              <div class="mr-4">
+                <p class="text-2xl font-bold text-gray-900" id="verifiedGuides">0</p>
+                <p class="text-sm text-gray-600">Guides Certifiés</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <i class="fas fa-clock text-3xl text-yellow-500"></i>
+              <div class="mr-4">
+                <p class="text-2xl font-bold text-gray-900" id="pendingGuides">0</p>
+                <p class="text-sm text-gray-600">En Attente</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guides List -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-semibold">Liste des Guides Certifiés</h2>
+              <div class="flex space-x-2">
+                <button onclick="refreshGuides()" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded text-sm transition-colors">
+                  <i class="fas fa-sync-alt mr-1"></i>Rafraîchir
+                </button>
+                <button onclick="exportGuides()" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded text-sm transition-colors">
+                  <i class="fas fa-download mr-1"></i>Exporter
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Search Bar -->
+          <div class="p-4 border-b">
+            <div class="flex space-x-2 space-x-reverse">
+              <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Rechercher un guide..." 
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onkeyup="searchGuides()"
+              >
+              <select id="filterSelect" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tous</option>
+                <option value="DISPONIBLE">Disponibles</option>
+                <option value="INDISPONIBLE">Indisponibles</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Guides Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Photo</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Spécialité</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Prix/Jour</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="guidesTableBody" class="bg-white divide-y divide-gray-200">
+                <!-- Guides will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Guide Details Modal -->
+  <div id="guideModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl mx-4 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Détails du Guide</h3>
+        <button onclick="closeGuideModal()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <div id="guideDetails" class="space-y-4">
+        <!-- Guide details will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allGuides = [];
+    let filteredGuides = [];
+
+    // Load guides on page load
+    document.addEventListener('DOMContentLoaded', loadGuides);
+
+    async function loadGuides() {
+      try {
+        const response = await fetch('/guides/all');
+        const data = await response.json();
+        
+        if (data.success) {
+          allGuides = data.guides;
+          filteredGuides = data.guides;
+          updateStatistics();
+          displayGuides(filteredGuides);
+        } else {
+          console.error('Error loading guides:', data.error);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    function updateStatistics() {
+      const total = allGuides.length;
+      const verified = allGuides.filter(g => g.verified).length;
+      const pending = allGuides.filter(g => !g.verified).length;
+      
+      document.getElementById('totalGuides').textContent = total;
+      document.getElementById('verifiedGuides').textContent = verified;
+      document.getElementById('pendingGuides').textContent = pending;
+    }
+
+    function displayGuides(guides) {
+      const tbody = document.getElementById('guidesTableBody');
+      
+      if (guides.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+              Aucun guide trouvé
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = guides.map(guide => `
+        <tr class="hover:bg-gray-50 fade-in">
+          <td class="px-6 py-4 whitespace-nowrap">
+            ${guide.photo ? `<img src="${guide.photo}" alt="${guide.nom}" class="w-12 h-12 rounded-full object-cover">` : '<div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center"><i class="fas fa-user text-gray-400"></i></div>'}
+          </td>
+          <td class="px-6 py-4 font-medium">${guide.nom}</td>
+          <td class="px-6 py-4 text-sm">${guide.email}</td>
+          <td class="px-6 py-4 text-sm">${guide.telephone || 'N/A'}</td>
+          <td class="px-6 py-4 text-sm">${guide.specialite || 'N/A'}</td>
+          <td class="px-6 py-4 text-sm">${guide.prixJournee ? guide.prixJournee + ' DT' : 'Sur demande'}</td>
+          <td class="px-6 py-4">
+            <span class="px-2 py-1 text-xs rounded-full ${guide.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+              ${guide.verified ? '✅ Certifié' : '⏳ En attente'}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <button onclick="viewGuideDetails(${guide.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm mr-1">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button onclick="editGuide(${guide.id})" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+              <i class="fas fa-edit"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function searchGuides() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const filterValue = document.getElementById('filterSelect').value;
+      
+      filteredGuides = allGuides.filter(guide => {
+        const matchesSearch = !searchTerm || 
+          guide.nom.toLowerCase().includes(searchTerm) ||
+          guide.email.toLowerCase().includes(searchTerm) ||
+          (guide.specialite && guide.specialite.toLowerCase().includes(searchTerm));
+        
+        const matchesFilter = !filterValue || guide.statut === filterValue;
+        
+        return matchesSearch && matchesFilter;
+      });
+      
+      displayGuides(filteredGuides);
+    }
+
+    async function viewGuideDetails(guideId) {
+      try {
+        const response = await fetch(`/guides/${guideId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          const guide = data.guide;
+          const detailsDiv = document.getElementById('guideDetails');
+          
+          detailsDiv.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <img src="${guide.photo || '/images/default-avatar.png'}" alt="${guide.nom}" class="w-32 h-32 rounded-lg object-cover">
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Nom Complet</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.nom}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Email</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.email}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Téléphone</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.telephone || 'Non spécifié'}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Spécialité</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.specialite || 'Non spécifiée'}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Description</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.description || 'Aucune description'}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Gouvernorat</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.gouvernorat || 'Non spécifié'}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Expérience</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.experience || 'Non spécifiée'}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Langues</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.langues || 'Non spécifiées'}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Prix/Jour</label>
+                  <p class="mt-1 text-sm text-gray-900">${guide.prixJournee ? guide.prixJournee + ' DT' : 'Sur demande'}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Disponibilité</label>
+                  <p class="mt-1 text-sm">
+                    <span class="px-2 py-1 text-xs rounded-full ${guide.disponibilite === 'DISPONIBLE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                      ${guide.disponibilite === 'DISPONIBLE' ? '🟢 Disponible' : '🔴 Indisponible'}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          document.getElementById('guideModal').classList.remove('hidden');
+        } else {
+          alert('Erreur lors du chargement des détails du guide');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    function closeGuideModal() {
+      document.getElementById('guideModal').classList.add('hidden');
+    }
+
+    function editGuide(guideId) {
+      // TODO: Implement edit functionality
+      alert('Fonction de modification bientôt disponible');
+    }
+
+    async function refreshGuides() {
+      await loadGuides();
+    }
+
+    function exportGuides() {
+      if (allGuides.length === 0) {
+        alert('Aucun guide à exporter');
+        return;
+      }
+      
+      const csvContent = [
+        'Nom,Email,Téléphone,Spécialité,Prix/Jour,Statut,Vérifié',
+        ...allGuides.map(guide => [
+          `"${guide.nom}"`,
+          `"${guide.email}"`,
+          `"${guide.telephone || ''}"`,
+          `"${guide.specialite || ''}"`,
+          `"${guide.prixJournee || ''}"`,
+          `"${guide.statut}"`,
+          `"${guide.verified ? 'Oui' : 'Non'}"`
+        ])
+      ].join('\n')
+      ].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `guides_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+    }
+  </script>
+</body>
+</html>

@@ -110,15 +110,6 @@
     }
     .message small { color: #666; font-size: 0.8em; }
 
-    .notification-badge {
-      background: red;
-      color: white;
-      border-radius: 50%;
-      padding: 2px 6px;
-      font-size: 0.7em;
-      margin-left: 5px;
-    }
-
     .plan-list {
       list-style: none;
     }
@@ -130,12 +121,40 @@
       align-items: center;
     }
     .plan-item:last-child { border-bottom: none; }
+
+    /* Notification Badge Styles */
+    .notification-badge {
+      position: absolute;
+      top: 5px;
+      right: 15px;
+      background: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .nav-btn {
+      position: relative !important;
+    }
   </style>
 </head>
 <body>
   <div class="guide-container">
 
-  <!-- ✅ SIDEBAR (ثابتة) -->
+  <!-- SIDEBAR (ثابتة) -->
   <div class="sidebar">
     <h2>🏛️ Guide Panel</h2>
 
@@ -144,12 +163,16 @@
     <button class="nav-btn" onclick="loadPage('/guide/plans')">🗺️ Mes Plans</button>
     <button class="nav-btn" onclick="loadPage('/guide/reservations')">📅 Réservations</button>
     <button class="nav-btn" onclick="loadPage('/guide/messages')">💬 Messages</button>
+    <button class="nav-btn" onclick="loadPage('/guide/notifications/{{user.id}}')" style="position: relative;">
+      📣 Notifications
+      <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
+    </button>
     <button class="nav-btn" onclick="loadPage('/guide/upload-docs')">📄 Documents</button>
 
     <a href="/logout" class="nav-btn">🚪 Déconnexion</a>
   </div>
 
-  <!-- ✅ CONTENT -->
+  <!-- CONTENT -->
   <div class="main-content">
     <div id="content-area">
 
@@ -379,10 +402,31 @@ function verifierAbonnement() {
       if(e.key === 'Enter') sendMsg();
     });
 
+    // Notification badge functions
+    function updateNotificationBadge() {
+      fetch('/notifications/unread-count')
+        .then(response => response.json())
+        .then(data => {
+          const badge = document.getElementById('notification-badge');
+          if (data.success && data.unreadCount > 0) {
+            badge.textContent = data.unreadCount > 99 ? '99+' : data.unreadCount;
+            badge.style.display = 'flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        })
+        .catch(err => console.error('Error fetching notification count:', err));
+    }
+
     // Charger les messages au démarrage
     loadMessages();
     // Rafraîchir toutes les 5 secondes
     setInterval(loadMessages, 5000);
+    
+    // Charger et mettre à jour le badge des notifications
+    updateNotificationBadge();
+    // Rafraîchir le badge toutes les 10 secondes
+    setInterval(updateNotificationBadge, 10000);
   </script>
 </body>
 </html>

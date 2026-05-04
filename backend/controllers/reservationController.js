@@ -3,6 +3,7 @@ const Paiement = require('../models/paiement');
 const Plan = require('../models/Plan');
 const User = require('../models/User');
 const db = require('../config/db');
+const NotificationService = require('../services/notificationService');
 
 /**
  * Show reservation creation form
@@ -158,6 +159,30 @@ exports.completeReservationPayment = async (req, res) => {
       type: 'reservation',
       statut: 'PAYE'
     });
+
+    // Créer une notification automatique pour la nouvelle réservation
+    await NotificationService.notifyNewReservation({
+      guide_id: plan.id_guide,
+      id_touriste: touristeId,
+      id_plan: pending.id_plan,
+      status: 'CONFIRMEE',
+      montant: montant
+    });
+
+    // Envoyer une notification en temps réel à l'admin
+    try {
+      const { sendAdminNotification } = require('../config/socket');
+      sendAdminNotification({
+        id: `res_${reservationId}`,
+        type: 'reservation',
+        title: `Nouvelle réservation (${plan.titre || 'Plan'})`,
+        content: `Guide ${plan.id_guide} - Touriste ${touristeId} - ${pending.nombre_personnes} personne(s) - ${new Date(pending.date_reservation).toLocaleDateString('fr-FR')}`,
+        sender_id: plan.id_guide,
+        created_at: new Date().toISOString()
+      });
+    } catch (socketError) {
+      console.error('Error sending real-time reservation notification to admin:', socketError);
+    }
 
     delete req.session.pendingReservation;
 

@@ -1,6 +1,7 @@
 const Avis = require('../models/Avis');
 const Plan = require('../models/Plan');
 const User = require('../models/User');
+const NotificationService = require('../services/notificationService');
 
 /**
  * Create a new review/avis
@@ -26,6 +27,14 @@ exports.createAvis = async (req, res) => {
       id_guide: plan.id_guide,
       id_touriste: touristeId,
       id_plan,
+      note,
+      commentaire
+    });
+
+    // Créer une notification automatique pour le nouvel avis
+    await NotificationService.notifyNewAvis({
+      id_guide: plan.id_guide,
+      id_touriste: touristeId,
       note,
       commentaire
     });

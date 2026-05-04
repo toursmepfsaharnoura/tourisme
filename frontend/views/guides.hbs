@@ -125,8 +125,9 @@
                   <span>Contacter</span>
                 </a>
                 {{#if ../user}}
-                  <form method="POST" action="/message/envoyer/{{id}}" class="flex-1">
-                    <input type="hidden" name="message" value="Bonjour {{nom_complet}}, je souhaite réserver un circuit">
+                  <form method="POST" action="/messages" class="flex-1">
+                    <input type="hidden" name="id_destinataire" value="{{id}}">
+                    <input type="hidden" name="contenu" value="Bonjour {{nom_complet}}, je souhaite réserver un circuit">
                     <button type="submit" class="w-full desert-gradient text-white px-4 py-3 rounded-2xl font-bold transition-all duration-300 shadow-lg button-glow animate-glow">
                       <i class="fas fa-calendar-check mr-2"></i>
                       <span>Réserver</span>

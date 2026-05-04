@@ -1,94 +1,481 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Validation Guides - Admin</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f6fa; }
-    
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    
-    .header { 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-      color: white; padding: 30px; border-radius: 15px; 
-      text-align: center; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    
-    .guide-card { 
-      background: white; padding: 25px; 
-      border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-      margin-bottom: 20px; border-left: 5px solid #667eea;
-    }
-    
-    .guide-name { font-size: 1.5em; font-weight: bold; color: #2c3e50; margin-bottom: 15px; }
-    
-    .docs-links { display: flex; gap: 20px; margin-bottom: 20px; }
-    
-    .doc-link { 
-      display: inline-block; padding: 12px 20px; 
-      background: #007bff; color: white; text-decoration: none; 
-      border-radius: 8px; font-weight: 500; transition: all 0.3s;
-    }
-    
-    .doc-link:hover { background: #0056b3; transform: translateY(-2px); }
-    
-    .actions { display: flex; gap: 15px; }
-    
-    .btn { 
-      padding: 12px 25px; border: none; border-radius: 8px; 
-      text-decoration: none; font-weight: 600; cursor: pointer; 
-      transition: all 0.3s; display: inline-block; text-align: center;
-    }
-    
-    .btn-accept { background: #28a745; color: white; }
-    .btn-accept:hover { background: #218838; transform: translateY(-2px); }
-    
-    .btn-reject { background: #dc3545; color: white; }
-    .btn-reject:hover { background: #c82333; transform: translateY(-2px); }
-    
-    .back-link {
-      display: inline-block; margin-bottom: 20px; padding: 10px 20px;
-      background: #6c757d; color: white; text-decoration: none;
-      border-radius: 8px; transition: all 0.3s;
-    }
-    
-    .back-link:hover {
-      background: #5a6268; transform: translateY(-1px);
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>📋 Validation des Guides</h1>
-      <p>Dossiers en attente de validation</p>
-    </div>
 
-    <a href="/admin/dashboard" class="back-link">← Retour au dashboard</a>
+<div class="main-content">
+  <div class="page-header">
+    <h1>📋 Documents des Guides en Attente</h1>
+    <p>Gestion des CV et diplômes des guides en attente de validation</p>
+  </div>
 
-    {{#each list}}
-    <div class="guide-card">
-      <div class="guide-name">{{nom_complet}}</div>
-      
-      <div class="docs-links">
-        <a href="{{uploadPath cv}}" target="_blank" class="doc-link">📄 Voir CV</a>
-        <a href="{{uploadPath diplome}}" target="_blank" class="doc-link">🎓 Voir Diplôme</a>
+  <div class="content-wrapper">
+    {{#if list}}
+      {{#each list}}
+        <div class="guide-doc-card">
+          <div class="guide-header">
+            <div class="guide-info">
+              <h3>{{this.nom_complet}}</h3>
+              <p class="guide-email">{{this.email}}</p>
+              <p class="guide-id">ID: {{this.id_utilisateur}}</p>
+            </div>
+            <div class="guide-status">
+              <span class="status-badge pending">En attente</span>
+            </div>
+          </div>
+
+          <div class="documents-section">
+            <div class="doc-item">
+              <h4>📄 CV</h4>
+              {{#if this.cv}}
+                <div class="doc-preview">
+                  <p class="doc-name">{{this.cv}}</p>
+                  <div class="doc-actions">
+                    <button onclick="viewDocument('{{this.cv}}', 'cv')" class="btn btn-primary btn-sm">
+                      <i class="fas fa-eye"></i> Voir
+                    </button>
+                    <a href="/uploads/{{this.cv}}" download class="btn btn-secondary btn-sm">
+                      <i class="fas fa-download"></i> Télécharger
+                    </a>
+                  </div>
+                </div>
+              {{else}}
+                <p class="no-doc">❌ CV non fourni</p>
+              {{/if}}
+            </div>
+
+            <div class="doc-item">
+              <h4>🎓 Diplôme</h4>
+              {{#if this.diplome}}
+                <div class="doc-preview">
+                  <p class="doc-name">{{this.diplome}}</p>
+                  <div class="doc-actions">
+                    <button onclick="viewDocument('{{this.diplome}}', 'diplome')" class="btn btn-primary btn-sm">
+                      <i class="fas fa-eye"></i> Voir
+                    </button>
+                    <a href="/uploads/{{this.diplome}}" download class="btn btn-secondary btn-sm">
+                      <i class="fas fa-download"></i> Télécharger
+                    </a>
+                  </div>
+                </div>
+              {{else}}
+                <p class="no-doc">❌ Diplôme non fourni</p>
+              {{/if}}
+            </div>
+          </div>
+
+          <div class="action-section">
+            <h4>🔧 Actions</h4>
+            <div class="action-buttons">
+              {{#if this.cv}}
+  {{#if this.diplome}}
+                <form action="/admin/guides-docs/{{this.id_utilisateur}}/approve" method="POST" class="inline-form">
+                  <button type="submit" class="btn btn-success" onclick="return confirm('Approuver tous les documents de {{this.nom_complet}}?')">
+                    <i class="fas fa-check"></i> Approuver les documents
+                  </button>
+                </form>
+                <button onclick="rejectDocs({{this.id_utilisateur}}, '{{this.nom_complet}}')" class="btn btn-danger">
+                  <i class="fas fa-times"></i> Rejeter les documents
+                </button>
+              {{else}}
+                <button class="btn btn-warning" disabled>
+                  <i class="fas fa-exclamation-triangle"></i> Documents incomplets
+                </button>
+              {{/if}}
+  {{/if}}
+            </div>
+          </div>
+
+          <div class="guide-details">
+            <h4>📝 Détails supplémentaires</h4>
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="label">Téléphone:</span>
+                <span class="value">{{#if this.telephone}}{{this.telephone}}{{else}}Non renseigné{{/if}}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Date d'inscription:</span>
+                <span class="value">{{formatDate this.date_creation}}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Statut du compte:</span>
+                <span class="value">{{#if this.est_actif}}Actif{{else}}Inactif{{/if}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h3>✅ Aucun document en attente</h3>
+        <p>Tous les documents des guides ont été validés.</p>
+        <a href="/admin/guides" class="btn btn-primary">
+          <i class="fas fa-users"></i> Voir tous les guides
+        </a>
       </div>
-      
-      <div class="actions">
-        <a href="/admin/accept-docs/{{id_utilisateur}}" class="btn btn-accept">✅ Accepter</a>
-        <a href="/admin/refuse-docs/{{id_utilisateur}}" class="btn btn-reject" onclick="return confirm('Refuser ce dossier ?')">❌ Refuser</a>
-      </div>
-    </div>
-    {{/each}}
-
-    {{#if (eq list.length 0)}}
-    <div class="guide-card">
-      <p style="text-align: center; color: #666; font-size: 1.2em;">Aucun dossier en attente de validation</p>
-    </div>
     {{/if}}
   </div>
-</body>
-</html>
+</div>
+
+<!-- Modal pour visualiser les documents -->
+<div id="documentModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">Visualisation du document</h3>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <iframe id="documentFrame" src="" width="100%" height="500px"></iframe>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal()" class="btn btn-secondary">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.guide-doc-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.guide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.guide-info h3 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.guide-email {
+  color: #6b7280;
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.guide-id {
+  color: #9ca3af;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.documents-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.doc-item h4 {
+  margin: 0 0 12px 0;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.doc-preview {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.doc-name {
+  margin: 0 0 8px 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.no-doc {
+  color: #dc2626;
+  font-style: italic;
+  margin: 0;
+}
+
+.action-section {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.action-section h4 {
+  margin: 0 0 12px 0;
+  color: #374151;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.inline-form {
+  display: inline;
+}
+
+.guide-details {
+  background: #f3f4f6;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.guide-details h4 {
+  margin: 0 0 12px 0;
+  color: #374151;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail-item .label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.detail-item .value {
+  color: #1f2937;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px dashed #e5e7eb;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: #d1d5db;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin: 0 0 24px 0;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.modal-body {
+  padding: 0;
+}
+
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  text-align: right;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}
+
+.btn-success {
+  background: #10b981;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #059669;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .documents-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .guide-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+</style>
+
+<script>
+function viewDocument(filename, type) {
+  const modal = document.getElementById('documentModal');
+  const frame = document.getElementById('documentFrame');
+  const title = document.getElementById('modalTitle');
+  
+  // Construire l'URL du document
+  const docUrl = `/uploads/${filename}`;
+  
+  // Mettre à jour le titre
+  title.textContent = type === 'cv' ? 'CV du Guide' : 'Diplôme du Guide';
+  
+  // Charger le document dans l'iframe
+  frame.src = docUrl;
+  
+  // Afficher le modal
+  modal.style.display = 'block';
+}
+
+function closeModal() {
+  const modal = document.getElementById('documentModal');
+  const frame = document.getElementById('documentFrame');
+  
+  // Cacher le modal
+  modal.style.display = 'none';
+  
+  // Vider l'iframe pour éviter les problèmes de mémoire
+  frame.src = '';
+}
+
+function rejectDocs(guideId, guideName) {
+  if (confirm(`Êtes-vous sûr de vouloir rejeter les documents de ${guideName} ?`)) {
+    // Rediriger vers l'action de rejet
+    window.location.href = `/admin/guides-docs/${guideId}/reject`;
+  }
+}
+
+// Fermer le modal en cliquant à l'extérieur
+window.onclick = function(event) {
+  const modal = document.getElementById('documentModal');
+  if (event.target === modal) {
+    closeModal();
+  }
+}
+
+// Helper pour formater les dates (si Handlebars ne l'a pas déjà fait)
+function formatDate(dateString) {
+  if (!dateString) return 'Non renseigné';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR');
+}
+</script>

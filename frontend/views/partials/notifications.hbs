@@ -1,0 +1,31 @@
+{{#if user}}
+<div class="relative group">
+  <a href="/guide/notifications/{{user.id}}" class="text-gray-700 hover:text-ocean-blue transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50 relative" title="Notifications">
+    <i class="fas fa-bell text-lg"></i>
+    <span id="navbar-notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+  </a>
+</div>
+
+<script>
+  // Update navbar notification badge
+  function updateNavbarNotificationBadge() {
+    fetch('/notifications/unread-count')
+      .then(response => response.json())
+      .then(data => {
+        const badge = document.getElementById('navbar-notification-badge');
+        if (data.success && data.unreadCount > 0) {
+          badge.textContent = data.unreadCount > 99 ? '99+' : data.unreadCount;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      })
+      .catch(err => console.error('Error fetching notification count:', err));
+  }
+
+  // Update badge every 10 seconds
+  setInterval(updateNavbarNotificationBadge, 10000);
+  // Initial update
+  updateNavbarNotificationBadge();
+</script>
+{{/if}}

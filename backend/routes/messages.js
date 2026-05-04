@@ -8,15 +8,19 @@ router.use(verifUser);
 
 // Routes principales de messagerie
 router.get('/', messageController.getConversations);                    // Liste des conversations
-router.get('/:userId', messageController.getConversation);             // Conversation spécifique
+router.post('/', messageController.sendMessage);                       // Envoyer un message (sans fichier)
 router.post('/send', messageController.uploadMessageFile, messageController.sendMessage); // Envoyer un message (avec fichier)
-router.get('/:userId/new', messageController.getNewMessages);         // Messages nouveaux (real-time)
-router.delete('/:id', messageController.deleteMessage);               // Supprimer un message
-
-// Routes additionnelles
 router.get('/search', messageController.searchMessages);              // Rechercher des messages
-router.get('/unread/count', messageController.getUnreadCount);       // Nombre de messages non lus
+router.get('/unread-count', messageController.getUnreadCount);        // Nombre de messages non lus
+router.get('/unread/count', messageController.getUnreadCount);        // Nombre de messages non lus (alternative)
+
+// Routes spécifiques à une conversation
+router.get('/:userId', messageController.getConversation);             // Conversation spécifique
+router.get('/:userId/new', messageController.getNewMessages);         // Messages nouveaux (real-time)
+router.get('/:userId/stats', messageController.getConversationStats); // Statistiques de conversation
+
+// Routes de gestion de messages
+router.delete('/:id', messageController.deleteMessage);               // Supprimer un message
 router.put('/:id/read', messageController.markAsRead);               // Marquer comme lu
-router.get('/:userId/stats', messageController.getConversationStats);    // Statistiques de conversation
 
 module.exports = router;

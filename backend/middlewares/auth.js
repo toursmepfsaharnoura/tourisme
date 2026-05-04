@@ -16,6 +16,10 @@ exports.verifTouriste = (req, res, next) => {
 
 exports.verifAdmin = (req, res, next) => {
   if (!req.session.user || req.session.user.role !== 'ADMIN') {
+    // Vérifier si c'est une requête AJAX
+    if (req.xhr || req.headers.accept?.includes('application/json')) {
+      return res.status(401).json({ error: 'Non autorisé - Admin requis' });
+    }
     return res.redirect('/auth/login');
   }
   next();

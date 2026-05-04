@@ -90,6 +90,28 @@ class Avis {
     );
     return rows[0].moyenne || 0;
   }
+
+  static async findByPlans(planIds) {
+    try {
+      if (!Array.isArray(planIds) || planIds.length === 0) {
+        return [];
+      }
+      
+      const placeholders = planIds.map(() => '?').join(',');
+      const [rows] = await db.query(
+        `SELECT a.*, p.titre as plan_titre 
+         FROM avis a 
+         JOIN plans_touristiques p ON a.id_plan = p.id 
+         WHERE a.id_plan IN (${placeholders}) 
+         ORDER BY a.date_creation DESC`,
+        planIds
+      );
+      return rows;
+    } catch (err) {
+      console.error("Avis.findByPlans ERROR:", err);
+      return [];
+    }
+  }
 }
 
 module.exports = Avis;

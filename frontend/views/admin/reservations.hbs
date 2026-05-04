@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Réservations - Admin Panel</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f6fa; }
+    
+    .admin-container { display: flex; height: 100vh; }
+    
+    /* SIDEBAR GAUCHE */
+    .sidebar { 
+      width: 250px; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 20px 0;
+    }
+    .sidebar h2 { text-align: center; margin-bottom: 30px; font-size: 1.4em; }
+    .nav-btn { 
+      display: block; width: 100%; padding: 15px 25px; 
+      color: white; text-decoration: none; border: none; 
+      background: transparent; text-align: left; cursor: pointer;
+      transition: all 0.3s; font-size: 1.1em;
+    }
+    .nav-btn:hover, .nav-btn.active { 
+      background: rgba(255,255,255,0.2); 
+      transform: translateX(10px); 
+    }
+    
+    /* CONTENU PRINCIPAL */
+    .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+    .header { 
+      background: white; padding: 20px; 
+      border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+    }
+    
+    /* GUIDE SECTIONS */
+    .guide-section {
+      background: white;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    
+    .guide-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .guide-info h3 {
+      margin: 0;
+      font-size: 1.3em;
+      font-weight: 600;
+    }
+    
+    .guide-info p {
+      margin: 5px 0 0 0;
+      opacity: 0.9;
+      font-size: 0.9em;
+    }
+    
+    .guide-stats {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    
+    .stat-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+    
+    /* PLAN SECTIONS */
+    .plan-section {
+      border-left: 4px solid #667eea;
+      margin-bottom: 20px;
+    }
+    
+    .plan-header {
+      background: #f8f9fa;
+      padding: 15px 25px;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .plan-info h4 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+    
+    .plan-info p {
+      margin: 5px 0 0 0;
+      color: #6c757d;
+      font-size: 0.85em;
+    }
+    
+    .plan-price {
+      background: #28a745;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+    
+    /* RESERVATION LIST */
+    .reservations-list {
+      padding: 20px 25px;
+    }
+    
+    .no-reservations {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-style: italic;
+    }
+    
+    .reservation-card {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    
+    .reservation-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .reservation-info h5 {
+      margin: 0 0 8px 0;
+      color: #2c3e50;
+      font-size: 1em;
+      font-weight: 600;
+    }
+    
+    .reservation-details {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85em;
+      color: #6c757d;
+    }
+    
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 0.8em;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-confirmed {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-cancelled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+    }
+    
+    .empty-state i {
+      font-size: 3em;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+      margin-bottom: 10px;
+      color: #495057;
+    }
+    
+    /* BOUTONS D'ACTION */
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .btn-view, .btn-delete {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .btn-view {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-view:hover {
+      background: #218838;
+      transform: translateY(-1px);
+    }
+    
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-delete:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      .admin-container { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; }
+      .main-content { padding: 15px; }
+      .guide-header { flex-direction: column; gap: 15px; text-align: center; }
+      .plan-header { flex-direction: column; gap: 10px; text-align: center; }
+      .reservation-card { flex-direction: column; gap: 15px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <h2>🏛️ Admin Panel</h2>
+      <a href="/admin/dashboard" class="nav-btn">📊 Dashboard</a>
+      <a href="/admin/guides-management" class="nav-btn">👥 Guides</a>
+      <a href="/admin/reservations" class="nav-btn active">📋 Réservations</a>
+      <a href="/admin/messages" class="nav-btn">💬 Messages</a>
+      <a href="/admin/notifications" class="nav-btn">🔔 Notifications</a>
+      <a href="/admin/guides-docs" class="nav-btn">📄 Documents</a>
+      <a href="/logout" class="nav-btn">🚪 Déconnexion</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <!-- HEADER -->
+      <div class="header">
+        <div>
+          <h1>📋 Gestion des Réservations</h1>
+          <p>Consultez toutes les réservations organisées par guide et par plan</p>
+        </div>
+        <div>
+          <strong>Admin:</strong> {{user.nom_complet}}
+        </div>
+      </div>
+
+      <!-- RÉSERVATIONS PAR GUIDE -->
+      {{#if guidesWithReservations.length}}
+        {{#each guidesWithReservations}}
+          <div class="guide-section">
+            <div class="guide-header">
+              <div class="guide-info">
+                <h3>👤 {{nom_complet}}</h3>
+                <p>📧 {{email}} {{#if telephone}}| 📞 {{telephone}}{{/if}}</p>
+              </div>
+              <div class="guide-stats">
+                <div class="stat-badge">
+                  📊 {{plans.length}} plan(s)
+                </div>
+                <div class="stat-badge">
+                  📋 {{#each plans}}{{this.reservations.length}}{{#unless @last}}+{{/unless}}{{/each}} réservation(s)
+                </div>
+              </div>
+            </div>
+
+            <!-- PLANS DU GUIDE -->
+            {{#if plans.length}}
+              {{#each plans}}
+                <div class="plan-section">
+                  <div class="plan-header">
+                    <div class="plan-info">
+                      <h4>🗺️ {{titre}}</h4>
+                      <p>{{#if description}}{{description}}{{else}}Aucune description{{/if}}</p>
+                    </div>
+                    <div class="plan-price">
+                      {{#if prix}}{{prix}} DT{{else}}Prix N/A{{/if}}
+                    </div>
+                  </div>
+
+                  <!-- RÉSERVATIONS DU PLAN -->
+                  <div class="reservations-list">
+                    {{#if reservations.length}}
+                      {{#each reservations}}
+                        <div class="reservation-card">
+                          <div class="reservation-info">
+                            <h5>👤 {{tourist.nom_complet}}</h5>
+                            <div class="reservation-details">
+                              <div class="detail-item">
+                                📧 {{tourist.email}}
+                              </div>
+                              {{#if telephone_contact}}
+                                <div class="detail-item">
+                                  📞 {{telephone_contact}}
+                                </div>
+                              {{/if}}
+                              {{#if nombre_personnes}}
+                                <div class="detail-item">
+                                  👥 {{nombre_personnes}} personne(s)
+                                </div>
+                              {{/if}}
+                              {{#if date_reservation}}
+                                <div class="detail-item">
+                                  📅 {{date_reservation}}
+                                </div>
+                              {{/if}}
+                              <div class="detail-item">
+                                🕐 {{date_creation}}
+                              </div>
+                            </div>
+                          </div>
+                          <div class="status-badge status-{{statut}}">
+                            {{statut}}
+                          </div>
+                          <div class="action-buttons">
+                            <a href="/admin/reservations/{{id}}/view" class="btn-view">
+                              👁️ Voir
+                            </a>
+                            <button class="btn-delete" onclick="deleteReservation({{id}})">
+                              🗑️ Supprimer
+                            </button>
+                          </div>
+                        </div>
+                      {{/each}}
+                    {{else}}
+                      <div class="no-reservations">
+                        📭 Aucune réservation pour ce plan
+                      </div>
+                    {{/if}}
+                  </div>
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="reservations-list">
+                <div class="no-reservations">
+                  📭 Ce guide n'a aucun plan
+                </div>
+              </div>
+            {{/if}}
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="empty-state">
+          <i>📭</i>
+          <h3>Aucune réservation trouvée</h3>
+          <p>Il n'y a actuellement aucune réservation dans le système.</p>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <script>
+    function deleteReservation(reservationId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?')) {
+        fetch(`/admin/reservations/${reservationId}/delete`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Réservation supprimée avec succès');
+            location.reload();
+          } else {
+            alert('Erreur lors de la suppression: ' + (data.error || 'Erreur inconnue'));
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          alert('Erreur lors de la suppression');
+        });
+      }
+    }
+  </script>
+</body>
+</html>

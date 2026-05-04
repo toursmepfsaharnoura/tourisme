@@ -1,9 +1,10 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
 const Guide = require('../models/Guide');
-const Notification = require('../models/Notification');
 const multer = require('multer');
 const path = require('path');
+const NotificationService = require('../services/notificationService');
+const { createMessageNotification } = require('../middlewares/notificationMiddleware');
 
 // Configuration de multer pour l'upload de fichiers
 const storage = multer.diskStorage({
@@ -122,18 +123,39 @@ exports.sendMessage = async (req, res) => {
 
     const messageId = await Message.create(messageData);
 
-    // Créer une notification pour le destinataire
-    if (id_destinataire !== senderId) {
-      await Notification.create({
-        id_utilisateur: id_destinataire,
-        type: 'MESSAGE',
-        contenu: `Nouveau message de ${req.session.user.nom_complet}`
-      });
-    }
-
     // Récupérer le message complet avec les infos de l'expéditeur
     const message = await Message.findById(messageId);
     const sender = await User.findById(senderId);
+    
+    // Créer une notification automatique
+    await NotificationService.notifyNewMessage(senderId, messageData.id_destinataire, messageData.contenu);
+    
+    // Envoyer une notification en temps réel à l'admin
+    try {
+      const { sendAdminNotification } = require('../config/socket');
+      sendAdminNotification({
+        id: `msg_${messageId}`,
+        type: 'message',
+        title: 'Nouveau message',
+        content: messageData.contenu,
+        sender_id: senderId,
+        created_at: new Date().toISOString()
+      });
+    } catch (socketError) {
+      console.error('Error sending real-time notification to admin:', socketError);
+    }
+    
+    // Créer une notification pour le guide si le destinataire est un guide
+    if (messageData.id_destinataire) {
+      try {
+        const receiver = await User.findById(messageData.id_destinataire);
+        if (receiver && receiver.role === 'GUIDE') {
+          await createMessageNotification(senderId, messageData.id_destinataire, messageData.contenu);
+        }
+      } catch (notifError) {
+        console.error('Error creating guide notification:', notifError);
+      }
+    }
     
     res.json({ 
       success: true, 
